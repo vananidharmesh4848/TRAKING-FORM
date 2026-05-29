@@ -196,7 +196,7 @@ textarea{resize:vertical;min-height:60px}
 
 <script>
 // --- CONFIGURATION ---
-var googleWebAppUrl = "અહીં_તમારી_નવી_WEB_APP_URL_પેસ્ટ_કરો"; // તમારી નવી લિંક અહીં નાખો
+var googleWebAppUrl = "https://script.google.com/macros/s/AKfycbzuMnsq60Xf3YjdMEUVvB1VAALuYo-U5DSNorud0bc/dev"; // તમારી નવી લિંક અહીં નાખો
 
 var db = { managers: [], departments: [], categories: [], submissions: [] };
 var selectedRole = "";
@@ -206,7 +206,7 @@ var uploadedFilesMap = {};
 
 // ગૂગલ શીટમાંથી લાઈવ ડેટા ખેંચવો
 function fetchLiveData() {
-  if(!googleWebAppUrl || googleWebAppUrl.includes("અહીં_તમારી")) return;
+  if(!googleWebAppUrl || googleWebAppUrl.includes("https://script.google.com/macros/s/AKfycbzuMnsq60Xf3YjdMEUVvB1VAALuYo-U5DSNorud0bc/dev")) return;
   document.getElementById('loading').style.display = 'flex';
   
   fetch(googleWebAppUrl + "?action=getData")
