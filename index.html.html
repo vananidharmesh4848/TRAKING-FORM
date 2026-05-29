@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FormTrack — Office Form System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0F1117;--s:#1A1D27;--s2:#22263A;--bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.15);
+  --t:#F0F2FF;--t2:#8B90A7;--t3:#4A4F6A;
+  --ac:#5B7BFF;--ac-bg:rgba(91,123,255,0.12);--ac-bd:rgba(91,123,255,0.35);
+  --green:#34D399;--green-bg:rgba(52,211,153,0.1);
+  --amber:#FBBF24;--amber-bg:rgba(251,191,36,0.1);
+  --red:#F87171;--red-bg:rgba(248,113,113,0.1);--red-bd:rgba(248,113,113,0.25);
+  --purple:#A78BFA;--purple-bg:rgba(167,139,250,0.1);
+  --teal:#2DD4BF;--teal-bg:rgba(45,212,191,0.1);
+  --r:12px;--rsm:8px;--rlg:16px;--rxl:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+.page{display:none;min-height:100vh}.page.active{display:block}
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:radial-gradient(ellipse at 50% 0%,rgba(91,123,255,0.15) 0%,transparent 70%)}
+.login-brand{text-align:center;margin-bottom:2rem}
+.login-logo{width:64px;height:64px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;box-shadow:0 0 0 1px rgba(91,123,255,0.3),0 8px 24px rgba(91,123,255,0.3)}
+.login-brand h1{font-size:24px;font-weight:600;letter-spacing:-0.5px}
+.login-brand p{font-size:12px;color:var(--t2);margin-top:4px}
+.login-card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rxl);padding:1.75rem;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+/* ROLE CARDS */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.role-card{border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
+.role-card:hover{border-color:var(--bd2)}
+.role-card.sel{border-color:var(--ac);background:var(--ac-bg)}
+.role-card .ri{font-size:24px;margin-bottom:6px}
+.role-card .rl{font-size:13px;font-weight:500}
+.role-card .rd{font-size:11px;color:var(--t2);margin-top:2px}
+/* FORM */
+label{font-size:12px;color:var(--t2);display:block;margin-bottom:5px;font-weight:500}
+input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rsm);padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t);outline:none;transition:border .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(91,123,255,0.15)}
+select option{background:#1A1D27}
+textarea{resize:vertical;min-height:60px}
+.fgroup{margin-bottom:14px}
+/* BUTTONS */
+.btn{padding:10px 18px;font-size:13px;font-weight:500;border-radius:var(--rsm);cursor:pointer;border:1px solid transparent;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:7px;transition:all .15s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-ac{background:var(--ac);color:#fff}.btn-ac:hover{background:#4A6AEE}
+.btn-ghost{background:transparent;color:var(--t);border-color:var(--bd)}.btn-ghost:hover{background:var(--s2)}
+.btn-danger{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.btn-warn{background:var(--amber-bg);color:var(--amber);border-color:rgba(251,191,36,0.25)}
+.btn-green{background:var(--green-bg);color:var(--green);border-color:rgba(52,211,153,0.25)}
+.btn-full{width:100%;justify-content:center}
+.btn-sm{padding:6px 12px;font-size:12px}.btn-xs{padding:4px 9px;font-size:11px}
+.err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px}
+.suc{font-size:12px;color:var(--green);margin-top:8px;min-height:16px}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between}
+.tbl-brand{display:flex;align-items:center;gap:10px}
+.tbl-logo{width:32px;height:32px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.tbl-name{font-size:14px;font-weight:600}
+.tbl-sub{font-size:11px;color:var(--t2)}
+.main{max-width:680px;margin:0 auto;padding:1.25rem 1rem 5.5rem}
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(15,17,23,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t3);transition:color .15s}
+.nb.on{color:var(--ac)}
+.nb .ni{font-size:20px;line-height:1}
+.nb .nl{font-size:10px;font-weight:500}
+/* ADMIN TABS */
+.atabs{display:flex;gap:4px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:1.25rem;overflow-x:auto;scrollbar-width:none}
+.atabs::-webkit-scrollbar{display:none}
+.atab{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--rsm);cursor:pointer;border:none;background:none;color:var(--t2);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s}
+.atab.on{background:var(--ac);color:#fff}
+.sec{display:none}.sec.on{display:block}
+/* CARD */
+.card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rlg);padding:1.1rem;margin-bottom:1rem}
+.card-title{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+/* SHIFT */
+.shift-toggle{display:flex;background:var(--s2);border-radius:var(--rsm);padding:4px;margin-bottom:1rem;border:1px solid var(--bd)}
+.sopt{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t2);transition:all .2s}
+.sopt.on.day{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,0.3)}
+.sopt.on.night{background:var(--ac-bg);color:var(--ac);border:1px solid var(--ac-bd)}
+/* UPLOAD */
+.cat-item{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:8px;transition:border .15s}
+.cat-item.has-files{border-color:rgba(52,211,153,0.3)}
+.cat-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cat-nm{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.cat-cnt{font-size:11px;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:100px}
+.upbtn{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed rgba(255,255,255,0.12);border-radius:var(--rsm);padding:10px;cursor:pointer;color:var(--t2);font-size:12px;background:rgba(255,255,255,0.02);transition:all .15s}
+.upbtn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
+.upbtn input{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.chip{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--bd);border-radius:100px;padding:3px 10px 3px 4px;font-size:11px;color:var(--t2)}
+.chip img{width:20px;height:20px;border-radius:4px;object-fit:cover}
+.chip .cx{cursor:pointer;color:var(--t3);font-size:15px;line-height:1;padding-left:3px}
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem}
+@media(min-width:480px){.sgrid{grid-template-columns:repeat(4,1fr)}}
+.scard{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px 12px;text-align:center}
+.sn{font-size:26px;font-weight:600;font-family:'DM Mono',monospace}
+.sl{font-size:11px;color:var(--t2);margin-top:3px}
+/* REPORT */
+.rep{background:var(--s);border:1px solid var(--bd);border-radius:var(--rlg);padding:14px;margin-bottom:10px}
+.rep-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.rep-name{font-weight:600;font-size:15px}
+.rep-id{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
+.rep-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--t2);margin-bottom:8px}
+.cfg{background:var(--s2);border-radius:var(--rsm);padding:9px 10px;margin-bottom:6px}
+.cfg-title{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.trow{display:flex;flex-wrap:wrap;gap:6px}
+.thumb{width:52px;height:52px;border-radius:var(--rsm);object-fit:cover;border:1px solid var(--bd);cursor:pointer;transition:transform .15s}
+.thumb:hover{transform:scale(1.05)}
+.tpdf{width:52px;height:52px;border-radius:var(--rsm);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;color:var(--t2);background:var(--s);font-weight:600;gap:3px}
+.note-box{font-size:12px;color:var(--t2);font-style:italic;margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:var(--rsm);border-left:2px solid var(--ac)}
+/* BADGES */
+.badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.b-day{background:var(--amber-bg);color:var(--amber)}
+.b-night{background:var(--ac-bg);color:var(--ac)}
+.b-green{background:var(--green-bg);color:var(--green)}
+.b-red{background:var(--red-bg);color:var(--red)}
+.b-purple{background:var(--purple-bg);color:var(--purple)}
+.b-teal{background:var(--teal-bg);color:var(--teal)}
+/* MGR ROW */
+.mrow{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r)}
+.av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--ac),#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;color:var(--t2);font-weight:600;padding:6px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+.tbl td{padding:10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+/* FILTER */
+.filt{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:1rem}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:480px){.fg{grid-template-columns:repeat(3,1fr)}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+@media(min-width:480px){.g3{grid-template-columns:1fr 1fr 1fr}}
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
+@media(min-width:480px){.mbg{align-items:center;padding:1rem}}
+.mbg.open{display:flex}
+.mbox{background:var(--s);border:1px solid var(--bd2);border-radius:var(--rxl) var(--rxl) 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 -8px 32px rgba(0,0,0,0.5);animation:su .25s ease}
+@media(min-width:480px){.mbox{border-radius:var(--rxl)}}
+@keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhandle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 1rem}
+.mtitle{font-size:16px;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px}
+/* LB */
+.lb{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:1rem}
+.lb.open{display:flex}
+.lb img{max-width:100%;max-height:85vh;border-radius:var(--r);object-fit:contain}
+.lb-x{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* EMPTY */
+.empty{text-align:center;padding:3rem 1rem;color:var(--t3)}
+.empty .ee{font-size:36px;margin-bottom:10px}
+/* BACKUP SECTION */
+.bk-status{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s2);border-radius:var(--rsm);margin-bottom:8px;font-size:13px}
+.bk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.bk-dot.ok{background:var(--green)}
+.bk-dot.err{background:var(--red)}
+.bk-dot.idle{background:var(--t3)}
+.bk-dot.loading{background:var(--amber);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+/* DIVIDER */
+.div{height:1px;background:var(--bd);margin:1rem 0}
+/* PW TOGGLE */
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:40px}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);font-size:16px;user-select:none;background:none;border:none;padding:0}
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em}
+/* SETUP GUIDE */
+.guide-step{background:var(--s2);border-radius:var(--rsm);padding:12px;margin-bottom:8px;border-left:3px solid var(--ac)}
+.gs-num{font-size:11px;font-weight:600;color:var(--ac);margin-bottom:4px}
+.gs-text{font-size:12px;color:var(--t2);line-height:1.6}
+.gs-code{font-family:'DM Mono',monospace;font-size:11px;background:var(--bg);padding:6px 10px;border-radius:4px;margin-top:6px;color:var(--teal);word-break:break-all;border:1px solid var(--bd)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="pg-login" class="page active">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-logo">📋</div>
+      <h1>FormTrack</h1>
+      <p>Office Form Management · Day &amp; Night Shift</p>
+    </div>
+    <div class="login-card">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:12px;font-weight:500">Select your role to continue</p>
+      <div class="role-grid">
+        <div class="role-card" id="rc-manager" onclick="selectRole('manager')">
+          <div class="ri">👤</div><div class="rl">Manager</div><div class="rd">Submit forms</div>
+        </div>
+        <div class="role-card" id="rc-admin" onclick="selectRole('admin')">
+          <div class="ri">🛡️</div><div class="rl">Admin</div><div class="rd">Full access</div>
+        </div>
+      </div>
+      <div id="mgr-block" style="display:none">
+        <div class="fgroup"><label>Manager ID</label><input type="text" id="l-mid" placeholder="MGR-01" autocomplete="username"></div>
+        <div class="fgroup"><label>Password</label>
+          <div class="pw-wrap"><input type="password" id="l-mpw" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"><button class="pw-eye" onclick="togglePw('l-mpw',this)">👁</button></div>
+        </div>
+      </div>
+      <div id="admin-block" style="display:none">
+        <div class="fgroup"><label>Admin Password</label>
+          <div class="pw-wrap"><input type="password" id="l-apw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()"><button class="pw-eye" onclick="togglePw('l-apw',this)">👁</button></div>
+        </div>
+      </div>
+      <button class="btn btn-ac btn-full" onclick="doLogin()">Continue →</button>
+      <div class="err" id="l-err"></div>
+      <p style="text-align:center;font-size:11px;color:var(--t3);margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--bd)">Day 8am–8pm &nbsp;·&nbsp; Night 8pm–8am</p>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGER PAGE -->
+<div id="pg-mgr" class="page">
+  <div class="topbar">
+    <div class="tbl-brand">
+      <div class="tbl-logo">📋</div>
+      <div><div class="tbl-name" id="m-name">—</div><div class="tbl-sub" id="m-dept">—</div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+  </div>
+  <div class="main">
+    <div class="sec on" id="ms-submit">
+      <div class="shift-toggle">
+        <button class="sopt on day" id="sh-d" onclick="pShift('day')">☀️ Day 8am–8pm</button>
+        <button class="sopt night" id="sh-n" onclick="pShift('night')">🌙 Night 8pm–8am</button>
+      </div>
+      <div class="g2" style="margin-bottom:1rem">
+        <div class="fgroup" style="margin:0"><label>Date</label><input type="date" id="sub-date"></div>
+        <div class="fgroup" style="margin:0"><label>Time (auto)</label><input type="text" id="sub-time" readonly style="background:var(--s2);cursor:default"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Upload Forms by Category</div>
+        <div id="cat-area"><div class="empty"><div class="ee">📂</div><p>No categories assigned</p></div></div>
+      </div>
+      <div class="fgroup"><label>Notes (optional)</label><textarea id="sub-note" placeholder="Any remarks..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost btn-sm" onclick="clearSub()">Clear</button>
+        <button class="btn btn-ac" onclick="submitForms()">✅ Submit Forms</button>
+      </div>
+      <div class="suc" id="sub-msg"></div>
+    </div>
+    <div class="sec" id="ms-reports"><div id="my-reps"></div></div>
+  </div>
+  <div class="bnav" id="mgr-nav">
+    <button class="nb on" onclick="mTab('submit',this)"><span class="ni">📤</span><span class="nl">Submit</span></button>
+    <button class="nb" onclick="mTab('reports',this)"><span class="ni">📋</span><span class="nl">My Reports</span></button>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="pg-admin" class="page">
+  <div class="topbar">
+    <div class="tbl-brand">
+      <div class="tbl-logo">🛡️</div>
+      <div><div class="tbl-name">Admin Dashboard</div><div class="tbl-sub">FormTrack</div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+  </div>
+  <div class="main">
+    <div class="atabs">
+      <button class="atab on" onclick="aTab('overview',this)">📊 Overview</button>
+      <button class="atab" onclick="aTab('reports',this)">📁 Reports</button>
+      <button class="atab" onclick="aTab('managers',this)">👥 Managers</button>
+      <button class="atab" onclick="aTab('depts',this)">🏬 Depts</button>
+      <button class="atab" onclick="aTab('cats',this)">🏷️ Categories</button>
+      <button class="atab" onclick="aTab('backup',this)">☁️ Backup</button>
+      <button class="atab" onclick="aTab('settings',this)">⚙️ Settings</button>
+    </div>
+
+    <div class="sec on" id="as-overview">
+      <div class="sgrid" id="a-stats"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Summary</div>
+      <div id="a-mgr-sum"></div>
+    </div>
+
+    <div class="sec" id="as-reports">
+      <div class="filt">
+        <div class="fg">
+          <div class="fgroup" style="margin:0"><label>From</label><input type="date" id="af-from"></div>
+          <div class="fgroup" style="margin:0"><label>To</label><input type="date" id="af-to"></div>
+          <div class="fgroup" style="margin:0"><label>Shift</label><select id="af-shift"><option value="">All shifts</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fgroup" style="margin:0"><label>Manager</label><select id="af-mgr"><option value="">All</option></select></div>
+          <div class="fgroup" style="margin:0"><label>Department</label><select id="af-dept"><option value="">All</option></select></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-ac btn-sm" onclick="renderAllRep()">Apply</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAF()">Reset</button>
+        </div>
+      </div>
+      <div id="all-reps"></div>
+    </div>
+
+    <div class="sec" id="as-managers">
+      <div class="card">
+        <div class="card-title">Add New Manager</div>
+        <div class="g3">
+          <div class="fgroup" style="margin:0"><label>Manager ID</label><input type="text" id="nm-id" placeholder="MGR-11"></div>
+          <div class="fgroup" style="margin:0"><label>Full Name</label><input type="text" id="nm-nm" placeholder="Name"></div>
+          <div class="fgroup" style="margin:0"><label>Department</label><select id="nm-dept"><option value="">— Select —</option></select></div>
+        </div>
+        <div class="g2" style="margin-top:6px">
+          <div class="fgroup" style="margin:0"><label>Password</label>
+            <div class="pw-wrap"><input type="password" id="nm-pw" placeholder="Set password"><button class="pw-eye" onclick="togglePw('nm-pw',this)">👁</button></div>
+          </div>
+          <div class="fgroup" style="margin:0"><label>Confirm Password</label>
+            <div class="pw-wrap"><input type="password" id="nm-pw2" placeholder="Repeat password"><button class="pw-eye" onclick="togglePw('nm-pw2',this)">👁</button></div>
+          </div>
+        </div>
+        <button class="btn btn-ac btn-sm" onclick="addMgr()">+ Add Manager</button>
+        <div class="suc" id="mgr-suc"></div>
+      </div>
+      <div class="card">
+        <div class="sh"><span class="sh-title">All Managers (<span id="mgr-cnt">0</span>)</span></div>
+        <div id="mgr-tbl"></div>
+      </div>
+    </div>
+
+    <div class="sec" id="as-depts">
+      <div class="card">
+        <div class="card-title">Add Department</div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div class="fgroup" style="flex:1;margin:0"><label>Department Name</label><input type="text" id="nd-nm" placeholder="Production, Quality, HR..."></div>
+          <button class="btn btn-ac btn-sm" onclick="addDept()">+ Add</button>
+        </div>
+        <div class="suc" id="dept-suc"></div>
+      </div>
+      <div class="card"><div id="dept-tbl"></div></div>
+    </div>
+
+    <div class="sec" id="as-cats">
+      <div class="card">
+        <div class="card-title">Add Category</div>
+        <div class="g2">
+          <div class="fgroup" style="margin:0"><label>Category Name</label><input type="text" id="nc-nm" placeholder="Checklist, Cross Tally..."></div>
+          <div class="fgroup" style="margin:0"><label>Department</label><select id="nc-dept"><option value="">— Select —</option></select></div>
+        </div>
+        <button class="btn btn-ac btn-sm" onclick="addCat()">+ Add Category</button>
+        <div class="suc" id="cat-suc"></div>
+      </div>
+      <div class="card"><div id="cat-list"></div></div>
+    </div>
+
+    <!-- BACKUP TAB -->
+    <div class="sec" id="as-backup">
+      <!-- Google Drive -->
+      <div class="card">
+        <div class="card-title">☁️ Google Drive Backup</div>
+        <div id="gdrive-status" class="bk-status"><span class="bk-dot idle"></span><span>Not configured</span></div>
+        <div class="fgroup"><label>Google Client ID</label><input type="text" id="gd-cid" placeholder="xxxx.apps.googleusercontent.com"></div>
+        <div class="fgroup"><label>Google API Key</label><input type="text" id="gd-key" placeholder="AIzaSy..."></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ac btn-sm" onclick="saveGDConfig()">💾 Save Config</button>
+          <button class="btn btn-green btn-sm" onclick="backupToGDrive()">⬆️ Backup Now</button>
+          <button class="btn btn-ghost btn-sm" onclick="restoreFromGDrive()">⬇️ Restore</button>
+        </div>
+        <div class="suc" id="gd-msg"></div>
+        <div class="div"></div>
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Setup Guide</div>
+        <div class="guide-step"><div class="gs-num">Step 1</div><div class="gs-text">Google Cloud Console (console.cloud.google.com) kholo → New Project banavo</div></div>
+        <div class="guide-step"><div class="gs-num">Step 2</div><div class="gs-text">APIs & Services → Enable APIs → "Google Drive API" enable karo</div></div>
+        <div class="guide-step"><div class="gs-num">Step 3</div><div class="gs-text">Credentials → Create Credentials → OAuth 2.0 Client ID → Web Application → Authorized origins ma tamaro site URL nakho</div></div>
+        <div class="guide-step"><div class="gs-num">Step 4</div><div class="gs-text">Credentials → Create Credentials → API Key banavo → ane upar Client ID + API Key nakho</div></div>
+      </div>
+      <!-- Storj -->
+      <div class="card">
+        <div class="card-title">🪐 Storj Backup</div>
+        <div id="storj-status" class="bk-status"><span class="bk-dot idle"></span><span>Not configured</span></div>
+        <div class="fgroup"><label>Storj Access Grant (S3 Gateway Token)</label><input type="text" id="st-token" placeholder="Paste your Storj access grant here..."></div>
+        <div class="fgroup"><label>Bucket Name</label><input type="text" id="st-bucket" placeholder="my-office-forms"></div>
+        <div class="fgroup"><label>Storj S3 Endpoint</label><input type="text" id="st-endpoint" placeholder="https://gateway.storjshare.io"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ac btn-sm" onclick="saveStorjConfig()">💾 Save Config</button>
+          <button class="btn btn-green btn-sm" onclick="backupToStorj()">⬆️ Backup Now</button>
+          <button class="btn btn-ghost btn-sm" onclick="restoreFromStorj()">⬇️ Restore</button>
+        </div>
+        <div class="suc" id="st-msg"></div>
+        <div class="div"></div>
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Setup Guide</div>
+        <div class="guide-step"><div class="gs-num">Step 1</div><div class="gs-text">storj.io par account banavo → Login karo</div></div>
+        <div class="guide-step"><div class="gs-num">Step 2</div><div class="gs-text">Access → Create Access Grant → "Full Access" do → Name "formtrack" rakho</div></div>
+        <div class="guide-step"><div class="gs-num">Step 3</div><div class="gs-text">S3 Credentials generate karo → Access Key + Secret Key male → upar "Access Grant" field ma paste karo</div></div>
+        <div class="guide-step"><div class="gs-num">Step 4</div><div class="gs-text">Bucket Name: jo naam rakho chho te (example: office-forms-2025) → Endpoint default rakho</div></div>
+      </div>
+      <!-- Manual Backup -->
+      <div class="card">
+        <div class="card-title">💾 Manual Backup / Restore</div>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Internet nai hoy tyare pan backup lai shako — JSON file download karo</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-green btn-sm" onclick="manualExport()">⬇️ Export JSON</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('imp-file').click()">⬆️ Import JSON
+            <input type="file" id="imp-file" accept=".json" style="display:none" onchange="manualImport(this)">
+          </button>
+        </div>
+        <div class="suc" id="manual-msg"></div>
+      </div>
+      <!-- Auto Backup -->
+      <div class="card">
+        <div class="card-title">🔄 Auto Backup Settings</div>
+        <div class="fgroup"><label>Auto backup frequency</label>
+          <select id="auto-bk-freq">
+            <option value="never">Never</option>
+            <option value="submit">Every form submit</option>
+            <option value="daily">Daily</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Backup to</label>
+          <select id="auto-bk-dest">
+            <option value="none">Select destination</option>
+            <option value="gdrive">Google Drive</option>
+            <option value="storj">Storj</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+        <button class="btn btn-ac btn-sm" onclick="saveAutoBackup()">💾 Save Auto Backup</button>
+        <div class="suc" id="auto-bk-msg"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="sec" id="as-settings">
+      <div class="card">
+        <div class="card-title">🔐 Change Admin Password</div>
+        <div class="fgroup"><label>Current Password</label>
+          <div class="pw-wrap"><input type="password" id="cpw-cur" placeholder="Current password"><button class="pw-eye" onclick="togglePw('cpw-cur',this)">👁</button></div>
+        </div>
+        <div class="fgroup"><label>New Password</label>
+          <div class="pw-wrap"><input type="password" id="cpw-new" placeholder="New password"><button class="pw-eye" onclick="togglePw('cpw-new',this)">👁</button></div>
+        </div>
+        <div class="fgroup"><label>Confirm New Password</label>
+          <div class="pw-wrap"><input type="password" id="cpw-con" placeholder="Repeat new password"><button class="pw-eye" onclick="togglePw('cpw-con',this)">👁</button></div>
+        </div>
+        <button class="btn btn-ac btn-sm" onclick="changeAdminPw()">Update Password</button>
+        <div class="suc" id="cpw-msg"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🗑️ Danger Zone</div>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Badha submissions delete karo (managers/categories raheshe)</p>
+        <button class="btn btn-danger btn-sm" onclick="clearAllSubs()">Delete All Submissions</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLB()">
+  <button class="lb-x" onclick="closeLB()">✕</button>
+  <img id="lb-img" src="" alt="">
+</div>
+
+<!-- EDIT MANAGER MODAL -->
+<div class="mbg" id="edit-m">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="mtitle">✏️ Edit Manager</div>
+    <div class="fgroup"><label>ID (fixed)</label><input type="text" id="e-id" readonly style="opacity:.5;cursor:not-allowed"></div>
+    <div class="fgroup"><label>Full Name</label><input type="text" id="e-nm"></div>
+    <div class="fgroup"><label>Department</label><select id="e-dept"><option value="">— Select —</option></select></div>
+    <div class="div"></div>
+    <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:10px">Change Password (khali chhodo to same raheshe)</div>
+    <div class="g2">
+      <div class="fgroup" style="margin:0"><label>New Password</label>
+        <div class="pw-wrap"><input type="password" id="e-pw" placeholder="New password"><button class="pw-eye" onclick="togglePw('e-pw',this)">👁</button></div>
+      </div>
+      <div class="fgroup" style="margin:0"><label>Confirm</label>
+        <div class="pw-wrap"><input type="password" id="e-pw2" placeholder="Repeat"><button class="pw-eye" onclick="togglePw('e-pw2',this)">👁</button></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-ac" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== DB INIT ===== */
+let db={
+  managers: JSON.parse(localStorage.getItem('ft4_mgrs')||'null'),
+  departments: JSON.parse(localStorage.getItem('ft4_depts')||'null'),
+  categories: JSON.parse(localStorage.getItem('ft4_cats')||'null'),
+  submissions: JSON.parse(localStorage.getItem('ft4_subs')||'[]'),
+  adminPw: localStorage.getItem('ft4_adminpw')||'admin123',
+  backup: JSON.parse(localStorage.getItem('ft4_bkcfg')||'{}')
+};
+if(!db.departments) db.departments=[{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
+if(!db.categories) db.categories=[
+  {id:'c1',name:'Checklist',deptId:'d1'},{id:'c2',name:'Cross Tally',deptId:'d1'},{id:'c3',name:'Production Report',deptId:'d1'},
+  {id:'c4',name:'Quality Check',deptId:'d2'},{id:'c5',name:'Whitemarking',deptId:'d2'},{id:'c6',name:'Safety Report',deptId:'d3'}
+];
+if(!db.managers){
+  db.managers=[];
+  for(let i=1;i<=10;i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'),name:'Manager '+i,deptId:'d1',pw:'pass'+String(i).padStart(2,'0')});
+}
+
+let catFiles={}, currentUser=null, editingId=null, currentRole=null;
+
+function persist(){
+  try{
+    localStorage.setItem('ft4_mgrs',JSON.stringify(db.managers));
+    localStorage.setItem('ft4_depts',JSON.stringify(db.departments));
+    localStorage.setItem('ft4_cats',JSON.stringify(db.categories));
+    localStorage.setItem('ft4_subs',JSON.stringify(db.submissions));
+    localStorage.setItem('ft4_adminpw',db.adminPw);
+    localStorage.setItem('ft4_bkcfg',JSON.stringify(db.backup));
+    // auto backup
+    const cfg=db.backup;
+    if(cfg.autoFreq==='submit'){
+      if(cfg.autoDest==='gdrive'||cfg.autoDest==='both') setTimeout(backupToGDrive,500);
+      if(cfg.autoDest==='storj'||cfg.autoDest==='both') setTimeout(backupToStorj,700);
+    }
+  }catch(e){alert('Storage full! Go to Admin > Settings and delete old submissions, or use Backup > Export JSON');}
+}
+
+/* ===== UTILS ===== */
+const ini=n=>n.trim().split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const fmtD=d=>{if(!d)return'';const[y,m,dy]=d.split('-');return dy+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y;};
+const fmtDT=iso=>{const d=new Date(iso);return fmtD(d.toISOString().split('T')[0])+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const today=()=>new Date().toISOString().split('T')[0];
+const nowT=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const dName=id=>{const d=db.departments.find(x=>x.id===id);return d?d.name:'—';};
+const showPg=id=>{document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');};
+const showMsg=(id,txt,isErr=false)=>{const el=document.getElementById(id);if(!el)return;el.textContent=txt;el.style.color=isErr?'var(--red)':'var(--green)';setTimeout(()=>el.textContent='',4000);};
+function togglePw(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁':'🙈';}
+
+/* ===== LOGIN ===== */
+function selectRole(r){
+  currentRole=r;
+  ['manager','admin'].forEach(x=>document.getElementById('rc-'+x).classList.toggle('sel',x===r));
+  document.getElementById('mgr-block').style.display=r==='manager'?'block':'none';
+  document.getElementById('admin-block').style.display=r==='admin'?'block':'none';
+}
+function doLogin(){
+  document.getElementById('l-err').textContent='';
+  if(!currentRole){document.getElementById('l-err').textContent='Select a role first';return;}
+  if(currentRole==='manager'){
+    const mid=document.getElementById('l-mid').value.trim().toUpperCase();
+    const mpw=document.getElementById('l-mpw').value;
+    const m=db.managers.find(x=>x.id===mid);
+    if(!m){document.getElementById('l-err').textContent='Manager ID not found';return;}
+    if(m.pw!==mpw){document.getElementById('l-err').textContent='Wrong password';return;}
+    currentUser=m;
+    showPg('pg-mgr');
+    initMgrPage();
+  }else{
+    if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('l-err').textContent='Wrong admin password';return;}
+    currentUser=null;
+    showPg('pg-admin');
+    initAdmin();
+  }
+}
+function doLogout(){
+  currentUser=null;catFiles={};currentRole=null;
+  document.getElementById('l-mid').value='';
+  document.getElementById('l-mpw').value='';
+  document.getElementById('l-apw').value='';
+  document.getElementById('l-err').textContent='';
+  document.getElementById('mgr-block').style.display='none';
+  document.getElementById('admin-block').style.display='none';
+  document.getElementById('rc-manager').classList.remove('sel');
+  document.getElementById('rc-admin').classList.remove('sel');
+  showPg('pg-login');
+}
+
+/* ===== MANAGER ===== */
+function initMgrPage(){
+  document.getElementById('m-name').textContent=currentUser.name;
+  document.getElementById('m-dept').textContent='🏬 '+dName(currentUser.deptId)+' · '+currentUser.id;
+  const h=new Date().getHours();
+  pShift(h>=8&&h<20?'day':'night');
+  document.getElementById('sub-date').value=today();
+  document.getElementById('sub-time').value=nowT();
+  renderCatArea();
+  document.querySelectorAll('#mgr-nav .nb').forEach(b=>b.classList.remove('on'));
+  document.querySelector('#mgr-nav .nb').classList.add('on');
+  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
+  document.getElementById('ms-submit').classList.add('on');
+}
+function pShift(s){
+  document.getElementById('sh-d').className='sopt day'+(s==='day'?' on':'');
+  document.getElementById('sh-n').className='sopt night'+(s==='night'?' on':'');
+}
+const gShift=()=>document.getElementById('sh-d').classList.contains('on')?'day':'night';
+function mTab(t,el){
+  document.querySelectorAll('#mgr-nav .nb').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('ms-'+t).classList.add('on');
+  if(t==='reports')renderMyRep();
+}
+function renderCatArea(){
+  catFiles={};
+  const myCats=db.categories.filter(c=>c.deptId===currentUser.deptId);
+  myCats.forEach(c=>catFiles[c.id]=[]);
+  if(!myCats.length){document.getElementById('cat-area').innerHTML='<div class="empty"><div class="ee">📂</div><p>No categories in your department<br><small>Contact admin</small></p></div>';return;}
+  document.getElementById('cat-area').innerHTML=myCats.map(c=>`
+    <div class="cat-item" id="ci-${c.id}">
+      <div class="cat-hdr">
+        <div class="cat-nm">📄 ${c.name}</div>
+        <span class="cat-cnt" id="cnt-${c.id}" style="display:none">0</span>
+      </div>
+      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">
+        ⬆️ <span>Tap to upload photo / PDF</span>
+        <input type="file" id="fu-${c.id}" multiple accept="image/*,.pdf" data-cid="${c.id}" onchange="onFile(this)">
+      </div>
+      <div class="chips" id="chips-${c.id}"></div>
+    </div>`).join('');
+}
+function onFile(inp){
+  const cid=inp.dataset.cid;
+  const fs=Array.from(inp.files);
+  if(!catFiles[cid])catFiles[cid]=[];
+  if(catFiles[cid].length+fs.length>10){alert('Max 10 files per category');inp.value='';return;}
+  let done=0;
+  fs.forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      catFiles[cid].push({name:f.name,type:f.type,data:e.target.result});
+      done++;
+      if(done===fs.length) refChips(cid);
+    };
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function refChips(cid){
+  const items=catFiles[cid]||[];
+  const cnt=document.getElementById('cnt-'+cid);
+  if(cnt){cnt.textContent=items.length+' file'+(items.length!==1?'s':'');cnt.style.display=items.length?'':'none';}
+  document.getElementById('ci-'+cid)?.classList.toggle('has-files',items.length>0);
+  const el=document.getElementById('chips-'+cid);
+  if(el)el.innerHTML=items.map((f,i)=>`
+    <div class="chip">
+      ${f.type?.startsWith('image')?`<img src="${f.data}" alt="">`:`<span style="font-size:14px">📄</span>`}
+      <span style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
+      <span class="cx" onclick="rmChip('${cid}',${i})">×</span>
+    </div>`).join('');
+}
+function rmChip(cid,i){catFiles[cid].splice(i,1);refChips(cid);}
+function submitForms(){
+  const date=document.getElementById('sub-date').value;
+  if(!date){alert('Select a date');return;}
+  const totalF=Object.values(catFiles).reduce((a,v)=>a+v.length,0);
+  if(!totalF){alert('Upload at least one form');return;}
+  const cats={};
+  db.categories.filter(c=>c.deptId===currentUser.deptId).forEach(c=>{
+    if(catFiles[c.id]?.length)cats[c.id]={name:c.name,files:[...catFiles[c.id]]};
+  });
+  const now=new Date().toISOString();
+  db.submissions.unshift({id:Date.now(),mgrId:currentUser.id,mgrName:currentUser.name,deptId:currentUser.deptId,deptName:dName(currentUser.deptId),date,shift:gShift(),note:document.getElementById('sub-note').value,categories:cats,submittedAt:now});
+  persist();
+  showMsg('sub-msg','✅ '+totalF+' forms submitted at '+fmtDT(now));
+  renderCatArea();
+  document.getElementById('sub-note').value='';
+}
+function clearSub(){renderCatArea();document.getElementById('sub-note').value='';}
+function renderMyRep(){
+  const subs=db.submissions.filter(s=>s.mgrId===currentUser.id);
+  document.getElementById('my-reps').innerHTML=subs.length?subs.map(s=>repCard(s,false)).join(''):'<div class="empty"><div class="ee">📭</div><p>No submissions yet</p></div>';
+}
+
+/* ===== REPORT CARD ===== */
+function repCard(s,isAdmin){
+  const cats=Object.values(s.categories||{});
+  const totalF=cats.reduce((a,c)=>a+c.files.length,0);
+  return `<div class="rep">
+    <div class="rep-top">
+      <div>
+        <div class="rep-name">${isAdmin?s.mgrName:'Submitted: '+fmtD(s.date)}</div>
+        ${isAdmin?`<div class="rep-id">${s.mgrId} · ${s.deptName||'—'}</div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        <span class="badge ${s.shift==='day'?'b-day':'b-night'}">${s.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+        ${isAdmin?`<button class="btn btn-danger btn-xs" onclick="delSub(${s.id})">Delete</button>`:''}
+      </div>
+    </div>
+    <div class="rep-meta">
+      <span>📅 ${fmtD(s.date)}</span><span>🕐 ${fmtDT(s.submittedAt)}</span><span>📎 ${totalF} files · ${cats.length} cats</span>
+    </div>
+    ${cats.map(c=>`<div class="cfg"><div class="cfg-title">🏷️ ${c.name} (${c.files.length})</div>
+      <div class="trow">${c.files.map(f=>f.type?.startsWith('image')
+        ?`<img class="thumb" src="${f.data}" onclick="openLB('${f.data}')" title="${f.name}">`
+        :`<div class="tpdf"><span style="font-size:18px">📄</span>${f.name.split('.').pop().toUpperCase()}</div>`
+      ).join('')}</div></div>`).join('')}
+    ${s.note?`<div class="note-box">${s.note}</div>`:''}
+  </div>`;
+}
+function openLB(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');}
+function closeLB(){document.getElementById('lb').classList.remove('open');}
+function delSub(id){if(!confirm('Delete?'))return;db.submissions=db.submissions.filter(s=>s.id!==id);persist();renderAllRep();renderAdminOverview();}
+
+/* ===== ADMIN ===== */
+function initAdmin(){aTab('overview',document.querySelector('#pg-admin .atab.on'));}
+function aTab(t,el){
+  document.querySelectorAll('#pg-admin .atab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('as-'+t).classList.add('on');
+  if(t==='overview')renderAdminOverview();
+  if(t==='reports'){
+    const ms=document.getElementById('af-mgr');ms.innerHTML='<option value="">All</option>';db.managers.forEach(m=>ms.add(new Option(m.name,m.id)));
+    const ds=document.getElementById('af-dept');ds.innerHTML='<option value="">All</option>';db.departments.forEach(d=>ds.add(new Option(d.name,d.id)));
+    renderAllRep();
+  }
+  if(t==='managers'){popDeptSels();renderMgrTbl();}
+  if(t==='depts')renderDeptTbl();
+  if(t==='cats'){popCatDept();renderCatList();}
+  if(t==='backup')loadBackupConfig();
+  if(t==='settings'){document.getElementById('cpw-cur').value='';document.getElementById('cpw-new').value='';document.getElementById('cpw-con').value='';}
+}
+function renderAdminOverview(){
+  const s=db.submissions,td=today();
+  const todayC=s.filter(x=>x.date===td).length;
+  const totalF=s.reduce((a,x)=>a+Object.values(x.categories||{}).reduce((b,c)=>b+c.files.length,0),0);
+  document.getElementById('a-stats').innerHTML=`
+    <div class="scard"><div class="sn" style="color:var(--ac)">${s.length}</div><div class="sl">Total Submissions</div></div>
+    <div class="scard"><div class="sn" style="color:var(--green)">${todayC}</div><div class="sl">Today</div></div>
+    <div class="scard"><div class="sn" style="color:var(--amber)">${s.filter(x=>x.shift==='day').length}</div><div class="sl">Day Shift</div></div>
+    <div class="scard"><div class="sn" style="color:var(--purple)">${totalF}</div><div class="sl">Total Files</div></div>
+  `;
+  document.getElementById('a-mgr-sum').innerHTML=db.managers.map(m=>{
+    const ms=s.filter(x=>x.mgrId===m.id),last=ms[0];
+    const days=[...new Set(ms.map(x=>x.date))].length;
+    return `<div class="mrow">
+      <div class="av">${ini(m.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${m.name} <span style="font-size:10px;color:var(--t3);font-family:'DM Mono'">${m.id}</span></div>
+        <div style="font-size:11px;color:var(--t2)">🏬 ${dName(m.deptId)} · ${ms.length} submissions · ${days} days</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        ${ms.length?`<span class="badge b-green">${ms.length} ✓</span><div style="font-size:10px;color:var(--t3);margin-top:3px">${last.date}</div>`:`<span class="badge b-red">No submissions</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderAllRep(){
+  let data=[...db.submissions];
+  const from=document.getElementById('af-from').value,to=document.getElementById('af-to').value;
+  const shift=document.getElementById('af-shift').value,mgr=document.getElementById('af-mgr').value,dept=document.getElementById('af-dept').value;
+  if(from)data=data.filter(s=>s.date>=from);
+  if(to)data=data.filter(s=>s.date<=to);
+  if(shift)data=data.filter(s=>s.shift===shift);
+  if(mgr)data=data.filter(s=>s.mgrId===mgr);
+  if(dept)data=data.filter(s=>s.deptId===dept);
+  document.getElementById('all-reps').innerHTML=data.length?data.map(s=>repCard(s,true)).join(''):'<div class="empty"><div class="ee">🔍</div><p>No results</p></div>';
+}
+function clearAF(){['af-from','af-to','af-shift','af-mgr','af-dept'].forEach(id=>document.getElementById(id).value='');renderAllRep();}
+
+/* ===== MANAGERS ===== */
+function popDeptSels(){
+  ['nm-dept','e-dept'].forEach(sid=>{
+    const sel=document.getElementById(sid);if(!sel)return;
+    const cur=sel.value;sel.innerHTML='<option value="">— Select dept —</option>';
+    db.departments.forEach(d=>sel.add(new Option(d.name,d.id)));
+    if(cur)sel.value=cur;
+  });
+}
+function addMgr(){
+  const id=document.getElementById('nm-id').value.trim().toUpperCase();
+  const name=document.getElementById('nm-nm').value.trim();
+  const deptId=document.getElementById('nm-dept').value;
+  const pw=document.getElementById('nm-pw').value;
+  const pw2=document.getElementById('nm-pw2').value;
+  if(!id||!name){showMsg('mgr-suc','Fill ID and Name',true);return;}
+  if(!deptId){showMsg('mgr-suc','Select department',true);return;}
+  if(!pw){showMsg('mgr-suc','Set a password',true);return;}
+  if(pw!==pw2){showMsg('mgr-suc','Passwords do not match',true);return;}
+  if(db.managers.find(m=>m.id===id)){showMsg('mgr-suc','ID already exists',true);return;}
+  if(db.managers.length>=50){showMsg('mgr-suc','Max 50 managers',true);return;}
+  db.managers.push({id,name,deptId,pw});persist();
+  ['nm-id','nm-nm','nm-pw','nm-pw2'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('nm-dept').value='';
+  showMsg('mgr-suc','✅ '+name+' added! Password set.');
+  renderMgrTbl();
+}
+function renderMgrTbl(){
+  document.getElementById('mgr-cnt').textContent=db.managers.length;
+  document.getElementById('mgr-tbl').innerHTML=db.managers.length?`
+    <table class="tbl">
+      <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Subs</th><th>PW</th><th></th></tr></thead>
+      <tbody>${db.managers.map(m=>`<tr>
+        <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${m.id}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:28px;height:28px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+        <td><span class="badge b-teal">${dName(m.deptId)}</span></td>
+        <td><span class="badge b-green">${db.submissions.filter(s=>s.mgrId===m.id).length}</span></td>
+        <td><span style="font-size:11px;color:var(--t3)">${m.pw?'🔒 Set':'⚠️ None'}</span></td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-warn btn-xs" onclick="openEdit('${m.id}')" style="margin-right:4px">Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="delMgr('${m.id}')">Delete</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`:'<div class="empty" style="padding:1.5rem"><p>No managers yet</p></div>';
+}
+function openEdit(id){
+  const m=db.managers.find(x=>x.id===id);if(!m)return;
+  editingId=id;popDeptSels();
+  document.getElementById('e-id').value=m.id;
+  document.getElementById('e-nm').value=m.name;
+  document.getElementById('e-dept').value=m.deptId||'';
+  document.getElementById('e-pw').value='';
+  document.getElementById('e-pw2').value='';
+  document.getElementById('edit-m').classList.add('open');
+}
+function closeEdit(){document.getElementById('edit-m').classList.remove('open');editingId=null;}
+function saveEdit(){
+  const name=document.getElementById('e-nm').value.trim();
+  const deptId=document.getElementById('e-dept').value;
+  const pw=document.getElementById('e-pw').value;
+  const pw2=document.getElementById('e-pw2').value;
+  if(!name||!deptId){alert('Fill all fields');return;}
+  if(pw&&pw!==pw2){alert('Passwords do not match');return;}
+  const m=db.managers.find(x=>x.id===editingId);if(!m)return;
+  m.name=name;m.deptId=deptId;
+  if(pw)m.pw=pw;
+  persist();closeEdit();
+  showMsg('mgr-suc','✅ '+name+' updated!');renderMgrTbl();
+}
+function delMgr(id){
+  if(!confirm('Delete this manager?'))return;
+  db.managers=db.managers.filter(m=>m.id!==id);persist();
+  renderMgrTbl();renderAdminOverview();
+}
+
+/* ===== DEPARTMENTS ===== */
+function addDept(){
+  const name=document.getElementById('nd-nm').value.trim();if(!name)return;
+  if(db.departments.find(d=>d.name.toLowerCase()===name.toLowerCase())){showMsg('dept-suc','Already exists',true);return;}
+  db.departments.push({id:'d'+Date.now(),name});persist();
+  document.getElementById('nd-nm').value='';
+  showMsg('dept-suc','✅ '+name+' added!');
+  renderDeptTbl();popDeptSels();popCatDept();
+}
+function renderDeptTbl(){
+  document.getElementById('dept-tbl').innerHTML=db.departments.length?`
+    <table class="tbl">
+      <thead><tr><th>Department</th><th>Managers</th><th>Categories</th><th></th></tr></thead>
+      <tbody>${db.departments.map(d=>`<tr>
+        <td><span class="badge b-teal">🏬 ${d.name}</span></td>
+        <td>${db.managers.filter(m=>m.deptId===d.id).length}</td>
+        <td>${db.categories.filter(c=>c.deptId===d.id).length}</td>
+        <td style="text-align:right"><button class="btn btn-danger btn-xs" onclick="delDept('${d.id}')">Delete</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`:'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
+}
+function delDept(id){
+  if(db.categories.filter(c=>c.deptId===id).length||db.managers.filter(m=>m.deptId===id).length){alert('Remove all managers & categories in this dept first');return;}
+  if(!confirm('Delete?'))return;
+  db.departments=db.departments.filter(d=>d.id!==id);persist();renderDeptTbl();
+}
+
+/* ===== CATEGORIES ===== */
+function popCatDept(){
+  const sel=document.getElementById('nc-dept');if(!sel)return;
+  const cur=sel.value;sel.innerHTML='<option value="">— Select dept —</option>';
+  db.departments.forEach(d=>sel.add(new Option(d.name,d.id)));if(cur)sel.value=cur;
+}
+function addCat(){
+  const name=document.getElementById('nc-nm').value.trim();
+  const deptId=document.getElementById('nc-dept').value;
+  if(!name||!deptId){showMsg('cat-suc','Fill name and select dept',true);return;}
+  if(db.categories.find(c=>c.name.toLowerCase()===name.toLowerCase()&&c.deptId===deptId)){showMsg('cat-suc','Already exists in this dept',true);return;}
+  db.categories.push({id:'c'+Date.now(),name,deptId});persist();
+  document.getElementById('nc-nm').value='';
+  showMsg('cat-suc','✅ '+name+' added!');renderCatList();
+}
+function renderCatList(){
+  document.getElementById('cat-list').innerHTML=db.departments.map(d=>{
+    const cats=db.categories.filter(c=>c.deptId===d.id);
+    return `<div style="margin-bottom:1rem">
+      <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:7px">🏬 ${d.name}</div>
+      ${cats.length?`<div style="display:flex;flex-wrap:wrap">${cats.map(c=>`<div style="display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rsm);padding:5px 10px;margin:3px;font-size:12px">🏷️ ${c.name}<button class="btn btn-danger btn-xs" style="padding:2px 7px;margin-left:4px" onclick="delCat('${c.id}')">✕</button></div>`).join('')}</div>`:'<p style="font-size:12px;color:var(--t3);padding:4px">No categories</p>'}
+    </div>`;
+  }).join('')||'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
+}
+function delCat(id){if(!confirm('Delete?'))return;db.categories=db.categories.filter(c=>c.id!==id);persist();renderCatList();}
+
+/* ===== SETTINGS ===== */
+function changeAdminPw(){
+  const cur=document.getElementById('cpw-cur').value;
+  const nw=document.getElementById('cpw-new').value;
+  const con=document.getElementById('cpw-con').value;
+  if(cur!==db.adminPw){showMsg('cpw-msg','Wrong current password',true);return;}
+  if(nw.length<4){showMsg('cpw-msg','Min 4 characters',true);return;}
+  if(nw!==con){showMsg('cpw-msg','Passwords do not match',true);return;}
+  db.adminPw=nw;persist();
+  showMsg('cpw-msg','✅ Admin password updated!');
+  ['cpw-cur','cpw-new','cpw-con'].forEach(x=>document.getElementById(x).value='');
+}
+function clearAllSubs(){
+  if(!confirm('DELETE ALL SUBMISSIONS? This cannot be undone!'))return;
+  db.submissions=[];persist();
+  renderAdminOverview();
+  alert('All submissions deleted.');
+}
+
+/* ===== BACKUP ===== */
+function loadBackupConfig(){
+  const c=db.backup;
+  if(c.gdClientId)document.getElementById('gd-cid').value=c.gdClientId;
+  if(c.gdApiKey)document.getElementById('gd-key').value=c.gdApiKey;
+  if(c.storjToken)document.getElementById('st-token').value=c.storjToken;
+  if(c.storjBucket)document.getElementById('st-bucket').value=c.storjBucket;
+  if(c.storjEndpoint)document.getElementById('st-endpoint').value=c.storjEndpoint||'https://gateway.storjshare.io';
+  if(c.autoFreq)document.getElementById('auto-bk-freq').value=c.autoFreq;
+  if(c.autoDest)document.getElementById('auto-bk-dest').value=c.autoDest;
+  updateBkStatus('gdrive-status',c.gdClientId&&c.gdApiKey);
+  updateBkStatus('storj-status',c.storjToken&&c.storjBucket);
+}
+function updateBkStatus(id,configured){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=configured
+    ?`<span class="bk-dot ok"></span><span>Configured ✓</span>`
+    :`<span class="bk-dot idle"></span><span>Not configured — fill fields below</span>`;
+}
+function setBkStatus(id,state,txt){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=`<span class="bk-dot ${state}"></span><span>${txt}</span>`;
+}
+function saveGDConfig(){
+  db.backup.gdClientId=document.getElementById('gd-cid').value.trim();
+  db.backup.gdApiKey=document.getElementById('gd-key').value.trim();
+  persist();updateBkStatus('gdrive-status',db.backup.gdClientId&&db.backup.gdApiKey);
+  showMsg('gd-msg','✅ Google Drive config saved!');
+}
+function saveStorjConfig(){
+  db.backup.storjToken=document.getElementById('st-token').value.trim();
+  db.backup.storjBucket=document.getElementById('st-bucket').value.trim();
+  db.backup.storjEndpoint=document.getElementById('st-endpoint').value.trim()||'https://gateway.storjshare.io';
+  persist();updateBkStatus('storj-status',db.backup.storjToken&&db.backup.storjBucket);
+  showMsg('st-msg','✅ Storj config saved!');
+}
+function saveAutoBackup(){
+  db.backup.autoFreq=document.getElementById('auto-bk-freq').value;
+  db.backup.autoDest=document.getElementById('auto-bk-dest').value;
+  persist();showMsg('auto-bk-msg','✅ Auto backup settings saved!');
+}
+
+function backupToGDrive(){
+  if(!db.backup.gdClientId||!db.backup.gdApiKey){showMsg('gd-msg','Configure Google Drive first',true);return;}
+  setBkStatus('gdrive-status','loading','Connecting to Google Drive...');
+  if(!window.gapi){
+    const s=document.createElement('script');
+    s.src='https://apis.google.com/js/api.js';
+    s.onload=()=>_gdBackup();
+    document.head.appendChild(s);
+  } else {_gdBackup();}
+}
+function _gdBackup(){
+  gapi.load('client:auth2',{
+    callback:()=>{
+      gapi.client.init({apiKey:db.backup.gdApiKey,clientId:db.backup.gdClientId,discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],scope:'https://www.googleapis.com/auth/drive.file'})
+      .then(()=>{
+        if(!gapi.auth2.getAuthInstance().isSignedIn.get()){
+          gapi.auth2.getAuthInstance().signIn().then(()=>_doGDUpload()).catch(e=>{setBkStatus('gdrive-status','err','Sign-in failed');showMsg('gd-msg','Sign-in cancelled',true);});
+        } else {_doGDUpload();}
+      }).catch(e=>{setBkStatus('gdrive-status','err','Init failed: '+e.message);showMsg('gd-msg','Error: '+e.message,true);});
+    },
+    onerror:()=>{setBkStatus('gdrive-status','err','Failed to load Google API');showMsg('gd-msg','Could not load Google API',true);}
+  });
+}
+function _doGDUpload(){
+  setBkStatus('gdrive-status','loading','Uploading backup...');
+  const payload=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,backupAt:new Date().toISOString()});
+  const file=new Blob([payload],{type:'application/json'});
+  const fname='FormTrack_backup_'+today()+'.json';
+  const meta={name:fname,mimeType:'application/json'};
+  const form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify(meta)],{type:'application/json'}));
+  form.append('file',file);
+  fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:new Headers({'Authorization':'Bearer '+gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token}),body:form})
+  .then(r=>r.json()).then(d=>{
+    if(d.id){setBkStatus('gdrive-status','ok','Backup uploaded ✓ — '+fname);showMsg('gd-msg','✅ Backup saved to Google Drive: '+fname);}
+    else{setBkStatus('gdrive-status','err','Upload failed');showMsg('gd-msg','Upload failed: '+(d.error?.message||'Unknown'),true);}
+  }).catch(e=>{setBkStatus('gdrive-status','err','Network error');showMsg('gd-msg','Error: '+e.message,true);});
+}
+
+function restoreFromGDrive(){
+  if(!db.backup.gdClientId||!db.backup.gdApiKey){showMsg('gd-msg','Configure Google Drive first',true);return;}
+  showMsg('gd-msg','Open Google Drive → find FormTrack_backup_*.json → download → use "Import JSON" below',false);
+}
+
+async function backupToStorj(){
+  if(!db.backup.storjToken||!db.backup.storjBucket){showMsg('st-msg','Configure Storj first',true);return;}
+  setBkStatus('storj-status','loading','Uploading to Storj...');
+  const payload=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,backupAt:new Date().toISOString()});
+  const fname='FormTrack_backup_'+today()+'.json';
+  const endpoint=(db.backup.storjEndpoint||'https://gateway.storjshare.io').replace(/\/$/,'');
+  try{
+    const res=await fetch(`${endpoint}/${db.backup.storjBucket}/${fname}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+db.backup.storjToken},
+      body:payload
+    });
+    if(res.ok||res.status===200||res.status===204){
+      setBkStatus('storj-status','ok','Backup uploaded ✓ — '+fname);
+      showMsg('st-msg','✅ Backup saved to Storj: '+fname);
+    } else {
+      setBkStatus('storj-status','err','Upload failed ('+res.status+')');
+      showMsg('st-msg','Storj error: '+res.status+' — CORS must be enabled on bucket',true);
+    }
+  }catch(e){
+    setBkStatus('storj-status','err','Network/CORS error');
+    showMsg('st-msg','⚠️ Storj CORS issue: Enable CORS on your bucket in Storj dashboard. Error: '+e.message,true);
+  }
+}
+function restoreFromStorj(){showMsg('st-msg','Download the backup JSON from Storj dashboard → use "Import JSON" below',false);}
+
+function manualExport(){
+  const data=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,exportedAt:new Date().toISOString()},null,2);
+  const a=document.createElement('a');
+  a.href='data:application/json,'+encodeURIComponent(data);
+  a.download='FormTrack_backup_'+today()+'.json';
+  a.click();
+  showMsg('manual-msg','✅ Backup JSON downloaded!');
+}
+function manualImport(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d.managers||!d.submissions){showMsg('manual-msg','Invalid backup file',true);return;}
+      if(!confirm('This will REPLACE all current data. Continue?'))return;
+      db.managers=d.managers||db.managers;
+      db.departments=d.departments||db.departments;
+      db.categories=d.categories||db.categories;
+      db.submissions=d.submissions||db.submissions;
+      persist();
+      showMsg('manual-msg','✅ Data restored from backup! Refreshing...');
+      setTimeout(()=>location.reload(),2000);
+    }catch(err){showMsg('manual-msg','Invalid JSON file',true);}
+  };
+  r.readAsText(f);
+  inp.value='';
+}
+</script>
+</body>
+</html>
