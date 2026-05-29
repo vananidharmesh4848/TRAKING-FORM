@@ -1,360 +1,93 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>FormTrack — Office Form System (Live Sync)</title><style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
-:root{
-  --bg:#0F1117;--s:#1A1D27;--s2:#22263A;--bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.15);
-  --t:#F0F2FF;--t2:#8B90A7;--t3:#4A4F6A;
-  --ac:#5B7BFF;--ac-bg:rgba(91,123,255,0.12);--ac-bd:rgba(91,123,255,0.35);
-  --green:#34D399;--green-bg:rgba(52,211,153,0.1);
-  --amber:#FBBF24;--amber-bg:rgba(251,191,36,0.1);
-  --red:#F87171;--red-bg:rgba(248,113,113,0.1);--red-bd:rgba(248,113,113,0.25);
-  --purple:#A78BFA;--purple-bg:rgba(167,139,250,0.1);
-  --teal:#2DD4BF;--teal-bg:rgba(45,212,191,0.1);
-  --r:12px;--rsm:8px;--rlg:16px;--rxl:24px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
-.page{display:none;min-height:100vh}.page.active{display:block}
-.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:radial-gradient(ellipse at 50% 0%,rgba(91,123,255,0.15) 0%,transparent 70%)}
-.login-brand{text-align:center;margin-bottom:2rem}
-.login-logo{width:64px;height:64px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;box-shadow:0 0 0 1px rgba(91,123,255,0.3),0 8px 24px rgba(91,123,255,0.3)}
-.login-brand h1{font-size:24px;font-weight:600;letter-spacing:-0.5px}
-.login-brand p{font-size:12px;color:var(--t2);margin-top:4px}
-.login-card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rxl);padding:1.75rem;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
-.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
-.role-card{border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
-.role-card:hover{border-color:var(--bd2)}
-.role-card.sel{border-color:var(--ac);background:var(--ac-bg)}
-.role-card .ri{font-size:24px;margin-bottom:6px}
-.role-card .rl{font-size:13px;font-weight:500}
-.role-card .rd{font-size:11px;color:var(--t2);margin-top:2px}
-label{font-size:12px;color:var(--t2);display:block;margin-bottom:5px;font-weight:500}
-input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rsm);padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t);outline:none;transition:border .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(91,123,255,0.15)}
-select option{background:#1A1D27}
-textarea{resize:vertical;min-height:60px}
-.fgroup{margin-bottom:14px}
-.btn{padding:10px 18px;font-size:13px;font-weight:500;border-radius:var(--rsm);cursor:pointer;border:1px solid transparent;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:7px;transition:all .15s;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn-ac{background:var(--ac);color:#fff}.btn-ac:hover{background:#4A6AEE}
-.btn-ghost{background:transparent;color:var(--t);border-color:var(--bd)}.btn-ghost:hover{background:var(--s2)}
-.btn-full{width:100%;justify-content:center}
-.btn-sm{padding:6px 12px;font-size:12px}
-.err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px}
-.suc{font-size:12px;color:var(--green);margin-top:8px;min-height:16px}
-.topbar{position:sticky;top:0;z-index:100;background:rgba(15,17,23,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between}
-.tbl-brand{display:flex;align-items:center;gap:10px}
-.tbl-logo{width:32px;height:32px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
-.tbl-name{font-size:14px;font-weight:600}
-.tbl-sub{font-size:11px;color:var(--t2)}
-.main{max-width:680px;margin:0 auto;padding:1.25rem 1rem 5.5rem}
-.atabs{display:flex;gap:4px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:1.25rem;overflow-x:auto}
-.atab{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--rsm);cursor:pointer;border:none;background:none;color:var(--t2);white-space:nowrap}
-.atab.on{background:var(--ac);color:#fff}
-.sec{display:none}.sec.on{display:block}
-.card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rlg);padding:1.1rem;margin-bottom:1rem}
-.card-title{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
-.shift-toggle{display:flex;background:var(--s2);border-radius:var(--rsm);padding:4px;margin-bottom:1rem;border:1px solid var(--bd)}
-.sopt{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:none;color:var(--t2)}
-.sopt.on.day{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,0.3)}
-.sopt.on.night{background:var(--ac-bg);color:var(--ac);border:1px solid var(--ac-bd)}
-.cat-item{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:8px}
-.cat-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.cat-nm{font-size:13px;font-weight:500}
-.upbtn{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed rgba(255,255,255,0.12);border-radius:var(--rsm);padding:10px;cursor:pointer;color:var(--t2);font-size:12px;background:rgba(255,255,255,0.02)}
-.upbtn input{display:none}
-.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
-.chip{background:var(--bg);border:1px solid var(--bd);border-radius:100px;padding:3px 10px;font-size:11px;color:var(--t2)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.g3{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
-@media(min-width:480px){.g3{grid-template-columns:1fr 1fr 1fr}}
-.tbl{width:100%;border-collapse:collapse;font-size:13px}
-.tbl th{font-size:11px;color:var(--t2);padding:6px 10px;border-bottom:1px solid var(--bd);text-align:left}
-.tbl td{padding:10px;border-bottom:1px solid var(--bd)}
-.pw-wrap{position:relative}
-.pw-wrap input{padding-right:40px}
-.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);background:none;border:none}
-.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;color:#fff;font-size:16px}
-</style></head><body>
-
-<div id="loading" class="loading-overlay">⏳ Fetching live data from Google Sheet...</div>
-
-<div id="pg-login" class="page active">
-  <div class="login-wrap">
-    <div class="login-brand">
-      <div class="login-logo">📋</div>
-      <h1>FormTrack Live</h1>
-      <p>Office System · Connected to Google Sheet</p>
-    </div>
-    <div class="login-card">
-      <div class="role-grid">
-        <div class="role-card" id="rc-manager" onclick="selectRole('manager')">
-          <div class="ri">👤</div><div class="rl">Manager</div>
-        </div>
-        <div class="role-card" id="rc-admin" onclick="selectRole('admin')">
-          <div class="ri">🛡️</div><div class="rl">Admin</div>
-        </div>
-      </div>
-      <div id="mgr-block" style="display:none">
-        <div class="fgroup"><label>Manager ID</label><input type="text" id="l-mid" placeholder="MGR-01"></div>
-        <div class="fgroup"><label>Password</label>
-          <div class="pw-wrap"><input type="password" id="l-mpw" placeholder="Enter password"><button class="pw-eye" onclick="togglePw('l-mpw',this)">👁</button></div>
-        </div>
-      </div>
-      <div id="admin-block" style="display:none">
-        <div class="fgroup"><label>Admin Password</label>
-          <div class="pw-wrap"><input type="password" id="l-apw" placeholder="Enter admin password"><button class="pw-eye" onclick="togglePw('l-apw',this)">👁</button></div>
-        </div>
-      </div>
-      <button class="btn btn-ac btn-full" onclick="doLogin()">Login →</button>
-      <div class="err" id="l-err"></div>
-    </div>
-  </div>
-</div>
-
-<div id="pg-mgr" class="page">
-  <div class="topbar">
-    <div class="tbl-brand">
-      <div class="tbl-logo">📋</div>
-      <div><div class="tbl-name" id="m-name">—</div><div class="tbl-sub" id="m-dept">—</div></div>
-    </div>
-    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
-  </div>
-  <div class="main">
-    <div class="shift-toggle">
-      <button class="sopt on day" id="sh-d" onclick="pShift('day')">☀️ Day</button>
-      <button class="sopt night" id="sh-n" onclick="pShift('night')">🌙 Night</button>
-    </div>
-    <div class="g2">
-      <div class="fgroup"><label>Date</label><input type="date" id="sub-date"></div>
-      <div class="fgroup"><label>Time</label><input type="text" id="sub-time" readonly></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Upload Forms by Category</div>
-      <div id="cat-area"></div>
-    </div>
-    <div class="fgroup"><label>Notes</label><textarea id="sub-note" placeholder="Any remarks..."></textarea></div>
-    <button class="btn btn-ac btn-full" onclick="submitForms()">✅ Submit Forms</button>
-    <div class="suc" id="sub-msg"></div>
-  </div>
-</div>
-
-<div id="pg-admin" class="page">
-  <div class="topbar">
-    <div class="tbl-brand"><div class="tbl-logo">🛡️</div><div class="tbl-name">Admin Live Dashboard</div></div>
-    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
-  </div>
-  <div class="main">
-    <div class="atabs">
-      <button class="atab on" onclick="aTab('managers',this)">👥 Managers</button>
-      <button class="atab" onclick="aTab('depts',this)">🏬 Depts</button>
-      <button class="atab" onclick="aTab('cats',this)">🏷️ Categories</button>
-    </div>
-
-    <div class="sec on" id="as-managers">
-      <div class="card">
-        <div class="card-title">Add New Manager (Saves to Sheet)</div>
-        <div class="g3">
-          <div class="fgroup"><label>ID</label><input type="text" id="nm-id" placeholder="MGR-01"></div>
-          <div class="fgroup"><label>Full Name</label><input type="text" id="nm-nm"></div>
-          <div class="fgroup"><label>Dept</label><select id="nm-dept"></select></div>
-        </div>
-        <div class="fgroup"><label>Password</label><input type="text" id="nm-pw"></div>
-        <button class="btn btn-ac btn-sm" onclick="addMgr()">+ Add Manager</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Live Managers List</div>
-        <table class="tbl"><thead><tr><th>ID</th><th>Name</th><th>Department</th></tr></thead><tbody id="mgr-tbl"></tbody></table>
-      </div>
-    </div>
-
-    <div class="sec" id="as-depts">
-      <div class="card">
-        <div class="card-title">Add Department</div>
-        <div style="display:flex;gap:8px;"><input type="text" id="nd-nm" placeholder="Production"><button class="btn btn-ac" onclick="addDept()">+ Add</button></div>
-      </div>
-      <div class="card">
-        <table class="tbl"><thead><tr><th>Department Name</th></tr></thead><tbody id="dept-tbl"></tbody></table>
-      </div>
-    </div>
-
-    <div class="sec" id="as-cats">
-      <div class="card">
-        <div class="card-title">Add Category</div>
-        <div class="g2">
-          <input type="text" id="nc-nm" placeholder="Category Name">
-          <select id="nc-dept"></select>
-        </div>
-        <button class="btn btn-ac btn-sm" onclick="addCat()">+ Add Category</button>
-      </div>
-      <div class="card">
-        <table class="tbl"><thead><tr><th>Category</th><th>Department</th></tr></thead><tbody id="cat-list"></tbody></table>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-// --- CONFIGURATION ---
-var googleWebAppUrl = "https://script.google.com/macros/s/AKfycbzuMnsq60Xf3YjdMEUVvB1VAALuYo-U5DSNorud0bc/dev"; // તમારી નવી લિંક અહીં નાખો
-
-var db = { managers: [], departments: [], categories: [], submissions: [] };
-var selectedRole = "";
-var currentShift = "day";
-var activeManager = null;
-var uploadedFilesMap = {};
-
-// ગૂગલ શીટમાંથી લાઈવ ડેટા ખેંચવો
-function fetchLiveData() {
-  if(!googleWebAppUrl || googleWebAppUrl.includes("https://script.google.com/macros/s/AKfycbzuMnsq60Xf3YjdMEUVvB1VAALuYo-U5DSNorud0bc/dev")) return;
-  document.getElementById('loading').style.display = 'flex';
-  
-  fetch(googleWebAppUrl + "?action=getData")
-    .then(res => res.json())
-    .then(data => {
-      db = data;
-      renderAdminUI();
-      if(activeManager) renderCategories();
-      document.getElementById('loading').style.display = 'none';
-    })
-    .catch(err => {
-      console.log(err);
-      document.getElementById('loading').style.display = 'none';
-    });
-}
-
-window.onload = fetchLiveData;
-
-function selectRole(role) {
-  selectedRole = role;
-  document.getElementById('rc-manager').classList.remove('sel');
-  document.getElementById('rc-admin').classList.remove('sel');
-  document.getElementById('mgr-block').style.display = 'none';
-  document.getElementById('admin-block').style.display = 'none';
-  if(role==='manager'){ document.getElementById('rc-manager').classList.add('sel'); document.getElementById('mgr-block').style.display='block'; }
-  else { document.getElementById('rc-admin').classList.add('sel'); document.getElementById('admin-block').style.display='block'; }
-}
-
-function doLogin() {
-  var errEl = document.getElementById('l-err');
-  errEl.innerText = "";
-  if(selectedRole === 'manager') {
-    var mid = document.getElementById('l-mid').value.toUpperCase().trim();
-    var mpw = document.getElementById('l-mpw').value.trim();
-    
-    // ગૂગલ શીટના લાઈવ ડેટા સાથે પાસવર્ડ મેચ કરવો
-    var mgr = db.managers.find(m => m.id === mid && String(m.password) === mpw);
-    if(mgr) {
-      activeManager = mgr;
-      document.getElementById('pg-login').classList.remove('active');
-      document.getElementById('pg-mgr').classList.add('active');
-      document.getElementById('m-name').innerText = mgr.name;
-      document.getElementById('m-dept').innerText = mgr.id + " · " + mgr.department;
-      document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
-      document.getElementById('sub-time').value = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      renderCategories();
-    } else { errEl.innerText = "Invalid Manager ID or Password (Live Check)"; }
-  } else if(selectedRole === 'admin') {
-    if(document.getElementById('l-apw').value === "admin123") {
-      document.getElementById('pg-login').classList.remove('active');
-      document.getElementById('pg-admin').classList.add('active');
-    } else { errEl.innerText = "Invalid Admin Password"; }
-  }
-}
-
-function renderCategories() {
-  var area = document.getElementById('cat-area'); area.innerHTML = "";
-  var myCats = db.categories.filter(c => c.department.toLowerCase() === activeManager.department.toLowerCase());
-  if(myCats.length===0) { area.innerHTML = "<p style='color:var(--t2)'>No categories for your department</p>"; return; }
-  
-  myCats.forEach(cat => {
-    var html = `
-      <div class="cat-item">
-        <div class="cat-hdr"><span class="cat-nm">📂 ${cat.name}</span></div>
-        <label class="upbtn"><span>📷 Tap to Upload Files</span>
-          <input type="file" multiple onchange="handleFile(this, '${cat.id}')">
-        </label>
-        <div class="chips" id="chips-${cat.id}"></div>
-      </div>`;
-    area.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-function handleFile(input, catId) {
-  if(!uploadedFilesMap[catId]) uploadedFilesMap[catId] = [];
-  Array.from(input.files).forEach(f => {
-    uploadedFilesMap[catId].push(f);
-    document.getElementById('chips-'+catId).insertAdjacentHTML('beforeend', `<div class="chip">📄 ${f.name}</div>`);
-  });
-}
-
 function submitForms() {
-  var msgEl = document.getElementById('sub-msg'); msgEl.innerText = "Saving to Google Sheet...";
+  var msgEl = document.getElementById('sub-msg'); 
+  msgEl.innerText = "⏳ Saving to Google Sheet...";
   var promises = [];
   
-  db.categories.filter(c => c.department.toLowerCase() === activeManager.department.toLowerCase()).forEach(cat => {
+  var myCats = db.categories.filter(c => c.department.toLowerCase() === activeManager.department.toLowerCase());
+  
+  myCats.forEach(cat => {
     var count = uploadedFilesMap[cat.id] ? uploadedFilesMap[cat.id].length : 0;
     var payload = {
-      action: "submitForm", managerId: activeManager.id, shift: currentShift,
-      date: document.getElementById('sub-date').value, time: document.getElementById('sub-time').value,
-      category: cat.name, filesCount: count, notes: document.getElementById('sub-note').value
+      action: "submitForm", 
+      managerId: activeManager.id, 
+      shift: currentShift,
+      date: document.getElementById('sub-date').value, 
+      time: document.getElementById('sub-time').value,
+      category: cat.name, 
+      filesCount: count, 
+      notes: document.getElementById('sub-note').value
     };
-    promises.push(fetch(googleWebAppUrl, { method:"POST", mode:"no-cors", body:JSON.stringify(payload) }));
+    
+    // ગૂગલ સ્ક્રિપ્ટને ડેટા મોકલવો (no-cors વગર)
+    promises.push(
+      fetch(googleWebAppUrl, { 
+        method: "POST", 
+        body: JSON.stringify(payload) 
+      })
+    );
   });
 
-  Promise.all(promises).then(() => {
-    msgEl.innerText = "✅ All data submitted directly to Google Sheet!";
-    setTimeout(() => { uploadedFilesMap={}; document.getElementById('sub-note').value=""; msgEl.innerText=""; fetchLiveData(); }, 2000);
-  });
-}
-
-function renderAdminUI() {
-  // Populate dropdowns
-  var dSel = document.getElementById('nm-dept'); dSel.innerHTML = "";
-  var cSel = document.getElementById('nc-dept'); cSel.innerHTML = "";
-  db.departments.forEach(d => {
-    dSel.insertAdjacentHTML('beforeend', `<option value="${d.name}">${d.name}</option>`);
-    cSel.insertAdjacentHTML('beforeend', `<option value="${d.name}">${d.name}</option>`);
-  });
-
-  // Render Managers Table
-  var mt = document.getElementById('mgr-tbl'); mt.innerHTML = "";
-  db.managers.forEach(m => mt.insertAdjacentHTML('beforeend', `<tr><td>${m.id}</td><td>${m.name}</td><td>${m.department}</td></tr>`));
-
-  // Render Depts Table
-  var dt = document.getElementById('dept-tbl'); dt.innerHTML = "";
-  db.departments.forEach(d => dt.insertAdjacentHTML('beforeend', `<tr><td>${d.name}</td></tr>`));
-
-  // Render Cats Table
-  var ct = document.getElementById('cat-list'); ct.innerHTML = "";
-  db.categories.forEach(c => ct.insertAdjacentHTML('beforeend', `<tr><td>${c.name}</td><td>${c.department}</td></tr>`));
+  Promise.all(promises)
+    .then(() => {
+      msgEl.innerText = "✅ All data submitted directly to Google Sheet!";
+      setTimeout(() => { 
+        uploadedFilesMap = {}; 
+        document.getElementById('sub-note').value = ""; 
+        msgEl.innerText = ""; 
+        fetchLiveData(); 
+      }, 2000);
+    })
+    .catch(err => {
+      msgEl.innerText = "❌ Error saving data!";
+      console.error(err);
+    });
 }
 
 function addMgr() {
   var payload = {
-    action: "addManager", id: document.getElementById('nm-id').value.toUpperCase(),
-    name: document.getElementById('nm-nm').value, department: document.getElementById('nm-dept').value,
-    password: document.getElementById('nm-pw').value
+    action: "addManager", 
+    id: document.getElementById('nm-id').value.toUpperCase().trim(),
+    name: document.getElementById('nm-nm').value.trim(), 
+    department: document.getElementById('nm-dept').value,
+    password: document.getElementById('nm-pw').value.trim()
   };
-  fetch(googleWebAppUrl, { method:"POST", mode:"no-cors", body:JSON.stringify(payload) }).then(() => { alert("Manager Saved to Sheet!"); fetchLiveData(); });
+  
+  if(!payload.id || !payload.name || !payload.password) { alert("Please fill all fields"); return; }
+
+  fetch(googleWebAppUrl, { method: "POST", body: JSON.stringify(payload) })
+    .then(res => res.json())
+    .then(data => { 
+      alert("Manager Saved to Sheet!"); 
+      fetchLiveData(); 
+    })
+    .catch(err => alert("Error: Data not saved!"));
 }
 
 function addDept() {
-  var payload = { action: "addDept", name: document.getElementById('nd-nm').value };
-  fetch(googleWebAppUrl, { method:"POST", mode:"no-cors", body:JSON.stringify(payload) }).then(() => { alert("Dept Saved to Sheet!"); fetchLiveData(); });
+  var name = document.getElementById('nd-nm').value.trim();
+  if(!name) return;
+  var payload = { action: "addDept", name: name };
+  
+  fetch(googleWebAppUrl, { method: "POST", body: JSON.stringify(payload) })
+    .then(res => res.json())
+    .then(data => { 
+      alert("Dept Saved to Sheet!"); 
+      document.getElementById('nd-nm').value = "";
+      fetchLiveData(); 
+    });
 }
 
 function addCat() {
-  var payload = { action: "addCat", id: "cat_" + Date.now(), name: document.getElementById('nc-nm').value, department: document.getElementById('nc-dept').value };
-  fetch(googleWebAppUrl, { method:"POST", mode:"no-cors", body:JSON.stringify(payload) }).then(() => { alert("Category Saved to Sheet!"); fetchLiveData(); });
+  var name = document.getElementById('nc-nm').value.trim();
+  var dept = document.getElementById('nc-dept').value;
+  if(!name) return;
+  var payload = { action: "addCat", id: "cat_" + Date.now(), name: name, department: dept };
+  
+  fetch(googleWebAppUrl, { method: "POST", body: JSON.stringify(payload) })
+    .then(res => res.json())
+    .then(data => { 
+      alert("Category Saved to Sheet!"); 
+      document.getElementById('nc-nm').value = "";
+      fetchLiveData(); 
+    });
 }
-
-function aTab(secId, btn) {
-  document.querySelectorAll('.atab').forEach(b => b.classList.remove('on')); btn.classList.add('on');
-  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on')); document.getElementById('as-'+secId).classList.add('on');
-}
-function pShift(s) { currentShift = s; document.getElementById('sh-d').classList.remove('on'); document.getElementById('sh-n').classList.remove('on'); if(s==='day')document.getElementById('sh-d').classList.add('on'); else document.getElementById('sh-n').classList.add('on'); }
-function togglePw(id, b) { var el = document.getElementById(id); if(el.type==='password'){ el.type='text'; b.innerText='🔒'; }else{ el.type='password'; b.innerText='👁'; } }
-function doLogout() { activeManager = null; document.getElementById('pg-mgr').classList.remove('active'); document.getElementById('pg-admin').classList.remove('active'); document.getElementById('pg-login').classList.add('active'); }
-</script>
-</body></html>
