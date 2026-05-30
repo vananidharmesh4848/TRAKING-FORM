@@ -416,7 +416,7 @@ textarea{resize:vertical;min-height:56px}
           <button class="btn bre bsm" id="gd-out" onclick="gdSignOut()" style="display:none">Sign Out</button>
         </div>
         <div class="ok" id="gd-msg"></div>
-        <div style="font-size:12px;color:var(--t2);padding:10px;background:var(--s2);border-radius:var(--rs)">📧 dharmesh4848@gmail.com saathe sign in karo</div>
+        <div style="font-size:12px;color:var(--t2);padding:10px;background:var(--s2);border-radius:var(--rs)">📧 vanani.dharmesh4848@gmail.com saathe sign in karo</div>
       </div>
       <div class="card">
         <div class="ct">💾 Manual Backup</div>
@@ -544,7 +544,7 @@ textarea{resize:vertical;min-height:56px}
 ============================================================ */
 const LEAVE_TYPES=['Casual Leave','Sick Leave','Earned Leave','Emergency Leave'];
 const DEF_BAL={'Casual Leave':12,'Sick Leave':10,'Earned Leave':15,'Emergency Leave':3};
-const GD_CLIENT_ID='52224266990-ul5mniq9j3f05qle2saobk18amcesrbu.apps.googleusercontent.com';
+const GD_CLIENT_ID='145497764596-l75ho3k8gonlh0qfcj9hu97sjlmuva93.apps.googleusercontent.com';
 const GD_SCOPES='https://www.googleapis.com/auth/drive.file';
 
 let db={
@@ -1098,7 +1098,7 @@ function gdUI(){
 }
 function gdSignIn(){
   if(GD_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID_HERE'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
-  const go=()=>{tclient=google.accounts.oauth2.initTokenClient({client_id:GD_CLIENT_ID,scope:GD_SCOPES,hint:'dharmesh4848@gmail.com',callback:(r)=>{if(r.error){sm('gd-msg','Sign-in failed',true);return;}gdToken=r.access_token;gdUI();sm('gd-msg','✅ Connected!');}}); tclient.requestAccessToken({prompt:'consent'});};
+  const go=()=>{tclient=google.accounts.oauth2.initTokenClient({client_id:GD_CLIENT_ID,scope:GD_SCOPES,hint:'vanani.dharmesh4848@gmail.com',callback:(r)=>{if(r.error){sm('gd-msg','Sign-in failed',true);return;}gdToken=r.access_token;gdUI();sm('gd-msg','✅ Connected!');}}); tclient.requestAccessToken({prompt:'consent'});};
   typeof google!=='undefined'?go():(()=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=go;document.head.appendChild(s);})();
 }
 function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
