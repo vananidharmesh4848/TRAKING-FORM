@@ -258,8 +258,33 @@ textarea{resize:vertical;min-height:56px}
     <button class="nb" id="mn-rep" onclick="mTab('rep',this)"><span class="ni">📋</span><span class="nl">Reports</span></button>
     <button class="nb" id="mn-lv" onclick="mTab('lv',this)"><span class="ni">🏖️</span><span class="nl">Leave</span></button>
     <button class="nb" id="mn-mist" onclick="mTab('mist',this)" style="position:relative"><span class="ni">⚠️</span><span class="nl">Mistakes</span><span class="nbadge" id="mist-mgr-badge" style="display:none">0</span></button>
+    <button class="nb" id="mn-late" onclick="mTab('late',this)"><span class="ni">⏰</span><span class="nl">Late</span><span class="nbadge" id="late-mgr-badge" style="display:none">!</span></button>
   </div>
 </div>
+
+    <div class="sec" id="ms-late">
+      <div class="card">
+        <div class="ct">⏰ Late Entry Report Karo</div>
+        <div class="fg"><label>Date</label><input type="date" id="le-date"></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Shift</label>
+            <select id="le-shift">
+              <option value="day">☀️ Day Shift (8am–8pm)</option>
+              <option value="night">🌙 Night Shift (8pm–8am)</option>
+            </select>
+          </div>
+          <div class="fg" style="margin:0"><label>Late by (minutes)</label>
+            <input type="number" id="le-mins" min="1" max="480" placeholder="30">
+          </div>
+        </div>
+        <div class="fg"><label>Actual Arrival Time</label><input type="time" id="le-time"></div>
+        <div class="fg"><label>Reason</label><textarea id="le-reason" placeholder="Late aavana no reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="submitLateEntry()">📨 Submit Late Entry</button>
+        <div class="ok" id="le-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Late Entry History</div>
+      <div id="mgr-late-list"></div>
+    </div>
 
 <!-- ADMIN PAGE -->
 <div id="pg-admin" class="pg">
@@ -277,6 +302,7 @@ textarea{resize:vertical;min-height:56px}
       <button class="atab" onclick="aTab('dp',this)">🏬 Depts</button>
       <button class="atab" onclick="aTab('ct',this)">🏷️ Categories</button>
       <button class="atab" onclick="aTab('bk',this)">☁️ Backup</button>
+      <button class="atab" onclick="aTab('late',this)">⏰ Late Entry <span id="late-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" onclick="aTab('st',this)">⚙️ Settings</button>
     </div>
 
@@ -511,6 +537,58 @@ textarea{resize:vertical;min-height:56px}
     </div>
 
     <!-- SETTINGS -->
+    <!-- LATE ENTRY ADMIN -->
+    <div class="sec" id="as-late">
+      <div class="card">
+        <div class="ct">⏰ Late Entry Add Karo (Admin)</div>
+        <div class="g3r">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="al-mg"><option value="">— Select —</option></select></div>
+          <div class="fg" style="margin:0"><label>Date</label><input type="date" id="al-date"></div>
+          <div class="fg" style="margin:0"><label>Shift</label>
+            <select id="al-shift">
+              <option value="day">☀️ Day (8am–8pm)</option>
+              <option value="night">🌙 Night (8pm–8am)</option>
+            </select>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Late by (minutes)</label><input type="number" id="al-mins" min="1" max="480" placeholder="30"></div>
+          <div class="fg" style="margin:0"><label>Actual Arrival Time</label><input type="time" id="al-time"></div>
+        </div>
+        <div class="fg"><label>Reason</label><textarea id="al-reason" placeholder="Late aavana no reason..."></textarea></div>
+        <div class="fg"><label>Admin Remark</label><textarea id="al-remark" placeholder="Admin note..."></textarea></div>
+        <button class="btn ba bsm" onclick="adminAddLate()">⏰ Add Late Entry</button>
+        <div class="ok" id="al-msg"></div>
+      </div>
+      <!-- Stats -->
+      <div class="sg3" id="late-stats"></div>
+      <!-- Filter -->
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="lef-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="lef-sh"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>Status</label><select id="lef-st"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Excused</option><option value="unexcused">❌ Unexcused</option></select></div>
+          <div class="fg" style="margin:0"><label>From</label><input type="date" id="lef-from"></div>
+          <div class="fg" style="margin:0"><label>To</label><input type="date" id="lef-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderLateReport()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrLateF()">Reset</button>
+        </div>
+      </div>
+      <!-- Summary Table -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Late Summary</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>Manager</th><th>Dept</th><th>Total Late</th><th>Total Mins</th><th>Excused</th><th>Unexcused</th></tr></thead>
+          <tbody id="late-sum-body"></tbody>
+        </table></div>
+      </div>
+      <!-- Full List -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Late Entries</div>
+      <div id="late-list"></div>
+    </div>
+
     <div class="sec" id="as-st">
       <div class="card">
         <div class="ct">🔐 Change Admin Password</div>
@@ -563,6 +641,7 @@ textarea{resize:vertical;min-height:56px}
 ============================================================ */
 const LEAVE_TYPES=['Casual Leave','Sick Leave','Earned Leave','Emergency Leave'];
 const DEF_BAL={'Casual Leave':12,'Sick Leave':10,'Earned Leave':15,'Emergency Leave':3};
+const GD_EMAIL='vanani.dharmesh4848@gmail.com';
 const GD_CLIENT_ID='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com';
 const GD_SCOPES='https://www.googleapis.com/auth/drive.file';
 
@@ -1116,8 +1195,8 @@ function gdUI(){
   document.getElementById('gd-txt').textContent=ok?'✅ Connected — Ready to backup':'Not signed in';
 }
 function gdSignIn(){
-  if(GD_CLIENT_ID==='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
-  const go=()=>{tclient=google.accounts.oauth2.initTokenClient({client_id:GD_CLIENT_ID,scope:GD_SCOPES,hint:'vanani.dharmesh4848@gmail.com',callback:(r)=>{if(r.error){sm('gd-msg','Sign-in failed',true);return;}gdToken=r.access_token;gdUI();sm('gd-msg','✅ Connected!');}}); tclient.requestAccessToken({prompt:'consent'});};
+  if(GD_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID_HERE'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
+  const go=()=>{tclient=google.accounts.oauth2.initTokenClient({client_id:GD_CLIENT_ID,scope:GD_SCOPES,hint:GD_EMAIL,callback:(r)=>{if(r.error){sm('gd-msg','Sign-in failed',true);return;}gdToken=r.access_token;gdUI();sm('gd-msg','✅ Connected!');}}); tclient.requestAccessToken({prompt:'consent'});};
   typeof google!=='undefined'?go():(()=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=go;document.head.appendChild(s);})();
 }
 function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
@@ -1442,5 +1521,306 @@ restoreSession=function(){
     },300);
   }
   return r;
+};
+</script><style>
+.late-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.late-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.late-name{font-weight:600;font-size:14px}
+.late-meta{font-size:11px;color:var(--t2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.b-exc{background:var(--gr2);color:var(--gr)}.b-unexc{background:var(--re2);color:var(--re)}.b-pend{background:var(--am2);color:var(--am)}
+</style>
+<script>
+/* ═══════════════════ LATE ENTRY SYSTEM ═══════════════════ */
+if(!db.lateEntries) db.lateEntries = JSON.parse(localStorage.getItem('ft7_late')||'[]');
+
+function persistLate(){
+  localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
+}
+
+// ── Manager: submit late entry ──
+function submitLateEntry(){
+  if(!curUser) return;
+  const date  = document.getElementById('le-date').value;
+  const shift = document.getElementById('le-shift').value;
+  const mins  = parseInt(document.getElementById('le-mins').value);
+  const time  = document.getElementById('le-time').value;
+  const reason= document.getElementById('le-reason').value.trim();
+  if(!date){sm('le-msg','Date nakho',true);return;}
+  if(!mins||mins<1){sm('le-msg','Late minutes nakho',true);return;}
+  if(!reason){sm('le-msg','Reason lakhao',true);return;}
+  db.lateEntries.unshift({
+    id:Date.now(), mgrId:curUser.id, mgrName:curUser.name,
+    deptId:curUser.deptId, deptName:dn(curUser.deptId),
+    date, shift, lateMinutes:mins, arrivalTime:time, reason,
+    status:'pending', remark:'', addedBy:'manager',
+    submittedAt:new Date().toISOString()
+  });
+  persistLate();
+  sm('le-msg','✅ Late entry submit thayi! Admin review karshhe.');
+  document.getElementById('le-date').value='';
+  document.getElementById('le-mins').value='';
+  document.getElementById('le-time').value='';
+  document.getElementById('le-reason').value='';
+  renderMgrLate();
+  updateLateBadges();
+}
+
+// ── Manager: view own late entries ──
+function renderMgrLate(){
+  if(!curUser) return;
+  const myL = db.lateEntries.filter(l=>l.mgrId===curUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el = document.getElementById('mgr-late-list');
+  if(el) el.innerHTML = myL.length ? myL.map(l=>lateCard(l,false)).join('') : '<div class="empty"><div class="ee">⏰</div><p>Koi late entry nathi</p></div>';
+}
+
+// ── Admin: add late entry ──
+function adminAddLate(){
+  const mgrId  = document.getElementById('al-mg').value;
+  const date   = document.getElementById('al-date').value;
+  const shift  = document.getElementById('al-shift').value;
+  const mins   = parseInt(document.getElementById('al-mins').value);
+  const time   = document.getElementById('al-time').value;
+  const reason = document.getElementById('al-reason').value.trim();
+  const remark = document.getElementById('al-remark').value.trim();
+  if(!mgrId){sm('al-msg','Manager select karo',true);return;}
+  if(!date){sm('al-msg','Date nakho',true);return;}
+  if(!mins||mins<1){sm('al-msg','Late minutes nakho',true);return;}
+  if(!reason){sm('al-msg','Reason lakhao',true);return;}
+  const mgr = db.managers.find(m=>m.id===mgrId);
+  db.lateEntries.unshift({
+    id:Date.now(), mgrId, mgrName:mgr.name,
+    deptId:mgr.deptId, deptName:dn(mgr.deptId),
+    date, shift, lateMinutes:mins, arrivalTime:time, reason,
+    status:'pending', remark, addedBy:'admin',
+    submittedAt:new Date().toISOString()
+  });
+  persistLate();
+  sm('al-msg','✅ Late entry add thayi — '+mgr.name);
+  ['al-mg','al-date','al-mins','al-time','al-reason','al-remark'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  renderLateReport();
+  updateLateBadges();
+}
+
+// ── Admin: approve/reject/delete ──
+function excuseLate(id){
+  const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
+  const rem=prompt('Excuse remark (optional):')||'Excused by admin';
+  l.status='approved';l.remark=rem;
+  persistLate();renderLateReport();
+}
+function unexcuseLate(id){
+  const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
+  const rem=prompt('Reason for unexcused:')||'Not acceptable';
+  l.status='unexcused';l.remark=rem;
+  persistLate();renderLateReport();
+}
+function delLate(id){
+  if(!confirm('Delete?'))return;
+  db.lateEntries=db.lateEntries.filter(l=>l.id!==id);
+  persistLate();renderLateReport();updateLateBadges();
+}
+
+// ── Late Card ──
+function lateCard(l, isAdmin){
+  const sb = l.status==='pending'
+    ?'<span class="badge b-pend">⏳ Pending</span>'
+    :l.status==='approved'
+    ?'<span class="badge b-exc">✅ Excused</span>'
+    :'<span class="badge b-unexc">❌ Unexcused</span>';
+  return `<div class="late-row" style="border-left:3px solid ${l.status==='approved'?'var(--gr)':l.status==='unexcused'?'var(--re)':'var(--am)'}">
+    <div class="late-top">
+      <div>
+        <div class="late-name">${isAdmin?l.mgrName:'Late Entry'}</div>
+        ${isAdmin?`<div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${l.mgrId} · ${l.deptName}</div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        ${sb}
+        ${isAdmin&&l.status==='pending'?`<button class="btn bgr bxs" onclick="excuseLate(${l.id})">✅ Excuse</button><button class="btn bre bxs" onclick="unexcuseLate(${l.id})">❌ Unexcuse</button>`:''}
+        ${isAdmin?`<button class="btn bg2 bxs" onclick="delLate(${l.id})">🗑️</button>`:''}
+      </div>
+    </div>
+    <div class="late-meta">
+      <span>📅 ${fmtD(l.date)}</span>
+      <span>${l.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+      <span>⏱️ ${l.lateMinutes} minutes late</span>
+      ${l.arrivalTime?`<span>🕐 Arrived: ${l.arrivalTime}</span>`:''}
+      <span>📝 ${l.addedBy==='admin'?'Admin added':'Self reported'}</span>
+    </div>
+    ${l.reason?`<div class="notebox">💬 ${l.reason}</div>`:''}
+    ${l.remark?`<div class="notebox" style="border-left-color:${l.status==='approved'?'var(--gr)':'var(--re)'}">📝 Admin: ${l.remark}</div>`:''}
+  </div>`;
+}
+
+// ── Admin: render full late report ──
+function renderLateReport(){
+  updateLateBadges();
+  // populate manager dropdowns
+  const almg=document.getElementById('al-mg');
+  if(almg&&almg.options.length<=1) db.managers.forEach(m=>almg.add(new Option(m.name+' ('+m.id+')',m.id)));
+  const lefmg=document.getElementById('lef-mg');
+  if(lefmg&&lefmg.options.length<=1) db.managers.forEach(m=>lefmg.add(new Option(m.name,m.id)));
+
+  const total=db.lateEntries.length;
+  const pend=db.lateEntries.filter(l=>l.status==='pending').length;
+  const excused=db.lateEntries.filter(l=>l.status==='approved').length;
+  const unexcused=db.lateEntries.filter(l=>l.status==='unexcused').length;
+  const statsEl=document.getElementById('late-stats');
+  if(statsEl) statsEl.innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--am)">${total}</div><div class="sl">Total Late</div></div>
+    <div class="sc"><div class="sn" style="color:var(--am)">${pend}</div><div class="sl">⏳ Pending</div></div>
+    <div class="sc"><div class="sn" style="color:var(--gr)">${excused}</div><div class="sl">✅ Excused</div></div>
+    <div class="sc"><div class="sn" style="color:var(--re)">${unexcused}</div><div class="sl">❌ Unexcused</div></div>
+  `;
+
+  // Summary table
+  const sumBody=document.getElementById('late-sum-body');
+  if(sumBody) sumBody.innerHTML=db.managers.map(m=>{
+    const ml=db.lateEntries.filter(l=>l.mgrId===m.id);
+    const totalMins=ml.reduce((a,l)=>a+l.lateMinutes,0);
+    const exc=ml.filter(l=>l.status==='approved').length;
+    const unexc=ml.filter(l=>l.status==='unexcused').length;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+      <td><span class="badge b-te" style="font-size:10px">${dn(m.deptId)}</span></td>
+      <td style="text-align:center;font-weight:600;color:${ml.length?'var(--am)':'var(--gr)'}">${ml.length}</td>
+      <td style="text-align:center;color:var(--am)">${totalMins} min</td>
+      <td style="text-align:center;color:var(--gr)">${exc}</td>
+      <td style="text-align:center;color:var(--re)">${unexc}</td>
+    </tr>`;
+  }).join('');
+
+  // Filtered list
+  let data=[...db.lateEntries].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const fmg=document.getElementById('lef-mg')?.value;
+  const fsh=document.getElementById('lef-sh')?.value;
+  const fst=document.getElementById('lef-st')?.value;
+  const ffrom=document.getElementById('lef-from')?.value;
+  const fto=document.getElementById('lef-to')?.value;
+  if(fmg)data=data.filter(l=>l.mgrId===fmg);
+  if(fsh)data=data.filter(l=>l.shift===fsh);
+  if(fst)data=data.filter(l=>l.status===fst);
+  if(ffrom)data=data.filter(l=>l.date>=ffrom);
+  if(fto)data=data.filter(l=>l.date<=fto);
+
+  const listEl=document.getElementById('late-list');
+  if(listEl) listEl.innerHTML=data.length
+    ?data.map(l=>lateCard(l,true)).join('')
+    :'<div class="empty"><div class="ee">⏰</div><p>Koi late entry nathi</p></div>';
+}
+function clrLateF(){
+  ['lef-mg','lef-sh','lef-st','lef-from','lef-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderLateReport();
+}
+
+// ── Badges ──
+function updateLateBadges(){
+  const pend=db.lateEntries.filter(l=>l.status==='pending').length;
+  const ab=document.getElementById('late-badge');
+  if(ab){ab.textContent=pend;ab.style.display=pend?'inline':'none';}
+  if(curUser){
+    const myNew=db.lateEntries.filter(l=>l.mgrId===curUser.id&&l.status!=='pending').length;
+    const mb=document.getElementById('late-mgr-badge');
+    if(mb){mb.style.display='none';}
+  }
+}
+
+// ── Patch mTab for late ──
+const _origMTab3=mTab;
+mTab=function(t,el){
+  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const sec=document.getElementById('ms-'+t);
+  if(sec)sec.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='rep')renderMyRep();
+  if(t==='lv')renderMgrLv();
+  if(t==='mist')renderMgrMist();
+  if(t==='late'){
+    document.getElementById('le-date').value=tod();
+    const h=new Date().getHours();
+    const sh=document.getElementById('le-shift');
+    if(sh)sh.value=h>=8&&h<20?'day':'night';
+    renderMgrLate();
+  }
+};
+
+// ── Patch aTab for late ──
+const _origATab3=aTab;
+aTab=function(t,el){
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  const sec=document.getElementById('as-'+t);
+  if(sec)sec.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='ov')renderOv();
+  if(t==='rp'){popF();renderReps();}
+  if(t==='lv')renderAdminLv();
+  if(t==='mist')renderMistReport();
+  if(t==='late')renderLateReport();
+  if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}
+  if(t==='dp')renderDpTbl();
+  if(t==='ct'){popD('cd');renderCtList();}
+  if(t==='bk')initBkTab();
+  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
+};
+
+// ── Patch initMgr for late ──
+const _origInitMgr3=initMgr;
+initMgr=function(){
+  _origInitMgr3();
+  updateLateBadges();
+};
+
+// ── Patch initAdmin for late ──
+const _origInitAdmin3=initAdmin;
+initAdmin=function(){
+  _origInitAdmin3();
+  updateLateBadges();
+};
+
+// ── Patch persist to include late ──
+const _origPersist=persist;
+persist=function(){
+  _origPersist();
+  persistLate();
+};
+
+// ── Patch expJSON to include late ──
+const _origExp=expJSON;
+expJSON=function(){
+  const data=JSON.stringify({
+    managers:db.managers,departments:db.departments,categories:db.categories,
+    submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,
+    mistakes:db.mistakes,lateEntries:db.lateEntries,
+    exportedAt:new Date().toISOString()
+  });
+  const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(data);
+  a.download='FormTrack_'+tod()+'.json';a.click();
+  const now=new Date().toISOString();localStorage.setItem('ft7_lastbk',now);
+  const el=document.getElementById('last-bk-txt');if(el)el.textContent='Last backup: '+new Date(now).toLocaleString()+' ✅';
+  sm('mn-msg','✅ Backup JSON downloaded!');
+};
+
+// ── Patch impJSON to include late ──
+const _origImp=impJSON;
+impJSON=function(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
+      if(!confirm('Restore? This replaces all data!'))return;
+      if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
+      if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
+      if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
+      if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
+      _origPersist();persistLate();
+      sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
+    }catch(e){sm('mn-msg','Invalid JSON',true);}
+  };r.readAsText(f);inp.value='';
 };
 </script>
