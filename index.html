@@ -4,1402 +4,695 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>FormTrack — Office System</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface2: #22263a;
-  --border: #2e3248;
-  --accent: #4f8ef7;
-  --accent2: #7c5cfa;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --text: #e8eaf6;
-  --text2: #8b92b8;
-  --text3: #555e80;
-  --radius: 10px;
-  --font: 'IBM Plex Sans', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap');
+:root{
+  --bg:#0F1117;--s:#1A1D27;--s2:#22263A;--s3:#2A2F45;
+  --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.15);
+  --t:#F0F2FF;--t2:#8B90A7;--t3:#4A4F6A;
+  --ac:#5B7BFF;--ac2:rgba(91,123,255,0.12);--ac3:rgba(91,123,255,0.3);
+  --gr:#34D399;--gr2:rgba(52,211,153,0.12);--gr3:rgba(52,211,153,0.3);
+  --am:#FBBF24;--am2:rgba(251,191,36,0.12);--am3:rgba(251,191,36,0.3);
+  --re:#F87171;--re2:rgba(248,113,113,0.12);--re3:rgba(248,113,113,0.3);
+  --pu:#A78BFA;--pu2:rgba(167,139,250,0.12);
+  --te:#2DD4BF;--te2:rgba(45,212,191,0.12);
+  --r:12px;--rs:8px;--rl:16px;--rx:22px;
+  --sh:0 2px 12px rgba(0,0,0,0.4);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; font-size: 14px; }
-
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+.pg{display:none;min-height:100vh}.pg.on{display:block}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
 /* LOGIN */
-.login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-.login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 380px; }
-.login-logo { font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; margin-bottom: 6px; }
-.login-sub { color: var(--text2); font-size: 13px; margin-bottom: 32px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; color: var(--text); font-family: var(--font); font-size: 14px; outline: none; transition: border-color 0.2s; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-.form-group select option { background: var(--surface); }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: var(--radius); border: none; cursor: pointer; font-family: var(--font); font-size: 13px; font-weight: 600; transition: all 0.2s; }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #3d7af0; }
-.btn-success { background: var(--success); color: #0f1117; }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-warning { background: var(--warning); color: #0f1117; }
-.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn-full { width: 100%; justify-content: center; }
-.error-msg { color: var(--danger); font-size: 12px; margin-top: 8px; }
-
-/* APP SHELL */
-.app { display: none; flex-direction: column; min-height: 100vh; }
-.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.topbar-brand { font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; }
-.topbar-user { display: flex; align-items: center; gap: 12px; }
-.user-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
-.user-badge.admin { color: var(--warning); border-color: var(--warning)33; }
-.user-badge.manager { color: var(--accent); border-color: var(--accent)33; }
-.logout-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 6px; }
-.logout-btn:hover { color: var(--danger); background: var(--danger)11; }
-
-/* NAV */
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; }
-.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; cursor: pointer; color: var(--text3); font-size: 10px; gap: 3px; position: relative; transition: color 0.2s; border: none; background: none; }
-.nav-item .nav-icon { font-size: 18px; }
-.nav-item.active { color: var(--accent); }
-.nav-badge { position: absolute; top: 6px; right: calc(50% - 14px); background: var(--danger); color: #fff; font-size: 9px; font-weight: 700; border-radius: 8px; padding: 1px 4px; min-width: 16px; text-align: center; }
-
-/* CONTENT */
-.content { flex: 1; padding: 16px; padding-bottom: 70px; max-width: 700px; margin: 0 auto; width: 100%; }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-.page-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
-.page-title span { color: var(--text3); font-size: 13px; font-weight: 400; margin-left: 8px; }
-
-/* CARDS */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-.card-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.card-title { font-weight: 600; font-size: 14px; }
-.card-sub { color: var(--text2); font-size: 12px; margin-top: 2px; }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.badge-blue { background: var(--accent)22; color: var(--accent); }
-.badge-green { background: var(--success)22; color: var(--success); }
-.badge-yellow { background: var(--warning)22; color: var(--warning); }
-.badge-red { background: var(--danger)22; color: var(--danger); }
-.badge-purple { background: var(--accent2)22; color: var(--accent2); }
-
-/* TABLE */
-.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; background: var(--surface); }
-th { background: var(--surface2); padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
-tr:last-child td { border-bottom: none; }
-
-/* FILTER BAR */
-.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.filter-bar select, .filter-bar input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; flex: 1; min-width: 120px; }
-
+.lwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:radial-gradient(ellipse at 50% 0%,rgba(91,123,255,0.18),transparent 65%)}
+.lbrand{text-align:center;margin-bottom:2rem}
+.lico{width:64px;height:64px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;box-shadow:0 0 0 1px rgba(91,123,255,0.3),0 8px 24px rgba(91,123,255,0.25)}
+.lbrand h1{font-size:26px;font-weight:600;letter-spacing:-.5px}
+.lbrand p{font-size:12px;color:var(--t2);margin-top:4px}
+.lbox{background:var(--s);border:1px solid var(--bd);border-radius:var(--rx);padding:1.75rem;width:100%;max-width:400px;box-shadow:var(--sh)}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.rc{border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
+.rc:hover{border-color:var(--bd2)}.rc.on{border-color:var(--ac);background:var(--ac2)}
+.rc .ri{font-size:26px;margin-bottom:6px}.rc .rl{font-size:13px;font-weight:500}.rc .rd{font-size:11px;color:var(--t2);margin-top:2px}
+/* FORM */
+label{font-size:12px;color:var(--t2);display:block;margin-bottom:5px;font-weight:500}
+input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t);outline:none;transition:border .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(91,123,255,0.15)}
+select option{background:#1A1D27}
+textarea{resize:vertical;min-height:56px}
+.fg{margin-bottom:14px}
+.pww{position:relative}.pww input{padding-right:42px}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);font-size:16px;background:none;border:none;padding:0}
+/* BUTTONS */
+.btn{padding:10px 18px;font-size:13px;font-weight:500;border-radius:var(--rs);cursor:pointer;border:1px solid transparent;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:7px;transition:all .15s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.ba{background:var(--ac);color:#fff}.ba:hover{background:#4A6AEE}
+.bg2{background:transparent;color:var(--t);border-color:var(--bd)}.bg2:hover{background:var(--s2)}
+.bre{background:var(--re2);color:var(--re);border-color:var(--re3)}
+.bam{background:var(--am2);color:var(--am);border-color:var(--am3)}
+.bgr{background:var(--gr2);color:var(--gr);border-color:var(--gr3)}
+.bfu{width:100%;justify-content:center}
+.bsm{padding:6px 12px;font-size:12px}.bxs{padding:4px 9px;font-size:11px}
+.err{font-size:12px;color:var(--re);margin-top:8px;min-height:16px}
+.ok{font-size:12px;color:var(--gr);margin-top:8px;min-height:16px}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:200;background:rgba(15,17,23,0.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between}
+.tbl{display:flex;align-items:center;gap:10px}
+.tlo{width:32px;height:32px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.tnm{font-size:14px;font-weight:600}.tsb{font-size:11px;color:var(--t2)}
+.wrap{max-width:700px;margin:0 auto;padding:1.25rem 1rem 6.5rem}
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(15,17,23,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom))}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t3);transition:color .15s;position:relative}
+.nb.on{color:var(--ac)}.nb .ni{font-size:20px;line-height:1}.nb .nl{font-size:10px;font-weight:500}
+.nbadge{position:absolute;top:2px;right:calc(50% - 18px);background:var(--re);color:#fff;border-radius:100px;font-size:9px;font-weight:600;padding:1px 5px;min-width:16px;text-align:center}
 /* ADMIN TABS */
-.admin-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 10px; padding: 4px; margin-bottom: 16px; overflow-x: auto; }
-.admin-tab { flex-shrink: 0; padding: 7px 14px; border-radius: 8px; border: none; background: none; color: var(--text2); cursor: pointer; font-family: var(--font); font-size: 12px; font-weight: 600; transition: all 0.2s; position: relative; white-space: nowrap; }
-.admin-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px #0005; }
-.admin-tab .tab-dot { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; background: var(--danger); border-radius: 50%; }
-
-/* STAT GRID */
-.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-.stat-value { font-size: 26px; font-weight: 700; font-family: var(--mono); }
-.stat-label { color: var(--text2); font-size: 11px; margin-top: 2px; }
-
-/* FILE UPLOAD */
-.upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 20px; text-align: center; color: var(--text2); cursor: pointer; transition: all 0.2s; }
-.upload-zone:hover { border-color: var(--accent); color: var(--accent); }
-.file-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.file-item { background: var(--surface2); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
-.file-item .del { margin-left: auto; cursor: pointer; color: var(--danger); }
-
+.atabs{display:flex;gap:3px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:1.25rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.atabs::-webkit-scrollbar{display:none}
+.atab{padding:8px 14px;font-size:12px;font-weight:500;border-radius:var(--rs);cursor:pointer;border:none;background:none;color:var(--t2);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;flex-shrink:0;position:relative}
+.atab.on{background:var(--ac);color:#fff}
+.sec{display:none}.sec.on{display:block}
+/* CARD */
+.card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:1.1rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+/* SHIFT */
+.stog{display:flex;background:var(--s2);border-radius:var(--rs);padding:4px;margin-bottom:1rem;border:1px solid var(--bd)}
+.so{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t2);transition:all .2s}
+.so.on.day{background:var(--am2);color:var(--am);border:1px solid var(--am3)}
+.so.on.night{background:var(--ac2);color:var(--ac);border:1px solid var(--ac3)}
+/* UPLOAD */
+.ci{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:8px;transition:border .15s}
+.ci.hf{border-color:var(--gr3)}
+.chdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cnm{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.ccnt{font-size:11px;color:var(--gr);background:var(--gr2);padding:2px 8px;border-radius:100px;display:none}
+.upbtn{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed rgba(255,255,255,0.1);border-radius:var(--rs);padding:10px;cursor:pointer;color:var(--t2);font-size:12px;background:rgba(255,255,255,0.02);transition:all .15s}
+.upbtn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac2)}
+.upbtn input{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.chip{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--bd);border-radius:100px;padding:3px 10px 3px 4px;font-size:11px;color:var(--t2)}
+.chip img{width:20px;height:20px;border-radius:4px;object-fit:cover}
+.cx{cursor:pointer;color:var(--t3);font-size:15px;line-height:1;padding-left:3px}
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem}
+@media(min-width:480px){.sg{grid-template-columns:repeat(4,1fr)}}
+.sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
+.sc{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px 12px;text-align:center}
+.sn{font-size:24px;font-weight:600;font-family:'DM Mono',monospace}.sl{font-size:11px;color:var(--t2);margin-top:3px}
+/* REPORT */
+.rep{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.rt{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.rnm{font-weight:600;font-size:15px}.rid{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
+.rm{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--t2);margin-bottom:8px}
+.cfg{background:var(--s2);border-radius:var(--rs);padding:9px 10px;margin-bottom:6px}
+.cft{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.tr{display:flex;flex-wrap:wrap;gap:6px}
+.th{width:52px;height:52px;border-radius:var(--rs);object-fit:cover;border:1px solid var(--bd);cursor:pointer;transition:transform .15s}
+.th:hover{transform:scale(1.06)}
+.tp{width:52px;height:52px;border-radius:var(--rs);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;color:var(--t2);background:var(--s);font-weight:600;gap:3px}
+.notebox{font-size:12px;color:var(--t2);font-style:italic;margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);border-left:2px solid var(--ac)}
+/* BADGES */
+.badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.b-day{background:var(--am2);color:var(--am)}.b-night{background:var(--ac2);color:var(--ac)}
+.b-gr{background:var(--gr2);color:var(--gr)}.b-re{background:var(--re2);color:var(--re)}
+.b-pu{background:var(--pu2);color:var(--pu)}.b-te{background:var(--te2);color:var(--te)}
+.b-am{background:var(--am2);color:var(--am)}
+/* MGR ROW */
+.mr{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r)}
+.av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--ac),#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;color:var(--t2);font-weight:600;padding:6px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+/* FILTER */
+.fwrap{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:1rem}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:480px){.fgrid{grid-template-columns:repeat(3,1fr)}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.g3r{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+@media(min-width:480px){.g3r{grid-template-columns:1fr 1fr 1fr}}
 /* MODAL */
-.modal-overlay { position: fixed; inset: 0; background: #000a; display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
-.modal-overlay.open { display: flex; }
-.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; }
-.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-
-/* DIVIDER */
-.divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-/* SEARCH */
-.search-box { position: relative; margin-bottom: 12px; }
-.search-box input { width: 100%; padding-left: 36px; }
-.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); }
-
-/* STATUS DOT */
-.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-.dot-green { background: var(--success); }
-.dot-yellow { background: var(--warning); }
-.dot-red { background: var(--danger); }
-.dot-blue { background: var(--accent); }
-
-/* TOAST */
-.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 20px; font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-.toast.show { opacity: 1; }
-.toast.success { border-color: var(--success); color: var(--success); }
-.toast.error { border-color: var(--danger); color: var(--danger); }
-
-/* LOADING */
-.loading { display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text3); flex-direction: column; gap: 12px; }
-.spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* SYNC INDICATOR */
-.sync-bar { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 6px 20px; font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
-.sync-dot.syncing { background: var(--warning); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-.empty { text-align: center; color: var(--text3); padding: 32px; font-size: 13px; }
-.text-red { color: var(--danger); }
-.text-green { color: var(--success); }
-.text-yellow { color: var(--warning); }
-.row-actions { display: flex; gap: 4px; }
+.mbg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
+@media(min-width:480px){.mbg{align-items:center;padding:1rem}}
+.mbg.open{display:flex}
+.mbox{background:var(--s);border:1px solid var(--bd2);border-radius:var(--rx) var(--rx) 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:su .25s ease}
+@media(min-width:480px){.mbox{border-radius:var(--rx)}}
+@keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhnd{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 1rem}
+.mtit{font-size:16px;font-weight:600;margin-bottom:1.25rem}
+/* LIGHTBOX */
+.lb{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.93);align-items:center;justify-content:center;padding:1rem}
+.lb.open{display:flex}.lb img{max-width:100%;max-height:85vh;border-radius:var(--r);object-fit:contain}
+.lbx{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.12);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* LEAVE */
+.lv-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.lv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.lv-name{font-weight:600;font-size:14px}
+.lv-meta{font-size:11px;color:var(--t2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.bal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem}
+@media(min-width:480px){.bal-grid{grid-template-columns:repeat(4,1fr)}}
+.bal-c{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;text-align:center}
+.bal-n{font-size:22px;font-weight:600;font-family:'DM Mono',monospace}
+.bal-l{font-size:11px;color:var(--t2);margin-top:3px}
+/* LEAVE REPORT TABLE */
+.lrep-wrap{overflow-x:auto;margin-bottom:1rem}
+.lrep-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+.lrep-tbl th{font-size:11px;color:var(--t2);font-weight:600;padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap;background:var(--s2)}
+.lrep-tbl td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.lrep-tbl tr:hover td{background:rgba(255,255,255,0.02)}
+/* CALENDAR VIEW */
+.lv-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.cal-day{background:var(--s2);border-radius:4px;padding:4px;text-align:center;font-size:10px;min-height:36px;border:1px solid var(--bd)}
+.cal-day.has-leave{background:var(--am2);border-color:var(--am3)}
+.cal-day.approved{background:var(--gr2);border-color:var(--gr3)}
+.cal-day.rejected{background:var(--re2);border-color:var(--re3)}
+.cal-hdr{font-size:10px;color:var(--t3);text-align:center;padding:3px 0;font-weight:600}
+/* EMPTY */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
+.empty .ee{font-size:34px;margin-bottom:8px}
+.div{height:1px;background:var(--bd);margin:1rem 0}
+.drive-status{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:12px;font-weight:500}
+.drive-status .dot{width:8px;height:8px;border-radius:50%}
+.drive-status .dot.no{background:var(--re)}
+.drive-status .dot.yes{background:var(--gr)}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">📋 FormTrack</div>
-    <div class="login-sub">Office Management System</div>
-    <div class="form-group">
-      <label>Role</label>
-      <select id="loginRole">
-        <option value="manager">Manager</option>
-        <option value="admin">Admin</option>
-      </select>
+<div id="pg-login" class="pg on">
+  <div class="lwrap">
+    <div class="lbrand">
+      <div class="lico">📋</div>
+      <h1>FormTrack</h1>
+      <p>Office Form System · Day &amp; Night Shift</p>
     </div>
-    <div class="form-group" id="managerSelectGroup">
-      <label>Select Manager</label>
-      <select id="loginManager"></select>
+    <div class="lbox">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:12px;font-weight:500">Select your role</p>
+      <div class="rgrid">
+        <div class="rc" id="rc-m" onclick="selR('m')"><div class="ri">👤</div><div class="rl">Manager</div><div class="rd">Submit forms</div></div>
+        <div class="rc" id="rc-a" onclick="selR('a')"><div class="ri">🛡️</div><div class="rl">Admin</div><div class="rd">Full access</div></div>
+      </div>
+      <div id="mb" style="display:none">
+        <div class="fg"><label>Manager ID</label><input type="text" id="l-id" placeholder="MGR-01" autocapitalize="characters"></div>
+        <div class="fg"><label>Password</label><div class="pww"><input type="password" id="l-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-pw',this)">👁</button></div></div>
+      </div>
+      <div id="ab" style="display:none">
+        <div class="fg"><label>Admin Password</label><div class="pww"><input type="password" id="l-apw" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-apw',this)">👁</button></div></div>
+      </div>
+      <button class="btn ba bfu" onclick="doLogin()">Continue →</button>
+      <div class="err" id="lerr"></div>
+      <p style="text-align:center;font-size:11px;color:var(--t3);margin-top:1rem;padding-top:1rem;border-top:1px solid var(--bd)">Day 8am–8pm · Night 8pm–8am</p>
     </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="loginPassword" placeholder="Enter password">
-    </div>
-    <div id="loginError" class="error-msg"></div>
-    <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="doLogin()">Login →</button>
-    <div style="margin-top:16px;color:var(--text3);font-size:11px;text-align:center">Powered by Supabase Cloud Sync</div>
   </div>
 </div>
 
-<!-- APP -->
-<div class="app" id="app">
+<div id="pg-mgr" class="pg">
   <div class="topbar">
-    <div class="topbar-brand">📋 FormTrack</div>
-    <div class="topbar-user">
-      <div class="user-badge" id="userBadge"></div>
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    <div class="tbl"><div class="tlo">📋</div><div><div class="tnm" id="m-nm">—</div><div class="tsb" id="m-dp">—</div></div></div>
+    <button class="btn bg2 bsm" onclick="doLogout()">Logout</button>
+  </div>
+  <div class="wrap">
+    <div class="sec on" id="ms-sub">
+      <div class="stog">
+        <button class="so on day" id="sh-d" onclick="psh('day')">☀️ Day 8am–8pm</button>
+        <button class="so night" id="sh-n" onclick="psh('night')">🌙 Night 8pm–8am</button>
+      </div>
+      <div class="g2" style="margin-bottom:1rem">
+        <div class="fg" style="margin:0"><label>Date</label><input type="date" id="sub-d"></div>
+        <div class="fg" style="margin:0"><label>Time (auto)</label><input type="text" id="sub-t" readonly style="background:var(--s2)"></div>
+      </div>
+      <div class="card"><div class="ct">Upload Forms by Category</div><div id="cat-area"></div></div>
+      <div class="fg"><label>Notes (optional)</label><textarea id="sub-n" placeholder="Any remarks..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn bg2 bsm" onclick="clrSub()">Clear</button>
+        <button class="btn ba" onclick="subForms()">✅ Submit Forms</button>
+      </div>
+      <div class="ok" id="sub-msg"></div>
+    </div>
+    <div class="sec" id="ms-rep"><div id="my-reps"></div></div>
+    <div class="sec" id="ms-lv">
+      <div class="card"><div class="ct">My Leave Balance</div><div class="bal-grid" id="mgr-bal"></div></div>
+      <div class="card">
+        <div class="ct">Apply for Leave</div>
+        <div class="fg"><label>Leave Type</label><select id="lv-type"></select></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="lv-from"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="lv-to"></div>
+        </div>
+        <div class="fg" style="margin-top:10px"><label>Reason</label><textarea id="lv-rsn" placeholder="Leave reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="applyLv()">📨 Apply Leave</button> <div class="ok" id="lv-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Leave History</div>
+      <div id="my-lv-list"></div>
+    </div>
+    <div class="sec" id="ms-mist">
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Mistake Reports</div>
+      <div id="mgr-mist-list"></div>
+    </div>
+    <div class="sec" id="ms-late">
+      <div class="card">
+        <div class="ct">⏰ Late Entry Report Karo</div>
+        <div class="fg"><label>Date</label><input type="date" id="le-date"></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Shift</label>
+            <select id="le-shift">
+              <option value="day">☀️ Day Shift (8am–8pm)</option>
+              <option value="night">🌙 Night Shift (8pm–8am)</option>
+            </select>
+          </div>
+          <div class="fg" style="margin:0"><label>Late by (minutes)</label>
+            <input type="number" id="le-mins" min="1" max="480" placeholder="30">
+          </div>
+        </div>
+        <div class="fg"><label>Actual Arrival Time</label><input type="time" id="le-time"></div>
+        <div class="fg"><label>Reason</label><textarea id="le-reason" placeholder="Late aavana no reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="submitLateEntry()">📨 Submit Late Entry</button>
+        <div class="ok" id="le-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Late Entry History</div>
+      <div id="mgr-late-list"></div>
     </div>
   </div>
-  <div class="sync-bar" id="syncBar">
-    <div class="sync-dot" id="syncDot"></div>
-    <span id="syncText">Connected to cloud</span>
-  </div>
-  <div class="content" id="mainContent"></div>
-  <nav class="bottom-nav" id="bottomNav"></nav>
-</div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modal">
-    <div class="modal-title" id="modalTitle"></div>
-    <div id="modalBody"></div>
-    <div class="modal-footer" id="modalFooter"></div>
+  <div class="bnav" id="mgr-bnav">
+    <button class="nb on" id="mn-sub" onclick="mTab('sub',this)"><span class="ni">📤</span><span class="nl">Submit</span></button>
+    <button class="nb" id="mn-rep" onclick="mTab('rep',this)"><span class="ni">📋</span><span class="nl">Reports</span></button>
+    <button class="nb" id="mn-lv" onclick="mTab('lv',this)"><span class="ni">🏖️</span><span class="nl">Leave</span></button>
+    <button class="nb" id="mn-mist" onclick="mTab('mist',this)" style="position:relative"><span class="ni">⚠️</span><span class="nl">Mistakes</span><span class="nbadge" id="mist-mgr-badge" style="display:none">0</span></button>
+    <button class="nb" id="mn-late" onclick="mTab('late',this)"><span class="ni">⏰</span><span class="nl">Late</span><span class="nbadge" id="late-mgr-badge" style="display:none">!</span></button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div id="pg-admin" class="pg">
+  <div class="topbar">
+    <div class="tbl"><div class="tlo">🛡️</div><div><div class="tnm">Admin</div><div class="tsb">FormTrack Dashboard</div></div></div>
+    <button class="btn bg2 bsm" onclick="doLogout()">Logout</button>
+  </div>
+  <div class="wrap">
+    <div class="atabs" id="atabs">
+      <button class="atab on" onclick="aTab('ov',this)">📊 Overview</button>
+      <button class="atab" onclick="aTab('rp',this)">📁 Reports</button>
+      <button class="atab" onclick="aTab('lv',this)">🏖️ Leave <span id="lv-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" onclick="aTab('mist',this)">⚠️ Mistakes <span id="mist-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" onclick="aTab('mg',this)">👥 Managers</button>
+      <button class="atab" onclick="aTab('dp',this)">🏬 Depts</button>
+      <button class="atab" onclick="aTab('ct',this)">🏷️ Categories</button>
+      <button class="atab" onclick="aTab('bk',this)">☁️ Supabase Cloud Backup</button>
+      <button class="atab" onclick="aTab('late',this)">⏰ Late Entry <span id="late-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" onclick="aTab('st',this)">⚙️ Settings</button>
+    </div>
+
+    <div class="sec on" id="as-ov">
+      <div class="sg" id="a-stats"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Summary</div>
+      <div id="a-sum"></div>
+    </div>
+
+    <div class="sec" id="as-rp">
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>From</label><input type="date" id="ff"></div>
+          <div class="fg" style="margin:0"><label>To</label><input type="date" id="ft"></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="fsh"><option value="">All shifts</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><select id="fm"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Department</label><select id="fd"><option value="">All</option></select></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderReps()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrF()">Reset</button>
+        </div>
+      </div>
+      <div id="all-reps"></div>
+    </div>
+
+    <div class="sec" id="as-lv">
+      <div class="sg3" id="lv-stats"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Pending Approvals</div>
+      <div id="lv-pending-list"></div>
+      <div class="div"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Leave Report</div>
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Status</label><select id="lf-st"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Approved</option><option value="rejected">❌ Rejected</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><select id="lf-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Leave Type</label><select id="lf-tp"><option value="">All types</option></select></div>
+          <div class="fg" style="margin:0"><label>From Month</label><input type="date" id="lf-from"></div>
+          <div class="fg" style="margin:0"><label>To Month</label><input type="date" id="lf-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderLvReport()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrLvF()">Reset</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="lrep-wrap"><table class="lrep-tbl" id="lv-rep-tbl">
+          <thead><tr><th>Manager</th><th>Dept</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th>Applied</th><th>Action</th></tr></thead>
+          <tbody id="lv-rep-body"></tbody>
+        </table></div>
+      </div>
+      <div class="ok" id="lv-admin-msg"></div>
+      <div class="div"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Leave Balance Summary</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="lrep-wrap"><table class="lrep-tbl" id="lv-bal-tbl">
+          <thead><tr id="lv-bal-hdr"></tr></thead>
+          <tbody id="lv-bal-body"></tbody>
+        </table></div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <div class="ct">🔧 Set Leave Balance</div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="sb-mg"><option value="">Select manager</option></select></div>
+          <div class="fg" style="margin:0"><label>Leave Type</label><select id="sb-tp"><option value="">Select type</option></select></div>
+        </div>
+        <div class="fg" style="margin-top:10px"><label>New Balance (days)</label><input type="number" id="sb-val" min="0" max="365" placeholder="e.g. 12"></div>
+        <button class="btn ba bsm" onclick="setBalance()">Set Balance</button>
+        <div class="ok" id="sb-msg"></div>
+      </div>
+    </div>
+
+    <div class="sec" id="as-mg">
+      <div class="card">
+        <div class="ct">Add New Manager</div>
+        <div class="g3r">
+          <div class="fg" style="margin:0"><label>Manager ID</label><input type="text" id="ni" placeholder="MGR-11" autocapitalize="characters"></div>
+          <div class="fg" style="margin:0"><label>Full Name</label><input type="text" id="nn"></div>
+          <div class="fg" style="margin:0"><label>Department</label><select id="nd"><option value="">— Select —</option></select></div>
+        </div>
+        <div class="g2" style="margin-top:4px">
+          <div class="fg" style="margin:0"><label>Password</label><div class="pww"><input type="password" id="np" placeholder="Set password"><button class="eye" onclick="tpw('np',this)">👁</button></div></div>
+          <div class="fg" style="margin:0"><label>Confirm Password</label><div class="pww"><input type="password" id="np2" placeholder="Repeat"><button class="eye" onclick="tpw('np2',this)">👁</button></div></div>
+        </div>
+        <button class="btn ba bsm" style="margin-top:4px" onclick="addMgr()">+ Add Manager</button>
+        <div class="ok" id="mg-msg"></div>
+      </div>
+      <div class="card"><div class="ct">All Managers (<span id="mg-cnt">0</span>)</div><div id="mg-tbl"></div></div>
+    </div>
+
+    <div class="sec" id="as-dp">
+      <div class="card">
+        <div class="ct">Add Department</div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div class="fg" style="flex:1;margin:0"><label>Department Name</label><input type="text" id="dn" placeholder="Production, Quality, HR..."></div>
+          <button class="btn ba bsm" onclick="addDept()">+ Add</button>
+        </div>
+        <div class="ok" id="dp-msg"></div>
+      </div>
+      <div class="card"><div id="dp-tbl"></div></div>
+    </div>
+
+    <div class="sec" id="as-ct">
+      <div class="card">
+        <div class="ct">Add Category</div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Category Name</label><input type="text" id="cn" placeholder="Checklist, Cross Tally..."></div>
+          <div class="fg" style="margin:0"><label>Department</label><select id="cd"><option value="">— Select —</option></select></div>
+        </div>
+        <button class="btn ba bsm" onclick="addCat()">+ Add Category</button> <div class="ok" id="ct-msg"></div>
+      </div>
+      <div class="card"><div id="ct-list"></div></div>
+    </div>
+
+    <div class="sec" id="as-bk">
+      <div class="card">
+        <div class="ct">☁️ Supabase Realtime Backup System</div>
+        <div class="drive-status" id="gd-st"><span class="dot no"></span><span id="gd-st-txt">Supabase Disconnected</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn ba bsm" onclick="sbConnect()">🔌 Connect Supabase</button>
+          <button class="btn bgr bsm" id="gd-bk-btn" onclick="sbBackup()" style="display:none">⬆️ Sync to Supabase</button>
+          <button class="btn bam bsm" id="gd-rs-btn" onclick="sbRestore()" style="display:none">⬇️ Pull from Supabase</button>
+        </div>
+        <div class="ok" id="gd-msg"></div>
+        <div style="font-size:12px;color:var(--t2);padding:10px;background:var(--s2);border-radius:var(--rs)">
+          ⚡ <strong>Supabase Integration Status:</strong> Connect to sync all app data (Managers, Submissions, Leaves, Mistakes, and Late Entries) automatically into centralized state management.
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">💾 Manual Local JSON Backup / Restore</div>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Use this when completely offline without cloud sync capability.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn bgr bsm" onclick="expJSON()">⬇️ Export JSON File</button>
+          <button class="btn ba bsm" onclick="document.getElementById('imp-f').click()">⬆️ Import JSON File</button>
+          <input type="file" id="imp-f" style="display:none" onchange="impJSON(this)" accept=".json">
+        </div>
+        <div class="ok" id="last-bk-txt" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="sec" id="as-late">
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Late Arrival History Audit</div>
+      <div id="all-late-list"></div>
+    </div>
+
+    <div class="sec" id="as-st">
+      <div class="card">
+        <div class="ct">System Access Password Configuration</div>
+        <div class="fg"><label>Admin Authentication Code</label><input type="password" id="sys-apw"></div>
+        <button class="btn ba bsm" onclick="saveSettings()">💾 Save Configurations</button>
+        <div class="ok" id="st-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-// ============ SUPABASE ============
-const SUPABASE_URL = 'https://vkbfsrttvbnoiwrgwiqg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_b-jW_IP7qptupeCo3cq7jA_-vje8U0w';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ============ STATE ============
-let currentUser = null; // { role, id, name, dept }
-let DB = {
+// ── SYSTEM CONFIGURATION & INITIAL LOCAL STATE DATA ──
+const db = {
   managers: [],
   departments: [],
   categories: [],
-  forms: [],
+  submissions: [],
   leaves: [],
-  lateEntries: [],
+  leavebal: {},
   mistakes: [],
-  settings: { adminPassword: 'admin123' }
+  lateEntries: []
 };
-let syncStatus = 'connected';
 
-// ============ SUPABASE DB OPS ============
-async function dbGet(key) {
+// ── SUPABASE CREDENTIAL INITIALIZATION ──
+// Enter your Supabase URL and public Anonymous API Key here
+const SUPABASE_URL = "https://your-project-id.supabase.co";
+const SUPABASE_KEY = "your-public-anon-key";
+let supabase = null;
+let sbConnectedState = false;
+
+function sbConnect() {
   try {
-    const { data, error } = await sb.from('formtrack').select('value').eq('key', key).single();
-    if (error || !data) return null;
-    return JSON.parse(data.value);
-  } catch { return null; }
-}
-
-async function dbSet(key, value) {
-  setSyncStatus('syncing');
-  try {
-    const { error } = await sb.from('formtrack').upsert({ key, value: JSON.stringify(value), updated_at: new Date().toISOString() });
-    if (error) throw error;
-    setSyncStatus('connected');
-    return true;
-  } catch(e) {
-    setSyncStatus('error');
-    console.error('DB set error:', e);
-    return false;
-  }
-}
-
-async function loadAllData() {
-  setSyncStatus('syncing');
-  try {
-    const { data, error } = await sb.from('formtrack').select('key,value');
-    if (error) throw error;
-    const map = {};
-    (data || []).forEach(r => { try { map[r.key] = JSON.parse(r.value); } catch {} });
-    if (map.managers) DB.managers = map.managers;
-    if (map.departments) DB.departments = map.departments;
-    if (map.categories) DB.categories = map.categories;
-    if (map.forms) DB.forms = map.forms;
-    if (map.leaves) DB.leaves = map.leaves;
-    if (map.lateEntries) DB.lateEntries = map.lateEntries;
-    if (map.mistakes) DB.mistakes = map.mistakes;
-    if (map.settings) DB.settings = { ...DB.settings, ...map.settings };
-    setSyncStatus('connected');
-  } catch(e) {
-    setSyncStatus('error');
-    console.error('Load error:', e);
-  }
-}
-
-async function saveCollection(key) {
-  return await dbSet(key, DB[key]);
-}
-
-// ============ SYNC STATUS ============
-function setSyncStatus(status) {
-  syncStatus = status;
-  const dot = document.getElementById('syncDot');
-  const text = document.getElementById('syncText');
-  if (!dot) return;
-  if (status === 'connected') {
-    dot.className = 'sync-dot';
-    text.textContent = 'Connected · cloud sync active';
-  } else if (status === 'syncing') {
-    dot.className = 'sync-dot syncing';
-    text.textContent = 'Syncing...';
-  } else {
-    dot.className = 'sync-dot';
-    dot.style.background = 'var(--danger)';
-    text.textContent = 'Sync error — check connection';
-  }
-}
-
-// ============ TOAST ============
-function toast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 2500);
-}
-
-// ============ MODAL ============
-function openModal(title, body, footer = '') {
-  document.getElementById('modalTitle').innerHTML = title;
-  document.getElementById('modalBody').innerHTML = body;
-  document.getElementById('modalFooter').innerHTML = footer;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-document.getElementById('modalOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-});
-
-// ============ AUTH ============
-function doLogin() {
-  const role = document.getElementById('loginRole').value;
-  const pw = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  errEl.textContent = '';
-
-  if (role === 'admin') {
-    if (pw !== DB.settings.adminPassword) { errEl.textContent = 'Wrong admin password'; return; }
-    currentUser = { role: 'admin', name: 'Admin', id: 'admin' };
-  } else {
-    const mid = document.getElementById('loginManager').value;
-    const mgr = DB.managers.find(m => m.id === mid);
-    if (!mgr) { errEl.textContent = 'Select a manager'; return; }
-    if (pw !== mgr.password) { errEl.textContent = 'Wrong password'; return; }
-    currentUser = { role: 'manager', id: mgr.id, name: mgr.name, dept: mgr.dept };
-  }
-  sessionStorage.setItem('ftUser', JSON.stringify(currentUser));
-  startApp();
-}
-
-function doLogout() {
-  sessionStorage.removeItem('ftUser');
-  currentUser = null;
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loginPassword').value = '';
-}
-
-document.getElementById('loginRole').addEventListener('change', function() {
-  document.getElementById('managerSelectGroup').style.display = this.value === 'manager' ? 'block' : 'none';
-});
-
-// ============ APP START ============
-async function init() {
-  // Show loading
-  document.getElementById('loginScreen').innerHTML = '<div style="color:var(--text2);font-family:var(--font)"><div class="spinner" style="margin:auto 0 12px"></div>Loading...</div>';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('loginScreen').style.alignItems = 'center';
-  document.getElementById('loginScreen').style.justifyContent = 'center';
-  
-  await loadAllData();
-  
-  // Initialize defaults if empty
-  if (DB.departments.length === 0) {
-    DB.departments = [
-      { id: 'd1', name: 'Production' },
-      { id: 'd2', name: 'Quality' },
-      { id: 'd3', name: 'Safety' }
-    ];
-    await saveCollection('departments');
-  }
-  if (DB.managers.length === 0) {
-    DB.managers = Array.from({length:10}, (_,i) => ({
-      id: 'MGR-' + String(i+1).padStart(2,'0'),
-      name: 'Manager ' + (i+1),
-      dept: 'd1',
-      password: 'pass' + String(i+1).padStart(2,'0')
-    }));
-    await saveCollection('managers');
-  }
-  if (DB.categories.length === 0) {
-    DB.categories = [
-      { id: 'c1', name: 'Checklist', dept: 'd1', formCount: 10 },
-      { id: 'c2', name: 'Cross Tally', dept: 'd1', formCount: 10 },
-      { id: 'c3', name: 'Production Report', dept: 'd1', formCount: 10 },
-      { id: 'c4', name: 'Whitemarking', dept: 'd2', formCount: 10 },
-      { id: 'c5', name: 'Quality Check', dept: 'd2', formCount: 10 },
-      { id: 'c6', name: 'Safety Inspection', dept: 'd3', formCount: 10 }
-    ];
-    await saveCollection('categories');
-  }
-
-  // Rebuild login screen
-  document.getElementById('loginScreen').innerHTML = `
-    <div class="login-card">
-      <div class="login-logo">📋 FormTrack</div>
-      <div class="login-sub">Office Management System</div>
-      <div class="form-group">
-        <label>Role</label>
-        <select id="loginRole" onchange="document.getElementById('managerSelectGroup').style.display=this.value==='manager'?'block':'none'">
-          <option value="manager">Manager</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-      <div class="form-group" id="managerSelectGroup">
-        <label>Select Manager</label>
-        <select id="loginManager">${DB.managers.map(m=>`<option value="${m.id}">${m.name} (${getDeptName(m.dept)})</option>`).join('')}</select>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPassword" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <div id="loginError" class="error-msg"></div>
-      <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="doLogin()">Login →</button>
-      <div style="margin-top:16px;color:var(--text3);font-size:11px;text-align:center">☁️ Cloud Sync Active · All data saved online</div>
-    </div>
-  `;
-  document.getElementById('loginScreen').style.alignItems = '';
-  document.getElementById('loginScreen').style.justifyContent = '';
-
-  // Check session
-  const saved = sessionStorage.getItem('ftUser');
-  if (saved) {
-    currentUser = JSON.parse(saved);
-    // Validate user still exists
-    if (currentUser.role === 'manager') {
-      const mgr = DB.managers.find(m => m.id === currentUser.id);
-      if (!mgr) { sessionStorage.removeItem('ftUser'); currentUser = null; }
-      else currentUser = { role: 'manager', id: mgr.id, name: mgr.name, dept: mgr.dept };
+    if (SUPABASE_URL.includes("your-project-id")) {
+      sm('gd-msg', '⚠️ Enter valid SUPABASE_URL and SUPABASE_KEY inside your code first!', true);
+      return;
     }
-    if (currentUser) startApp();
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    sbConnectedState = true;
+    document.getElementById('gd-st').innerHTML = '<span class="dot yes"></span><span id="gd-st-txt">Connected to Supabase ✅</span>';
+    document.getElementById('gd-bk-btn').style.display = 'inline-flex';
+    document.getElementById('gd-rs-btn').style.display = 'inline-flex';
+    sm('gd-msg', '✅ Supabase target Client created successfully.');
+  } catch (err) {
+    console.error(err);
+    sm('gd-msg', '❌ Connection Failed: ' + err.message, true);
   }
 }
 
-function startApp() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  document.getElementById('app').style.flexDirection = 'column';
-  document.getElementById('userBadge').textContent = currentUser.role === 'admin' ? '⚙️ Admin' : '👤 ' + currentUser.name;
-  document.getElementById('userBadge').className = 'user-badge ' + currentUser.role;
-  renderNav();
-  renderCurrentTab();
-}
-
-// ============ HELPERS ============
-function getDeptName(id) { const d = DB.departments.find(x=>x.id===id); return d?d.name:'—'; }
-function getCatName(id) { const c = DB.categories.find(x=>x.id===id); return c?c.name:'—'; }
-function getMgrName(id) { const m = DB.managers.find(x=>x.id===id); return m?m.name:'—'; }
-function fmtDate(iso) { if(!iso)return'—'; return new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
-function fmtDT(iso) { if(!iso)return'—'; return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-
-// ============ NAV ============
-let currentTab = '';
-
-function renderNav() {
-  const nav = document.getElementById('bottomNav');
-  const tabs = currentUser.role === 'admin' ? adminTabs() : managerTabs();
-  nav.innerHTML = tabs.map(t => {
-    const badge = t.badge ? t.badge() : 0;
-    return `<button class="nav-item" id="nav_${t.id}" onclick="switchTab('${t.id}')">
-      <span class="nav-icon">${t.icon}</span>
-      <span>${t.label}</span>
-      ${badge > 0 ? `<span class="nav-badge">${badge}</span>` : ''}
-    </button>`;
-  }).join('');
-  const first = tabs[0].id;
-  currentTab = first;
-  setActiveNav(first);
-}
-
-function adminTabs() {
-  return [
-    { id: 'a_dashboard', icon: '📊', label: 'Dashboard' },
-    { id: 'a_forms', icon: '📁', label: 'Forms' },
-    { id: 'a_managers', icon: '👥', label: 'Managers' },
-    { id: 'a_leave', icon: '🏖️', label: 'Leave', badge: () => DB.leaves.filter(l=>l.status==='pending').length },
-    { id: 'a_late', icon: '⏰', label: 'Late' },
-    { id: 'a_mistakes', icon: '⚠️', label: 'Mistakes' },
-    { id: 'a_settings', icon: '⚙️', label: 'Settings' }
-  ];
-}
-
-function managerTabs() {
-  return [
-    { id: 'm_upload', icon: '📤', label: 'Upload' },
-    { id: 'm_myforms', icon: '📋', label: 'My Forms' },
-    { id: 'm_leave', icon: '🏖️', label: 'Leave' },
-    { id: 'm_late', icon: '⏰', label: 'Late' },
-    { id: 'm_mistakes', icon: '⚠️', label: 'Mistakes', badge: () => DB.mistakes.filter(m=>m.managerId===currentUser.id&&m._new).length }
-  ];
-}
-
-function setActiveNav(id) {
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('nav_'+id);
-  if (el) el.classList.add('active');
-}
-
-function switchTab(id) {
-  currentTab = id;
-  setActiveNav(id);
-  renderCurrentTab();
-}
-
-function renderCurrentTab() {
-  const content = document.getElementById('mainContent');
-  content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  setTimeout(() => {
-    if (currentUser.role === 'admin') renderAdminTab(currentTab);
-    else renderManagerTab(currentTab);
-  }, 50);
-}
-
-// ============ ADMIN TABS ============
-function renderAdminTab(tab) {
-  const c = document.getElementById('mainContent');
-  switch(tab) {
-    case 'a_dashboard': c.innerHTML = buildAdminDashboard(); break;
-    case 'a_forms': c.innerHTML = buildAdminForms(); break;
-    case 'a_managers': c.innerHTML = buildAdminManagers(); break;
-    case 'a_leave': c.innerHTML = buildAdminLeave(); break;
-    case 'a_late': c.innerHTML = buildAdminLate(); break;
-    case 'a_mistakes': c.innerHTML = buildAdminMistakes(); break;
-    case 'a_settings': c.innerHTML = buildAdminSettings(); break;
-  }
-}
-
-// --- DASHBOARD ---
-function buildAdminDashboard() {
-  const today = new Date().toDateString();
-  const todayForms = DB.forms.filter(f=>new Date(f.submittedAt).toDateString()===today);
-  const pendingLeave = DB.leaves.filter(l=>l.status==='pending').length;
-  const pendingLate = DB.lateEntries.filter(l=>l.status==='pending').length;
-  const totalForms = DB.forms.length;
-  const mgrCount = DB.managers.length;
-
-  let mgrActivity = DB.managers.map(m => {
-    const mForms = DB.forms.filter(f=>f.managerId===m.id);
-    const last = mForms.sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt))[0];
-    return { ...m, formCount: mForms.length, last };
-  }).sort((a,b)=>b.formCount-a.formCount).slice(0,5);
-
-  return `
-    <div class="page-title">Dashboard</div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${totalForms}</div><div class="stat-label">Total Forms</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--success)">${todayForms.length}</div><div class="stat-label">Today's Forms</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--warning)">${pendingLeave}</div><div class="stat-label">Leave Pending</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${pendingLate}</div><div class="stat-label">Late Pending</div></div>
-    </div>
-    <div class="page-title" style="font-size:14px">Top Active Managers</div>
-    ${mgrActivity.map(m=>`
-      <div class="card card-row">
-        <div>
-          <div class="card-title">${m.name}</div>
-          <div class="card-sub">${getDeptName(m.dept)} · Last: ${m.last?fmtDT(m.last.submittedAt):'Never'}</div>
-        </div>
-        <span class="badge badge-blue">${m.formCount} forms</span>
-      </div>
-    `).join('')}
-  `;
-}
-
-// --- ADMIN FORMS ---
-function buildAdminForms() {
-  const mgrs = DB.managers;
-  const cats = DB.categories;
+async function sbBackup() {
+  if (!supabase) return sm('gd-msg', 'Please connect Supabase client instance first.', true);
+  sm('gd-msg', 'Syncing state database payload...');
   
-  let html = `
-    <div class="page-title">Form Reports <span>${DB.forms.length} total</span></div>
-    <div class="filter-bar">
-      <select id="flt_mgr" onchange="filterForms()"><option value="">All Managers</option>${mgrs.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select>
-      <select id="flt_cat" onchange="filterForms()"><option value="">All Categories</option>${cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select>
-      <select id="flt_shift" onchange="filterForms()"><option value="">All Shifts</option><option>Day</option><option>Night</option></select>
-    </div>
-    <div id="formsDateRange" style="display:flex;gap:8px;margin-bottom:12px">
-      <input type="date" id="flt_from" onchange="filterForms()" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:var(--font)">
-      <input type="date" id="flt_to" onchange="filterForms()" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:var(--font)">
-    </div>
-    <div id="formsTableWrap"></div>
-  `;
-  setTimeout(filterForms, 50);
-  return html;
-}
+  const payload = {
+    id: "formtrack_primary_sync", // Unique target document reference identifier key
+    updated_at: new Date().toISOString(),
+    db_snapshot: {
+      managers: db.managers,
+      departments: db.departments,
+      categories: db.categories,
+      submissions: db.submissions,
+      leaves: db.leaves,
+      leavebal: db.leavebal,
+      mistakes: db.mistakes,
+      lateEntries: db.lateEntries
+    }
+  };
 
-function filterForms() {
-  const mgr = document.getElementById('flt_mgr')?.value;
-  const cat = document.getElementById('flt_cat')?.value;
-  const shift = document.getElementById('flt_shift')?.value;
-  const from = document.getElementById('flt_from')?.value;
-  const to = document.getElementById('flt_to')?.value;
-  
-  let forms = DB.forms;
-  if (mgr) forms = forms.filter(f=>f.managerId===mgr);
-  if (cat) forms = forms.filter(f=>f.categoryId===cat);
-  if (shift) forms = forms.filter(f=>f.shift===shift);
-  if (from) forms = forms.filter(f=>f.submittedAt>=from);
-  if (to) forms = forms.filter(f=>f.submittedAt<=to+'T23:59:59');
-  forms = forms.sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
-  
-  const wrap = document.getElementById('formsTableWrap');
-  if (!wrap) return;
-  if (forms.length === 0) { wrap.innerHTML = '<div class="empty">No forms found</div>'; return; }
-  
-  wrap.innerHTML = `<div class="table-wrap"><table>
-    <tr><th>Date/Time</th><th>Manager</th><th>Category</th><th>Shift</th><th>Files</th></tr>
-    ${forms.map(f=>`<tr>
-      <td style="font-family:var(--mono);font-size:12px">${fmtDT(f.submittedAt)}</td>
-      <td>${getMgrName(f.managerId)}</td>
-      <td>${getCatName(f.categoryId)}</td>
-      <td><span class="badge ${f.shift==='Day'?'badge-yellow':'badge-purple'}">${f.shift}</span></td>
-      <td>${f.files?f.files.length:0} files</td>
-    </tr>`).join('')}
-  </table></div>`;
-}
+  try {
+    // Upsert backups to a relational schema table containing raw state document
+    const { data, error } = await supabase
+      .from('formtrack_backups')
+      .upsert([payload], { onConflict: 'id' });
 
-// --- ADMIN MANAGERS ---
-function buildAdminManagers() {
-  return `
-    <div class="page-title">Managers</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button class="btn btn-primary btn-sm" onclick="openAddMgrModal()">+ Add Manager</button>
-      <button class="btn btn-ghost btn-sm" onclick="openDeptModal()">🏬 Departments</button>
-      <button class="btn btn-ghost btn-sm" onclick="openCatModal()">🏷️ Categories</button>
-    </div>
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" placeholder="Search managers..." oninput="renderMgrList(this.value)" style="padding-left:36px">
-    </div>
-    <div id="mgrList"></div>
-  `;
-  setTimeout(renderMgrList, 50);
-}
-
-function renderMgrList(q='') {
-  const el = document.getElementById('mgrList');
-  if (!el) return;
-  let mgrs = DB.managers;
-  if (q) mgrs = mgrs.filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
-  el.innerHTML = mgrs.map(m=>`
-    <div class="card card-row">
-      <div>
-        <div class="card-title">${m.name}</div>
-        <div class="card-sub">ID: ${m.id} · ${getDeptName(m.dept)}</div>
-      </div>
-      <div class="row-actions">
-        <button class="btn btn-ghost btn-sm" onclick="openEditMgrModal('${m.id}')">✏️</button>
-        <button class="btn btn-sm" style="background:var(--danger)22;color:var(--danger)" onclick="deleteMgr('${m.id}')">🗑️</button>
-      </div>
-    </div>
-  `).join('') || '<div class="empty">No managers found</div>';
-}
-
-function openAddMgrModal() {
-  openModal('Add Manager', `
-    <div class="form-group"><label>Name</label><input id="nm_name" placeholder="Manager name"></div>
-    <div class="form-group"><label>Password</label><input id="nm_pass" type="password" placeholder="Password"></div>
-    <div class="form-group"><label>Department</label><select id="nm_dept">${DB.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select></div>
-  `, `<button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button><button class="btn btn-primary btn-sm" onclick="addMgr()">Add</button>`);
-}
-
-async function addMgr() {
-  const name = document.getElementById('nm_name').value.trim();
-  const pass = document.getElementById('nm_pass').value;
-  const dept = document.getElementById('nm_dept').value;
-  if (!name || !pass) return;
-  const id = 'MGR-' + String(DB.managers.length+1).padStart(2,'0') + '-' + uid().slice(0,3).toUpperCase();
-  DB.managers.push({ id, name, dept, password: pass });
-  await saveCollection('managers');
-  closeModal();
-  renderCurrentTab();
-  toast('Manager added ✓', 'success');
-}
-
-function openEditMgrModal(id) {
-  const m = DB.managers.find(x=>x.id===id);
-  openModal('Edit Manager', `
-    <div class="form-group"><label>Name</label><input id="em_name" value="${m.name}"></div>
-    <div class="form-group"><label>New Password (blank = keep)</label><input id="em_pass" type="password" placeholder="Leave blank to keep"></div>
-    <div class="form-group"><label>Department</label><select id="em_dept">${DB.departments.map(d=>`<option value="${d.id}" ${d.id===m.dept?'selected':''}>${d.name}</option>`).join('')}</select></div>
-  `, `<button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveMgr('${id}')">Save</button>`);
-}
-
-async function saveMgr(id) {
-  const m = DB.managers.find(x=>x.id===id);
-  m.name = document.getElementById('em_name').value.trim() || m.name;
-  const np = document.getElementById('em_pass').value;
-  if (np) m.password = np;
-  m.dept = document.getElementById('em_dept').value;
-  await saveCollection('managers');
-  closeModal();
-  renderCurrentTab();
-  toast('Saved ✓', 'success');
-}
-
-async function deleteMgr(id) {
-  if (!confirm('Delete this manager?')) return;
-  DB.managers = DB.managers.filter(m=>m.id!==id);
-  await saveCollection('managers');
-  renderCurrentTab();
-  toast('Deleted', 'error');
-}
-
-// Departments modal
-function openDeptModal() {
-  const renderDepts = () => `
-    <div class="form-group" style="display:flex;gap:8px">
-      <input id="nd_name" placeholder="New department name" style="flex:1">
-      <button class="btn btn-primary btn-sm" onclick="addDept()">Add</button>
-    </div>
-    ${DB.departments.map(d=>`
-      <div class="card card-row" style="padding:10px 14px">
-        <div>
-          <div class="card-title">${d.name}</div>
-          <div class="card-sub">${DB.managers.filter(m=>m.dept===d.id).length} managers · ${DB.categories.filter(c=>c.dept===d.id).length} categories</div>
-        </div>
-        <button class="btn btn-sm" style="background:var(--danger)22;color:var(--danger)" onclick="deleteDept('${d.id}')">🗑️</button>
-      </div>
-    `).join('')}
-  `;
-  openModal('Departments', renderDepts(), `<button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>`);
-}
-
-async function addDept() {
-  const name = document.getElementById('nd_name').value.trim();
-  if (!name) return;
-  DB.departments.push({ id: 'd'+uid(), name });
-  await saveCollection('departments');
-  openDeptModal();
-}
-
-async function deleteDept(id) {
-  if (DB.managers.some(m=>m.dept===id)||DB.categories.some(c=>c.dept===id)) {
-    toast('Remove managers & categories first', 'error'); return;
-  }
-  DB.departments = DB.departments.filter(d=>d.id!==id);
-  await saveCollection('departments');
-  openDeptModal();
-}
-
-// Categories modal
-function openCatModal() {
-  const renderCats = () => `
-    <div class="form-group"><label>Name</label><input id="nc_name" placeholder="Category name"></div>
-    <div class="form-group"><label>Department</label><select id="nc_dept">${DB.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select></div>
-    <div class="form-group"><label>Number of Forms</label><input id="nc_count" type="number" value="10" min="1"></div>
-    <button class="btn btn-primary btn-sm btn-full" onclick="addCat()">Add Category</button>
-    <div class="divider"></div>
-    ${DB.categories.map(c=>`
-      <div class="card card-row" style="padding:10px 14px">
-        <div>
-          <div class="card-title">${c.name}</div>
-          <div class="card-sub">${getDeptName(c.dept)} · ${c.formCount} forms</div>
-        </div>
-        <button class="btn btn-sm" style="background:var(--danger)22;color:var(--danger)" onclick="deleteCat('${c.id}')">🗑️</button>
-      </div>
-    `).join('')}
-  `;
-  openModal('Categories', renderCats(), `<button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>`);
-}
-
-async function addCat() {
-  const name = document.getElementById('nc_name').value.trim();
-  const dept = document.getElementById('nc_dept').value;
-  const formCount = parseInt(document.getElementById('nc_count').value)||10;
-  if (!name) return;
-  DB.categories.push({ id: 'c'+uid(), name, dept, formCount });
-  await saveCollection('categories');
-  openCatModal();
-}
-
-async function deleteCat(id) {
-  DB.categories = DB.categories.filter(c=>c.id!==id);
-  await saveCollection('categories');
-  openCatModal();
-}
-
-// --- ADMIN LEAVE ---
-function buildAdminLeave() {
-  const pending = DB.leaves.filter(l=>l.status==='pending');
-  const all = DB.leaves;
-  
-  const leaveTypes = ['Casual Leave','Sick Leave','Earned Leave','Emergency Leave'];
-  
-  return `
-    <div class="page-title">Leave Management <span>${pending.length} pending</span></div>
+    if (error) throw error;
     
-    <div class="admin-tabs">
-      <button class="admin-tab active" id="ltab_pending" onclick="switchLeaveTab('pending')">Pending ${pending.length>0?'●':''}</button>
-      <button class="admin-tab" id="ltab_all" onclick="switchLeaveTab('all')">All Leaves</button>
-      <button class="admin-tab" id="ltab_balance" onclick="switchLeaveTab('balance')">Balances</button>
-      <button class="admin-tab" id="ltab_add" onclick="switchLeaveTab('add')">+ Add Entry</button>
-    </div>
-    <div id="leaveTabContent"></div>
-  `;
-  setTimeout(()=>switchLeaveTab('pending'),50);
-}
-
-function switchLeaveTab(tab) {
-  document.querySelectorAll('[id^="ltab_"]').forEach(el=>el.classList.remove('active'));
-  const el = document.getElementById('ltab_'+tab);
-  if(el) el.classList.add('active');
-  
-  const c = document.getElementById('leaveTabContent');
-  if (!c) return;
-  
-  if (tab === 'pending') {
-    const pending = DB.leaves.filter(l=>l.status==='pending');
-    if (pending.length===0) { c.innerHTML='<div class="empty">No pending leaves ✓</div>'; return; }
-    c.innerHTML = pending.map(l=>`
-      <div class="card">
-        <div class="card-row">
-          <div>
-            <div class="card-title">${getMgrName(l.managerId)}</div>
-            <div class="card-sub">${l.type} · ${fmtDate(l.from)} to ${fmtDate(l.to)}</div>
-            <div style="margin-top:4px;font-size:12px;color:var(--text)">${l.reason}</div>
-          </div>
-          <span class="badge badge-yellow">Pending</span>
-        </div>
-        <div style="margin-top:10px;display:flex;gap:8px">
-          <button class="btn btn-success btn-sm" onclick="reviewLeave('${l.id}','approved')">✓ Approve</button>
-          <button class="btn btn-danger btn-sm" onclick="reviewLeave('${l.id}','rejected')">✗ Reject</button>
-        </div>
-      </div>
-    `).join('');
-  } else if (tab === 'all') {
-    const all = [...DB.leaves].sort((a,b)=>new Date(b.appliedAt)-new Date(a.appliedAt));
-    if (all.length===0) { c.innerHTML='<div class="empty">No leaves</div>'; return; }
-    c.innerHTML = `<div class="table-wrap"><table>
-      <tr><th>Manager</th><th>Type</th><th>From</th><th>To</th><th>Status</th></tr>
-      ${all.map(l=>`<tr>
-        <td>${getMgrName(l.managerId)}</td><td>${l.type}</td>
-        <td>${fmtDate(l.from)}</td><td>${fmtDate(l.to)}</td>
-        <td><span class="badge ${l.status==='approved'?'badge-green':l.status==='rejected'?'badge-red':'badge-yellow'}">${l.status}</span></td>
-      </tr>`).join('')}
-    </table></div>`;
-  } else if (tab === 'balance') {
-    c.innerHTML = `<div class="table-wrap"><table>
-      <tr><th>Manager</th><th>Casual</th><th>Sick</th><th>Earned</th><th>Emergency</th></tr>
-      ${DB.managers.map(m=>{
-        const bal = getLeaveBalance(m.id);
-        return `<tr><td>${m.name}</td><td>${bal.casual}</td><td>${bal.sick}</td><td>${bal.earned}</td><td>${bal.emergency}</td></tr>`;
-      }).join('')}
-    </table></div>`;
-  } else if (tab === 'add') {
-    c.innerHTML = `
-      <div class="card">
-        <div class="form-group"><label>Manager</label><select id="al_mgr">${DB.managers.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select></div>
-        <div class="form-group"><label>Leave Type</label><select id="al_type"><option>Casual Leave</option><option>Sick Leave</option><option>Earned Leave</option><option>Emergency Leave</option></select></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group"><label>From</label><input type="date" id="al_from"></div>
-          <div class="form-group"><label>To</label><input type="date" id="al_to"></div>
-        </div>
-        <div class="form-group"><label>Reason</label><textarea id="al_reason" rows="2"></textarea></div>
-        <button class="btn btn-primary" onclick="adminAddLeave()">Submit Leave</button>
-      </div>
-    `;
+    sm('gd-msg', '✅ Database payload snapshot successfully synchronized to Supabase Cloud Instance!');
+    localStorage.setItem('ft7_lastbk', new Date().toISOString());
+    updBkTxt();
+  } catch (err) {
+    console.error(err);
+    sm('gd-msg', '❌ Supabase Sync Failed: ' + err.message, true);
   }
 }
 
-function getLeaveBalance(mgrid) {
-  const defaults = { casual:12, sick:10, earned:15, emergency:3 };
-  const used = { casual:0, sick:0, earned:0, emergency:0 };
-  DB.leaves.filter(l=>l.managerId===mgrid&&l.status==='approved').forEach(l=>{
-    const days = Math.ceil((new Date(l.to)-new Date(l.from))/(864e5))+1;
-    const k = l.type.toLowerCase().split(' ')[0];
-    if(used[k]!==undefined) used[k]+=days;
-  });
-  return { casual:defaults.casual-used.casual, sick:defaults.sick-used.sick, earned:defaults.earned-used.earned, emergency:defaults.emergency-used.emergency };
-}
-
-async function reviewLeave(id, status) {
-  const l = DB.leaves.find(x=>x.id===id);
-  if(l) l.status = status;
-  await saveCollection('leaves');
-  switchTab('a_leave');
-  toast(status==='approved'?'Leave approved ✓':'Leave rejected', status==='approved'?'success':'error');
-}
-
-async function adminAddLeave() {
-  const mgr = document.getElementById('al_mgr').value;
-  const type = document.getElementById('al_type').value;
-  const from = document.getElementById('al_from').value;
-  const to = document.getElementById('al_to').value;
-  const reason = document.getElementById('al_reason').value;
-  if (!from||!to) { toast('Select dates','error'); return; }
-  DB.leaves.push({ id:uid(), managerId:mgr, type, from, to, reason, status:'approved', appliedAt:new Date().toISOString() });
-  await saveCollection('leaves');
-  toast('Leave added ✓','success');
-  switchLeaveTab('all');
-}
-
-// --- ADMIN LATE ---
-function buildAdminLate() {
-  return `
-    <div class="page-title">Late Entry Management</div>
-    <div class="admin-tabs">
-      <button class="admin-tab active" id="latab_list" onclick="switchLateAdminTab('list')">All Entries</button>
-      <button class="admin-tab" id="latab_add" onclick="switchLateAdminTab('add')">+ Add Entry</button>
-      <button class="admin-tab" id="latab_summary" onclick="switchLateAdminTab('summary')">Summary</button>
-    </div>
-    <div id="lateAdminContent"></div>
-  `;
-  setTimeout(()=>switchLateAdminTab('list'),50);
-}
-
-function switchLateAdminTab(tab) {
-  document.querySelectorAll('[id^="latab_"]').forEach(el=>el.classList.remove('active'));
-  const el = document.getElementById('latab_'+tab);
-  if(el) el.classList.add('active');
-  const c = document.getElementById('lateAdminContent');
-  if(!c) return;
+async function sbRestore() {
+  if (!supabase) return sm('gd-msg', 'Please connect Supabase client instance first.', true);
+  if (!confirm('Are you absolutely sure you want to pull data from Supabase? This overrides your local state definitions.')) return;
   
-  if (tab === 'list') {
-    const entries = [...DB.lateEntries].sort((a,b)=>new Date(b.date)-new Date(a.date));
-    if (!entries.length) { c.innerHTML='<div class="empty">No late entries</div>'; return; }
-    c.innerHTML = `<div class="table-wrap"><table>
-      <tr><th>Manager</th><th>Date</th><th>Shift</th><th>Minutes Late</th><th>Status</th><th></th></tr>
-      ${entries.map(e=>`<tr>
-        <td>${getMgrName(e.managerId)}</td>
-        <td>${fmtDate(e.date)}</td>
-        <td>${e.shift}</td>
-        <td>${e.lateMinutes}</td>
-        <td><span class="badge ${e.status==='excused'?'badge-green':e.status==='unexcused'?'badge-red':'badge-yellow'}">${e.status}</span></td>
-        <td>
-          ${e.status==='pending'?`<button class="btn btn-sm btn-success" onclick="reviewLate('${e.id}','excused')">✓</button> <button class="btn btn-sm btn-danger" onclick="reviewLate('${e.id}','unexcused')">✗</button>`:''}
-        </td>
-      </tr>`).join('')}
-    </table></div>`;
-  } else if (tab === 'add') {
-    c.innerHTML = `
-      <div class="card">
-        <div class="form-group"><label>Manager</label><select id="la_mgr">${DB.managers.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select></div>
-        <div class="form-group"><label>Date</label><input type="date" id="la_date" value="${new Date().toISOString().slice(0,10)}"></div>
-        <div class="form-group"><label>Shift</label><select id="la_shift"><option>Day</option><option>Night</option></select></div>
-        <div class="form-group"><label>Minutes Late</label><input type="number" id="la_min" placeholder="e.g. 30"></div>
-        <div class="form-group"><label>Reason</label><textarea id="la_reason" rows="2"></textarea></div>
-        <button class="btn btn-primary" onclick="adminAddLate()">Add Late Entry</button>
-      </div>
-    `;
-  } else if (tab === 'summary') {
-    c.innerHTML = `<div class="table-wrap"><table>
-      <tr><th>Manager</th><th>Total Late</th><th>Total Mins</th><th>Excused</th><th>Unexcused</th></tr>
-      ${DB.managers.map(m=>{
-        const entries = DB.lateEntries.filter(e=>e.managerId===m.id);
-        return `<tr>
-          <td>${m.name}</td>
-          <td>${entries.length}</td>
-          <td>${entries.reduce((s,e)=>s+parseInt(e.lateMinutes||0),0)}</td>
-          <td class="text-green">${entries.filter(e=>e.status==='excused').length}</td>
-          <td class="text-red">${entries.filter(e=>e.status==='unexcused').length}</td>
-        </tr>`;
-      }).join('')}
-    </table></div>`;
-  }
-}
-
-async function reviewLate(id, status) {
-  const e = DB.lateEntries.find(x=>x.id===id);
-  if(e) e.status=status;
-  await saveCollection('lateEntries');
-  switchLateAdminTab('list');
-}
-
-async function adminAddLate() {
-  const mgr=document.getElementById('la_mgr').value;
-  const date=document.getElementById('la_date').value;
-  const shift=document.getElementById('la_shift').value;
-  const lateMinutes=document.getElementById('la_min').value;
-  const reason=document.getElementById('la_reason').value;
-  if(!date||!lateMinutes){toast('Fill all fields','error');return;}
-  DB.lateEntries.push({id:uid(),managerId:mgr,date,shift,lateMinutes,reason,status:'pending',submittedAt:new Date().toISOString()});
-  await saveCollection('lateEntries');
-  toast('Added ✓','success');
-  switchLateAdminTab('list');
-}
-
-// --- ADMIN MISTAKES ---
-function buildAdminMistakes() {
-  const cats=['Form Error','Late Submission','Safety Issue','Quality Issue','Process Violation','Other'];
-  const sevs=['Minor','Moderate','Major','Critical'];
-  const sevColors={Minor:'badge-yellow',Moderate:'badge-yellow',Major:'badge-red',Critical:'badge-red'};
-  
-  return `
-    <div class="page-title">Mistake Reports</div>
-    <div class="admin-tabs">
-      <button class="admin-tab active" id="mtab_list" onclick="switchMistakeTab('list')">All Reports</button>
-      <button class="admin-tab" id="mtab_add" onclick="switchMistakeTab('add')">+ Add Report</button>
-      <button class="admin-tab" id="mtab_perf" onclick="switchMistakeTab('perf')">Performance</button>
-    </div>
-    <div id="mistakeTabContent"></div>
-  `;
-  setTimeout(()=>switchMistakeTab('list'),50);
-}
-
-function switchMistakeTab(tab) {
-  document.querySelectorAll('[id^="mtab_"]').forEach(el=>el.classList.remove('active'));
-  const el = document.getElementById('mtab_'+tab);
-  if(el) el.classList.add('active');
-  const c = document.getElementById('mistakeTabContent');
-  if(!c) return;
-  
-  if (tab === 'list') {
-    const mistakes = [...DB.mistakes].sort((a,b)=>new Date(b.date)-new Date(a.date));
-    if(!mistakes.length){c.innerHTML='<div class="empty">No mistake reports</div>';return;}
-    c.innerHTML = mistakes.map(m=>`
-      <div class="card">
-        <div class="card-row">
-          <div>
-            <div class="card-title">${getMgrName(m.managerId)}</div>
-            <div class="card-sub">${fmtDate(m.date)} · ${m.category}</div>
-          </div>
-          <span class="badge ${m.severity==='Minor'?'badge-yellow':m.severity==='Moderate'?'badge-yellow':'badge-red'}">${m.severity}</span>
-        </div>
-        <div style="margin-top:8px;font-size:12px;color:var(--text)">${m.description}</div>
-        ${m.actionTaken?`<div style="margin-top:4px;font-size:11px;color:var(--text2)">Action: ${m.actionTaken}</div>`:''}
-      </div>
-    `).join('');
-  } else if (tab === 'add') {
-    c.innerHTML = `
-      <div class="card">
-        <div class="form-group"><label>Manager</label><select id="mr_mgr">${DB.managers.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select></div>
-        <div class="form-group"><label>Date</label><input type="date" id="mr_date" value="${new Date().toISOString().slice(0,10)}"></div>
-        <div class="form-group"><label>Severity</label><select id="mr_sev"><option>Minor</option><option>Moderate</option><option>Major</option><option>Critical</option></select></div>
-        <div class="form-group"><label>Category</label><select id="mr_cat"><option>Form Error</option><option>Late Submission</option><option>Safety Issue</option><option>Quality Issue</option><option>Process Violation</option><option>Other</option></select></div>
-        <div class="form-group"><label>Description</label><textarea id="mr_desc" rows="3" placeholder="Describe the mistake..."></textarea></div>
-        <div class="form-group"><label>Action Taken</label><textarea id="mr_action" rows="2" placeholder="What action was taken..."></textarea></div>
-        <button class="btn btn-primary" onclick="addMistake()">Submit Report</button>
-      </div>
-    `;
-  } else if (tab === 'perf') {
-    const scores = DB.managers.map(m=>{
-      const mist = DB.mistakes.filter(x=>x.managerId===m.id);
-      const score = Math.max(0, 100 - mist.reduce((s,x)=>s+({Minor:2,Moderate:5,Major:10,Critical:20}[x.severity]||0),0));
-      const grade = score>=90?'Excellent':score>=75?'Good':score>=60?'Average':score>=40?'Poor':'Critical';
-      return {...m, total:mist.length, score, grade};
-    });
-    c.innerHTML = `<div class="table-wrap"><table>
-      <tr><th>Manager</th><th>Mistakes</th><th>Score</th><th>Grade</th></tr>
-      ${scores.map(m=>`<tr>
-        <td>${m.name}</td><td>${m.total}</td>
-        <td style="font-family:var(--mono)">${m.score}</td>
-        <td><span class="badge ${m.grade==='Excellent'?'badge-green':m.grade==='Good'?'badge-blue':m.grade==='Average'?'badge-yellow':'badge-red'}">${m.grade}</span></td>
-      </tr>`).join('')}
-    </table></div>`;
-  }
-}
-
-async function addMistake() {
-  const mgr=document.getElementById('mr_mgr').value;
-  const date=document.getElementById('mr_date').value;
-  const severity=document.getElementById('mr_sev').value;
-  const category=document.getElementById('mr_cat').value;
-  const description=document.getElementById('mr_desc').value.trim();
-  const actionTaken=document.getElementById('mr_action').value.trim();
-  if(!description){toast('Add description','error');return;}
-  DB.mistakes.push({id:uid(),managerId:mgr,date,severity,category,description,actionTaken,_new:true,createdAt:new Date().toISOString()});
-  await saveCollection('mistakes');
-  toast('Report added ✓','success');
-  switchMistakeTab('list');
-}
-
-// --- ADMIN SETTINGS ---
-function buildAdminSettings() {
-  return `
-    <div class="page-title">Settings</div>
-    <div class="card">
-      <div class="card-title" style="margin-bottom:12px">Change Admin Password</div>
-      <div class="form-group"><label>Current Password</label><input type="password" id="set_cur" placeholder="Current password"></div>
-      <div class="form-group"><label>New Password</label><input type="password" id="set_new" placeholder="New password"></div>
-      <button class="btn btn-primary" onclick="changeAdminPw()">Update Password</button>
-    </div>
-    <div class="card" style="margin-top:12px">
-      <div class="card-title" style="margin-bottom:12px">☁️ Cloud Sync Status</div>
-      <div style="color:var(--text2);font-size:13px">All data is saved to Supabase cloud database in real-time.<br>All devices using this app share the same data.</div>
-      <div style="margin-top:12px;padding:10px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text3)">
-        Project: vkbfsrttvbnoiwrgwiqg.supabase.co<br>
-        Last loaded: ${new Date().toLocaleString('en-IN')}
-      </div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="reloadData()">🔄 Reload from Cloud</button>
-    </div>
-  `;
-}
-
-async function changeAdminPw() {
-  const cur = document.getElementById('set_cur').value;
-  const nw = document.getElementById('set_new').value;
-  if (cur !== DB.settings.adminPassword) { toast('Wrong current password','error'); return; }
-  if (!nw) { toast('Enter new password','error'); return; }
-  DB.settings.adminPassword = nw;
-  await saveCollection('settings');
-  toast('Password updated ✓','success');
-}
-
-async function reloadData() {
-  setSyncStatus('syncing');
-  await loadAllData();
-  renderCurrentTab();
-  toast('Reloaded from cloud ✓','success');
-}
-
-// ============ MANAGER TABS ============
-function renderManagerTab(tab) {
-  const c = document.getElementById('mainContent');
-  switch(tab) {
-    case 'm_upload': c.innerHTML = buildManagerUpload(); break;
-    case 'm_myforms': c.innerHTML = buildMyForms(); break;
-    case 'm_leave': c.innerHTML = buildManagerLeave(); break;
-    case 'm_late': c.innerHTML = buildManagerLate(); break;
-    case 'm_mistakes': c.innerHTML = buildManagerMistakes(); break;
-  }
-}
-
-// --- UPLOAD ---
-function buildManagerUpload() {
-  const myDept = currentUser.dept;
-  const myCats = DB.categories.filter(c=>c.dept===myDept);
-  
-  const now = new Date();
-  const hour = now.getHours();
-  const defaultShift = (hour>=8&&hour<20)?'Day':'Night';
-  
-  return `
-    <div class="page-title">Upload Forms</div>
-    <div class="card">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <div class="form-group">
-          <label>Shift</label>
-          <select id="up_shift">
-            <option ${defaultShift==='Day'?'selected':''}>Day</option>
-            <option ${defaultShift==='Night'?'selected':''}>Night</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Date</label>
-          <input type="date" id="up_date" value="${now.toISOString().slice(0,10)}">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Category</label>
-        <select id="up_cat">
-          ${myCats.length ? myCats.map(c=>`<option value="${c.id}">${c.name} (${c.formCount} forms)</option>`).join('') : '<option value="">No categories for your department</option>'}
-        </select>
-      </div>
-      ${myCats.length ? `
-        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-          📎 Click or drag to upload forms<br>
-          <span style="font-size:12px">Photos, PDFs, images accepted</span>
-          <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none" onchange="handleFiles(this.files)">
-        </div>
-        <div id="fileList" class="file-list"></div>
-        <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="submitForms()">📤 Submit Forms</button>
-      ` : '<div class="empty">No categories assigned to your department. Contact admin.</div>'}
-    </div>
-  `;
-}
-
-let uploadedFiles = [];
-
-function handleFiles(files) {
-  Array.from(files).forEach(f => {
-    if (!uploadedFiles.find(x=>x.name===f.name)) {
-      uploadedFiles.push(f);
-    }
-  });
-  renderFileList();
-}
-
-function renderFileList() {
-  const el = document.getElementById('fileList');
-  if (!el) return;
-  el.innerHTML = uploadedFiles.map((f,i)=>`
-    <div class="file-item">
-      <span>${f.type.startsWith('image')?'🖼️':'📄'}</span>
-      <span>${f.name}</span>
-      <span style="color:var(--text3);font-size:11px">${(f.size/1024).toFixed(0)}KB</span>
-      <span class="del" onclick="removeFile(${i})">✕</span>
-    </div>
-  `).join('');
-}
-
-function removeFile(i) {
-  uploadedFiles.splice(i,1);
-  renderFileList();
-}
-
-async function submitForms() {
-  const shift = document.getElementById('up_shift').value;
-  const date = document.getElementById('up_date').value;
-  const catId = document.getElementById('up_cat').value;
-  if (!catId) { toast('Select a category','error'); return; }
-  if (uploadedFiles.length===0) { toast('Upload at least one file','error'); return; }
-  
-  const cat = DB.categories.find(c=>c.id===catId);
-  if (uploadedFiles.length < cat.formCount) {
-    if (!confirm(`Category requires ${cat.formCount} forms, you uploaded ${uploadedFiles.length}. Continue?`)) return;
-  }
-  
-  // Store file names (base64 would be too large for Supabase free tier — store metadata)
-  const filesMeta = uploadedFiles.map(f=>({ name:f.name, size:f.size, type:f.type }));
-  
-  DB.forms.push({
-    id: uid(),
-    managerId: currentUser.id,
-    categoryId: catId,
-    shift,
-    date,
-    files: filesMeta,
-    fileCount: uploadedFiles.length,
-    submittedAt: new Date().toISOString()
-  });
-  
-  await saveCollection('forms');
-  uploadedFiles = [];
-  toast(`${filesMeta.length} forms submitted ✓`, 'success');
-  switchTab('m_myforms');
-}
-
-// --- MY FORMS ---
-function buildMyForms() {
-  const myForms = DB.forms.filter(f=>f.managerId===currentUser.id).sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
-  
-  return `
-    <div class="page-title">My Forms <span>${myForms.length} total</span></div>
-    ${myForms.length===0?'<div class="empty">No forms submitted yet</div>':
-      myForms.map(f=>`
-        <div class="card">
-          <div class="card-row">
-            <div>
-              <div class="card-title">${getCatName(f.categoryId)}</div>
-              <div class="card-sub">${fmtDT(f.submittedAt)}</div>
-            </div>
-            <div style="text-align:right">
-              <span class="badge ${f.shift==='Day'?'badge-yellow':'badge-purple'}">${f.shift}</span><br>
-              <span style="font-size:11px;color:var(--text3);margin-top:4px">${f.fileCount||0} files</span>
-            </div>
-          </div>
-        </div>
-      `).join('')}
-  `;
-}
-
-// --- MANAGER LEAVE ---
-function buildManagerLeave() {
-  const myLeaves = DB.leaves.filter(l=>l.managerId===currentUser.id).sort((a,b)=>new Date(b.appliedAt)-new Date(a.appliedAt));
-  const bal = getLeaveBalance(currentUser.id);
-  
-  return `
-    <div class="page-title">Leave</div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${bal.casual}</div><div class="stat-label">Casual</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--success)">${bal.sick}</div><div class="stat-label">Sick</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--warning)">${bal.earned}</div><div class="stat-label">Earned</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${bal.emergency}</div><div class="stat-label">Emergency</div></div>
-    </div>
-    <button class="btn btn-primary" style="margin-bottom:14px" onclick="openLeaveApply()">+ Apply for Leave</button>
-    <div class="page-title" style="font-size:14px">My Leave History</div>
-    ${myLeaves.length===0?'<div class="empty">No leave applications</div>':
-      myLeaves.map(l=>`
-        <div class="card card-row">
-          <div>
-            <div class="card-title">${l.type}</div>
-            <div class="card-sub">${fmtDate(l.from)} → ${fmtDate(l.to)}</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:2px">${l.reason}</div>
-          </div>
-          <span class="badge ${l.status==='approved'?'badge-green':l.status==='rejected'?'badge-red':'badge-yellow'}">${l.status}</span>
-        </div>
-      `).join('')}
-  `;
-}
-
-function openLeaveApply() {
-  openModal('Apply for Leave', `
-    <div class="form-group"><label>Leave Type</label><select id="lv_type"><option>Casual Leave</option><option>Sick Leave</option><option>Earned Leave</option><option>Emergency Leave</option></select></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div class="form-group"><label>From</label><input type="date" id="lv_from"></div>
-      <div class="form-group"><label>To</label><input type="date" id="lv_to"></div>
-    </div>
-    <div class="form-group"><label>Reason</label><textarea id="lv_reason" rows="3" placeholder="Reason for leave..."></textarea></div>
-  `, `<button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button><button class="btn btn-primary btn-sm" onclick="submitLeave()">Apply</button>`);
-}
-
-async function submitLeave() {
-  const type=document.getElementById('lv_type').value;
-  const from=document.getElementById('lv_from').value;
-  const to=document.getElementById('lv_to').value;
-  const reason=document.getElementById('lv_reason').value;
-  if(!from||!to){toast('Select dates','error');return;}
-  DB.leaves.push({id:uid(),managerId:currentUser.id,type,from,to,reason,status:'pending',appliedAt:new Date().toISOString()});
-  await saveCollection('leaves');
-  closeModal();
-  renderCurrentTab();
-  toast('Leave applied ✓','success');
-}
-
-// --- MANAGER LATE ---
-function buildManagerLate() {
-  const myLate = DB.lateEntries.filter(e=>e.managerId===currentUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  
-  return `
-    <div class="page-title">Late Entries</div>
-    <button class="btn btn-primary" style="margin-bottom:14px" onclick="openLateApply()">+ Report Late Entry</button>
-    ${myLate.length===0?'<div class="empty">No late entries</div>':
-      myLate.map(e=>`
-        <div class="card card-row">
-          <div>
-            <div class="card-title">${fmtDate(e.date)} · ${e.shift} Shift</div>
-            <div class="card-sub">${e.lateMinutes} minutes late · ${e.reason||'No reason'}</div>
-          </div>
-          <span class="badge ${e.status==='excused'?'badge-green':e.status==='unexcused'?'badge-red':'badge-yellow'}">${e.status}</span>
-        </div>
-      `).join('')}
-  `;
-}
-
-function openLateApply() {
-  const now = new Date();
-  const hour = now.getHours();
-  const shift = (hour>=8&&hour<20)?'Day':'Night';
-  openModal('Report Late Entry', `
-    <div class="form-group"><label>Date</label><input type="date" id="lt_date" value="${now.toISOString().slice(0,10)}"></div>
-    <div class="form-group"><label>Shift</label><select id="lt_shift"><option ${shift==='Day'?'selected':''}>Day</option><option ${shift==='Night'?'selected':''}>Night</option></select></div>
-    <div class="form-group"><label>Minutes Late</label><input type="number" id="lt_min" placeholder="e.g. 20"></div>
-    <div class="form-group"><label>Arrival Time</label><input type="time" id="lt_arr"></div>
-    <div class="form-group"><label>Reason</label><textarea id="lt_reason" rows="2" placeholder="Reason for being late..."></textarea></div>
-  `, `<button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button><button class="btn btn-primary btn-sm" onclick="submitLate()">Submit</button>`);
-}
-
-async function submitLate() {
-  const date=document.getElementById('lt_date').value;
-  const shift=document.getElementById('lt_shift').value;
-  const lateMinutes=document.getElementById('lt_min').value;
-  const reason=document.getElementById('lt_reason').value;
-  if(!date||!lateMinutes){toast('Fill all fields','error');return;}
-  DB.lateEntries.push({id:uid(),managerId:currentUser.id,date,shift,lateMinutes,reason,status:'pending',submittedAt:new Date().toISOString()});
-  await saveCollection('lateEntries');
-  closeModal();
-  renderCurrentTab();
-  toast('Late entry submitted ✓','success');
-}
-
-// --- MANAGER MISTAKES ---
-function buildManagerMistakes() {
-  const myMistakes = DB.mistakes.filter(m=>m.managerId===currentUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  // Clear new flag
-  myMistakes.forEach(m=>{ if(m._new) delete m._new; });
-  if (myMistakes.some(m=>m._new===undefined)) saveCollection('mistakes');
-  
-  return `
-    <div class="page-title">My Mistake Reports</div>
-    ${myMistakes.length===0?'<div class="empty" style="color:var(--success)">✓ No mistake reports — keep it up!</div>':
-      myMistakes.map(m=>`
-        <div class="card">
-          <div class="card-row">
-            <div>
-              <div class="card-title">${m.category}</div>
-              <div class="card-sub">${fmtDate(m.date)}</div>
-            </div>
-            <span class="badge ${m.severity==='Minor'?'badge-yellow':m.severity==='Moderate'?'badge-yellow':'badge-red'}">${m.severity}</span>
-          </div>
-          <div style="margin-top:8px;font-size:13px">${m.description}</div>
-          ${m.actionTaken?`<div style="margin-top:6px;padding:8px;background:var(--surface2);border-radius:6px;font-size:12px;color:var(--text2)">Action: ${m.actionTaken}</div>`:''}
-        </div>
-      `).join('')}
-  `;
-}
-
-// ============ DRAG DROP ============
-document.addEventListener('dragover', e => {
-  if (currentTab === 'm_upload') e.preventDefault();
-});
-document.addEventListener('drop', e => {
-  if (currentTab === 'm_upload') {
-    e.preventDefault();
-    handleFiles(e.dataTransfer.files);
-  }
-});
-
-// ============ SUPABASE TABLE SETUP ============
-async function ensureTable() {
-  // Try to read — if it fails, table might not exist
+  sm('gd-msg', 'Fetching backup files from cloud schema rows...');
   try {
-    await sb.from('formtrack').select('key').limit(1);
-  } catch(e) {
-    console.warn('Table may not exist:', e);
+    const { data, error } = await supabase
+      .from('formtrack_backups')
+      .select('db_snapshot')
+      .eq('id', 'formtrack_primary_sync')
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        throw new Error("No remote snapshot sync configuration documents exist on Supabase table database rows yet.");
+      }
+      throw error;
+    }
+
+    if (data && data.db_snapshot) {
+      const backup = data.db_snapshot;
+      if (backup.managers) db.managers = backup.managers;
+      if (backup.departments) db.departments = backup.departments;
+      if (backup.categories) db.categories = backup.categories;
+      if (backup.submissions) db.submissions = backup.submissions;
+      if (backup.leaves) db.leaves = backup.leaves;
+      if (backup.leavebal) db.leavebal = backup.leavebal;
+      if (backup.mistakes) db.mistakes = backup.mistakes;
+      if (backup.lateEntries) db.lateEntries = backup.lateEntries;
+
+      saveDB();
+      sm('gd-msg', '🎉 State tracking parameters completely restored from Supabase backend!');
+      if (typeof initAdmin === 'function') initAdmin();
+    }
+  } catch (err) {
+    console.error(err);
+    sm('gd-msg', '❌ Supabase Pull Failed: ' + err.message, true);
   }
 }
 
-// ============ INIT ============
-ensureTable().then(() => init());
+// ── UTILITIES AND LOCAL STATE STORAGE WRAPPERS ──
+function sm(id, txt, isErr = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = txt;
+  el.className = isErr ? 'err' : 'ok';
+}
+
+function saveDB() {
+  localStorage.setItem('ft7_db', JSON.stringify(db));
+}
+
+function loadDB() {
+  const raw = localStorage.getItem('ft7_db');
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      Object.assign(db, parsed);
+    } catch (e) {
+      console.error("Local database breakdown reconstruction failure: ", e);
+    }
+  }
+}
+
+function updBkTxt() {
+  const el = document.getElementById('last-bk-txt');
+  const savedTime = localStorage.getItem('ft7_lastbk');
+  if (el && savedTime) {
+    el.textContent = 'Last cloud/local sync: ' + new Date(savedTime).toLocaleString() + ' ✅';
+  }
+}
+
+const expJSON = function() {
+  const data = JSON.stringify({
+    managers: db.managers,
+    departments: db.departments,
+    categories: db.categories,
+    submissions: db.submissions,
+    leaves: db.leaves,
+    leavebal: db.leavebal,
+    mistakes: db.mistakes,
+    lateEntries: db.lateEntries,
+    exportedAt: new Date().toISOString()
+  });
+  const a = document.createElement('a');
+  a.href = 'data:application/json,' + encodeURIComponent(data);
+  a.download = 'FormTrack_Backup.json';
+  a.click();
+  localStorage.setItem('ft7_lastbk', new Date().toISOString());
+  updBkTxt();
+};
+
+const impJSON = function(inp) {
+  const f = inp.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (!confirm('Restore? This replaces all data!')) return;
+      if (d.managers) db.managers = d.managers;
+      if (d.departments) db.departments = d.departments;
+      if (d.categories) db.categories = d.categories;
+      if (d.submissions) db.submissions = d.submissions;
+      if (d.leaves) db.leaves = d.leaves;
+      if (d.leavebal) db.leavebal = d.leavebal;
+      if (d.mistakes) db.mistakes = d.mistakes;
+      if (d.lateEntries) db.lateEntries = d.lateEntries;
+      saveDB();
+      alert('Data loaded successfully.');
+      window.location.reload();
+    } catch (err) {
+      alert('Invalid file format structure.');
+    }
+  };
+  r.readAsText(f);
+};
+
+// Placeholder initialization boilerplate to ensure app view bindings compile cleanly
+let currentRole = 'm';
+function selR(r) {
+  currentRole = r;
+  document.getElementById('rc-m').className = r === 'm' ? 'rc on' : 'rc';
+  document.getElementById('rc-a').className = r === 'a' ? 'rc on' : 'rc';
+  document.getElementById('mb').style.display = r === 'm' ? 'block' : 'none';
+  document.getElementById('ab').style.display = r === 'a' ? 'block' : 'none';
+}
+function doLogin() {
+  if (currentRole === 'a') {
+    document.getElementById('pg-login').classList.remove('on');
+    document.getElementById('pg-admin').classList.add('on');
+  } else {
+    document.getElementById('pg-login').classList.remove('on');
+    document.getElementById('pg-mgr').classList.add('on');
+  }
+}
+function doLogout() {
+  document.getElementById('pg-admin').classList.remove('on');
+  document.getElementById('pg-mgr').classList.remove('on');
+  document.getElementById('pg-login').classList.add('on');
+}
+function mTab(sec, btn) {
+  document.querySelectorAll('#mgr-bnav .nb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#pg-mgr .sec').forEach(s => s.classList.remove('on'));
+  const target = document.getElementById('ms-' + sec);
+  if (target) target.classList.add('on');
+}
+function aTab(sec, btn) {
+  document.querySelectorAll('#atabs .atab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#pg-admin .sec').forEach(s => s.classList.remove('on'));
+  const target = document.getElementById('as-' + sec);
+  if (target) target.classList.add('on');
+}
+
+window.onload = function() {
+  loadDB();
+  updBkTxt();
+  selR('m');
+};
 </script>
 </body>
 </html>
