@@ -469,7 +469,7 @@ textarea{resize:vertical;min-height:56px}
 // Google OAuth — dharmesh4848@gmail.com account ke liye
 // Ek var Google Cloud Console ma ek baar setup karvu padse
 // Niche CLIENT_ID update karo tamara account thi
-const GD_CLIENT_ID = '52224266990-4cmj0lmpkgu65iiegf9au9oktg0ms3cu.apps.googleusercontent.com'; // TODO: replace after setup
+const GD_CLIENT_ID = '87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com'; // TODO: replace after setup
 const GD_SCOPES = 'https://www.googleapis.com/auth/drive.file';
 const GD_FOLDER = 'FormTrack_Backups';
 
@@ -930,7 +930,7 @@ function updateGDUI() {
 
 function gdSignIn() {
   // Check if GD_CLIENT_ID is set
-  if (GD_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+  if (GD_CLIENT_ID != '87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com') {
     // Show setup instructions
     document.getElementById('gd-st').innerHTML = '<span class="dot no"></span><span>⚠️ Setup needed — see instructions below</span>';
     sm('gd-msg', '⚠️ Niche setup guide follow karo — ek var Client ID set karvo padse', true);
