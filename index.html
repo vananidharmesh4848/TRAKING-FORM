@@ -1195,7 +1195,7 @@ function gdUI(){
   document.getElementById('gd-txt').textContent=ok?'✅ Connected — Ready to backup':'Not signed in';
 }
 function gdSignIn(){
-  if(GD_CLIENT_ID==='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
+  if(GD_CLIENT_ID !='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
   const go=()=>{tclient=google.accounts.oauth2.initTokenClient({client_id:GD_CLIENT_ID,scope:GD_SCOPES,hint:GD_EMAIL,callback:(r)=>{if(r.error){sm('gd-msg','Sign-in failed',true);return;}gdToken=r.access_token;gdUI();sm('gd-msg','✅ Connected!');}}); tclient.requestAccessToken({prompt:'consent'});};
   typeof google!=='undefined'?go():(()=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=go;document.head.appendChild(s);})();
 }
