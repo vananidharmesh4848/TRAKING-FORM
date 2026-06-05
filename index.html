@@ -1213,9 +1213,10 @@ function clrRange(){
 let tclient=null;
 function gdUI(){
   const ok=!!gdToken;
-  ['gd-bk','gd-rs','gd-out'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=ok?'inline-flex':'none';});
-  document.getElementById('gd-dot').style.background=ok?'var(--gr)':'var(--re)';
-  document.getElementById('gd-txt').textContent=ok?'✅ Connected — Ready to backup':'Not signed in';
+  ['gd-bk-btn','gd-rs-btn','gd-out-btn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=ok?'inline-flex':'none';});
+  const stEl=document.getElementById('gd-st-txt');if(stEl)stEl.textContent=ok?'✅ Connected — Ready to backup':'Not signed in';
+  const stDiv=document.getElementById('gd-st');
+  if(stDiv){const dot=stDiv.querySelector('.dot');if(dot){dot.className='dot '+(ok?'on':'no');}}
 }
 function gdSignIn(){
   if(GD_CLIENT_ID==='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
@@ -1225,7 +1226,7 @@ function gdSignIn(){
 function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
 async function gdBackup(){
   if(!gdToken){sm('gd-msg','Sign in first',true);return;}
-  document.getElementById('gd-txt').textContent='Uploading...';
+  const stEl2=document.getElementById('gd-st-txt');if(stEl2)stEl2.textContent='Uploading...';
   try{
     const q=encodeURIComponent(`name='FormTrack_Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
     const fr=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`,{headers:{'Authorization':'Bearer '+gdToken}});
@@ -1256,6 +1257,21 @@ async function gdRestore(){
     if(bk.mistakes)db.mistakes=bk.mistakes;if(bk.lateEntries)db.lateEntries=bk.lateEntries;
     persist();persistLate();sm('gd-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
   }catch(e){sm('gd-msg','Error: '+e.message,true);}
+}
+function initBkTab(){
+  gdUI();
+  const lastbk=localStorage.getItem('ft7_lastbk');
+  const el=document.getElementById('last-bk-txt');
+  if(el)el.textContent=lastbk?'Last backup: '+new Date(lastbk).toLocaleString()+' ✅':'Last backup: Never';
+}
+function saveAuto(){
+  const f=document.getElementById('ab-f');
+  const d=document.getElementById('ab-d');
+  if(!f||!d)return;
+  db.backup=db.backup||{};
+  db.backup.autoF=f.value;
+  db.backup.autoD=d.value;
+  persist();sm('ab-msg','✅ Auto backup settings saved!');
 }
 function expJSON(){
   const a=document.createElement('a');
