@@ -2,124 +2,109 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>FormTrack</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>FormTrack — Office System</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap');
 :root{
-  --bg:#0F1117;--s:#1A1D27;--s2:#22263A;--bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.18);
+  --bg:#0F1117;--s:#1A1D27;--s2:#22263A;--s3:#2A2F45;
+  --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.15);
   --t:#F0F2FF;--t2:#8B90A7;--t3:#4A4F6A;
-  --ac:#5B7BFF;--ac-bg:rgba(91,123,255,0.12);--ac-bd:rgba(91,123,255,0.35);
-  --gr:#34D399;--gr-bg:rgba(52,211,153,0.1);--gr-bd:rgba(52,211,153,0.3);
-  --am:#FBBF24;--am-bg:rgba(251,191,36,0.1);
-  --re:#F87171;--re-bg:rgba(248,113,113,0.1);--re-bd:rgba(248,113,113,0.25);
-  --pu:#A78BFA;--pu-bg:rgba(167,139,250,0.1);
-  --te:#2DD4BF;--te-bg:rgba(45,212,191,0.1);
-  --r:12px;--rs:8px;--rl:16px;--rx:24px;
+  --ac:#5B7BFF;--ac2:rgba(91,123,255,0.12);--ac3:rgba(91,123,255,0.3);
+  --gr:#34D399;--gr2:rgba(52,211,153,0.12);--gr3:rgba(52,211,153,0.3);
+  --am:#FBBF24;--am2:rgba(251,191,36,0.12);--am3:rgba(251,191,36,0.3);
+  --re:#F87171;--re2:rgba(248,113,113,0.12);--re3:rgba(248,113,113,0.3);
+  --pu:#A78BFA;--pu2:rgba(167,139,250,0.12);
+  --te:#2DD4BF;--te2:rgba(45,212,191,0.12);
+  --r:12px;--rs:8px;--rl:16px;--rx:22px;
+  --sh:0 2px 12px rgba(0,0,0,0.4);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
-.page{display:none;min-height:100vh}.page.active{display:block}
-
+.pg{display:none;min-height:100vh}.pg.on{display:block}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
 /* LOGIN */
-.lwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:radial-gradient(ellipse at 50% 0%,rgba(91,123,255,0.18) 0%,transparent 65%)}
+.lwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:radial-gradient(ellipse at 50% 0%,rgba(91,123,255,0.18),transparent 65%)}
 .lbrand{text-align:center;margin-bottom:2rem}
-.llogo{width:64px;height:64px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;box-shadow:0 0 0 1px rgba(91,123,255,0.3),0 8px 24px rgba(91,123,255,0.25)}
-.lbrand h1{font-size:26px;font-weight:600;letter-spacing:-0.5px}
+.lico{width:64px;height:64px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;box-shadow:0 0 0 1px rgba(91,123,255,0.3),0 8px 24px rgba(91,123,255,0.25)}
+.lbrand h1{font-size:26px;font-weight:600;letter-spacing:-.5px}
 .lbrand p{font-size:12px;color:var(--t2);margin-top:4px}
-.lcard{background:var(--s);border:1px solid var(--bd);border-radius:var(--rx);padding:1.75rem;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
-
-/* ROLE */
+.lbox{background:var(--s);border:1px solid var(--bd);border-radius:var(--rx);padding:1.75rem;width:100%;max-width:400px;box-shadow:var(--sh)}
 .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
-.rcard{border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
-.rcard:hover{border-color:var(--bd2)}
-.rcard.sel{border-color:var(--ac);background:var(--ac-bg)}
-.rcard .ri{font-size:26px;margin-bottom:6px}
-.rcard .rl{font-size:13px;font-weight:500}
-.rcard .rd{font-size:11px;color:var(--t2);margin-top:2px}
-
-/* INPUTS */
+.rc{border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
+.rc:hover{border-color:var(--bd2)}.rc.on{border-color:var(--ac);background:var(--ac2)}
+.rc .ri{font-size:26px;margin-bottom:6px}.rc .rl{font-size:13px;font-weight:500}.rc .rd{font-size:11px;color:var(--t2);margin-top:2px}
+/* FORM */
 label{font-size:12px;color:var(--t2);display:block;margin-bottom:5px;font-weight:500}
 input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--t);outline:none;transition:border .15s;-webkit-appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(91,123,255,0.15)}
 select option{background:#1A1D27}
 textarea{resize:vertical;min-height:56px}
 .fg{margin-bottom:14px}
-.pw-w{position:relative}
-.pw-w input{padding-right:42px}
-.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);font-size:16px;background:none;border:none;padding:0;line-height:1}
-
+.pww{position:relative}.pww input{padding-right:42px}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);font-size:16px;background:none;border:none;padding:0}
 /* BUTTONS */
 .btn{padding:10px 18px;font-size:13px;font-weight:500;border-radius:var(--rs);cursor:pointer;border:1px solid transparent;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:7px;transition:all .15s;white-space:nowrap}
 .btn:active{transform:scale(.97)}
 .ba{background:var(--ac);color:#fff}.ba:hover{background:#4A6AEE}
-.bg{background:transparent;color:var(--t);border-color:var(--bd)}.bg:hover{background:var(--s2);border-color:var(--bd2)}
-.bd2{background:var(--re-bg);color:var(--re);border-color:var(--re-bd)}
-.bw{background:var(--am-bg);color:var(--am);border-color:rgba(251,191,36,0.25)}
-.bgr{background:var(--gr-bg);color:var(--gr);border-color:var(--gr-bd)}
-.bfull{width:100%;justify-content:center}
+.bg2{background:transparent;color:var(--t);border-color:var(--bd)}.bg2:hover{background:var(--s2)}
+.bre{background:var(--re2);color:var(--re);border-color:var(--re3)}
+.bam{background:var(--am2);color:var(--am);border-color:var(--am3)}
+.bgr{background:var(--gr2);color:var(--gr);border-color:var(--gr3)}
+.bfu{width:100%;justify-content:center}
 .bsm{padding:6px 12px;font-size:12px}.bxs{padding:4px 9px;font-size:11px}
 .err{font-size:12px;color:var(--re);margin-top:8px;min-height:16px}
-.suc{font-size:12px;color:var(--gr);margin-top:8px;min-height:16px}
-
+.ok{font-size:12px;color:var(--gr);margin-top:8px;min-height:16px}
 /* TOPBAR */
-.topbar{position:sticky;top:0;z-index:200;background:rgba(15,17,23,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between}
-.tb-l{display:flex;align-items:center;gap:10px}
-.tb-logo{width:32px;height:32px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
-.tb-name{font-size:14px;font-weight:600}
-.tb-sub{font-size:11px;color:var(--t2)}
-.wrap{max-width:700px;margin:0 auto;padding:1.25rem 1rem 6rem}
-
+.topbar{position:sticky;top:0;z-index:200;background:rgba(15,17,23,0.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between}
+.tbl{display:flex;align-items:center;gap:10px}
+.tlo{width:32px;height:32px;background:linear-gradient(135deg,#5B7BFF,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.tnm{font-size:14px;font-weight:600}.tsb{font-size:11px;color:var(--t2)}
+.wrap{max-width:700px;margin:0 auto;padding:1.25rem 1rem 6.5rem}
 /* BOTTOM NAV */
 .bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(15,17,23,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom))}
-.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t3);transition:all .15s}
-.nb.on{color:var(--ac)}
-.nb .ni{font-size:20px;line-height:1}
-.nb .nl{font-size:10px;font-weight:500}
-
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t3);transition:color .15s;position:relative}
+.nb.on{color:var(--ac)}.nb .ni{font-size:20px;line-height:1}.nb .nl{font-size:10px;font-weight:500}
+.nbadge{position:absolute;top:2px;right:calc(50% - 18px);background:var(--re);color:#fff;border-radius:100px;font-size:9px;font-weight:600;padding:1px 5px;min-width:16px;text-align:center}
 /* ADMIN TABS */
 .atabs{display:flex;gap:3px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:1.25rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .atabs::-webkit-scrollbar{display:none}
-.atab{padding:8px 14px;font-size:12px;font-weight:500;border-radius:var(--rs);cursor:pointer;border:none;background:none;color:var(--t2);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.atab{padding:8px 14px;font-size:12px;font-weight:500;border-radius:var(--rs);cursor:pointer;border:none;background:none;color:var(--t2);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .15s;flex-shrink:0;position:relative}
 .atab.on{background:var(--ac);color:#fff}
 .sec{display:none}.sec.on{display:block}
-
 /* CARD */
 .card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:1.1rem;margin-bottom:1rem}
 .ct{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
-
 /* SHIFT */
 .stog{display:flex;background:var(--s2);border-radius:var(--rs);padding:4px;margin-bottom:1rem;border:1px solid var(--bd)}
 .so{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--t2);transition:all .2s}
-.so.on.day{background:var(--am-bg);color:var(--am);border:1px solid rgba(251,191,36,0.3)}
-.so.on.night{background:var(--ac-bg);color:var(--ac);border:1px solid var(--ac-bd)}
-
-/* CATEGORY UPLOAD */
+.so.on.day{background:var(--am2);color:var(--am);border:1px solid var(--am3)}
+.so.on.night{background:var(--ac2);color:var(--ac);border:1px solid var(--ac3)}
+/* UPLOAD */
 .ci{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:8px;transition:border .15s}
-.ci.hf{border-color:var(--gr-bd)}
+.ci.hf{border-color:var(--gr3)}
 .chdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .cnm{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
-.ccnt{font-size:11px;color:var(--gr);background:var(--gr-bg);padding:2px 8px;border-radius:100px;display:none}
+.ccnt{font-size:11px;color:var(--gr);background:var(--gr2);padding:2px 8px;border-radius:100px;display:none}
 .upbtn{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed rgba(255,255,255,0.1);border-radius:var(--rs);padding:10px;cursor:pointer;color:var(--t2);font-size:12px;background:rgba(255,255,255,0.02);transition:all .15s}
-.upbtn:hover,.upbtn:active{border-color:var(--ac);color:var(--ac);background:var(--ac-bg)}
+.upbtn:hover{border-color:var(--ac);color:var(--ac);background:var(--ac2)}
 .upbtn input{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
 .chip{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--bd);border-radius:100px;padding:3px 10px 3px 4px;font-size:11px;color:var(--t2)}
 .chip img{width:20px;height:20px;border-radius:4px;object-fit:cover}
 .cx{cursor:pointer;color:var(--t3);font-size:15px;line-height:1;padding-left:3px}
-
 /* STATS */
-.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem}
-@media(min-width:480px){.sgrid{grid-template-columns:repeat(4,1fr)}}
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem}
+@media(min-width:480px){.sg{grid-template-columns:repeat(4,1fr)}}
+.sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
 .sc{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px 12px;text-align:center}
-.sn{font-size:26px;font-weight:600;font-family:'DM Mono',monospace}
-.sl{font-size:11px;color:var(--t2);margin-top:3px}
-
+.sn{font-size:24px;font-weight:600;font-family:'DM Mono',monospace}.sl{font-size:11px;color:var(--t2);margin-top:3px}
 /* REPORT */
 .rep{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
 .rt{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
-.rnm{font-weight:600;font-size:15px}
-.rid{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
+.rnm{font-weight:600;font-size:15px}.rid{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
 .rm{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--t2);margin-bottom:8px}
 .cfg{background:var(--s2);border-radius:var(--rs);padding:9px 10px;margin-bottom:6px}
 .cft{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px}
@@ -127,27 +112,21 @@ textarea{resize:vertical;min-height:56px}
 .th{width:52px;height:52px;border-radius:var(--rs);object-fit:cover;border:1px solid var(--bd);cursor:pointer;transition:transform .15s}
 .th:hover{transform:scale(1.06)}
 .tp{width:52px;height:52px;border-radius:var(--rs);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;color:var(--t2);background:var(--s);font-weight:600;gap:3px}
-.nb2{font-size:12px;color:var(--t2);font-style:italic;margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);border-left:2px solid var(--ac)}
-
+.notebox{font-size:12px;color:var(--t2);font-style:italic;margin-top:8px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);border-left:2px solid var(--ac)}
 /* BADGES */
 .badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
-.b-day{background:var(--am-bg);color:var(--am)}
-.b-night{background:var(--ac-bg);color:var(--ac)}
-.b-gr{background:var(--gr-bg);color:var(--gr)}
-.b-re{background:var(--re-bg);color:var(--re)}
-.b-pu{background:var(--pu-bg);color:var(--pu)}
-.b-te{background:var(--te-bg);color:var(--te)}
-
+.b-day{background:var(--am2);color:var(--am)}.b-night{background:var(--ac2);color:var(--ac)}
+.b-gr{background:var(--gr2);color:var(--gr)}.b-re{background:var(--re2);color:var(--re)}
+.b-pu{background:var(--pu2);color:var(--pu)}.b-te{background:var(--te2);color:var(--te)}
+.b-am{background:var(--am2);color:var(--am)}
 /* MGR ROW */
 .mr{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r)}
 .av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--ac),#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
-
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{font-size:11px;color:var(--t2);font-weight:600;padding:6px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
 .tbl td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
-
 /* FILTER */
 .fwrap{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:1rem}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -155,7 +134,6 @@ textarea{resize:vertical;min-height:56px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .g3r{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
 @media(min-width:480px){.g3r{grid-template-columns:1fr 1fr 1fr}}
-
 /* MODAL */
 .mbg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
 @media(min-width:480px){.mbg{align-items:center;padding:1rem}}
@@ -163,74 +141,76 @@ textarea{resize:vertical;min-height:56px}
 .mbox{background:var(--s);border:1px solid var(--bd2);border-radius:var(--rx) var(--rx) 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:su .25s ease}
 @media(min-width:480px){.mbox{border-radius:var(--rx)}}
 @keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mhandle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 1rem}
-.mtitle{font-size:16px;font-weight:600;margin-bottom:1.25rem}
-
+.mhnd{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 1rem}
+.mtit{font-size:16px;font-weight:600;margin-bottom:1.25rem}
 /* LIGHTBOX */
 .lb{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.93);align-items:center;justify-content:center;padding:1rem}
-.lb.open{display:flex}
-.lb img{max-width:100%;max-height:85vh;border-radius:var(--r);object-fit:contain}
+.lb.open{display:flex}.lb img{max-width:100%;max-height:85vh;border-radius:var(--r);object-fit:contain}
 .lbx{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.12);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-/* DRIVE */
-.drive-box{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:10px}
-.drive-status{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--rs);margin-bottom:12px}
-.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.dot.ok{background:var(--gr)}
-.dot.no{background:var(--re)}
-.dot.ld{background:var(--am);animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.div{height:1px;background:var(--bd);margin:1rem 0}
+/* LEAVE */
+.lv-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.lv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.lv-name{font-weight:600;font-size:14px}
+.lv-meta{font-size:11px;color:var(--t2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.bal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem}
+@media(min-width:480px){.bal-grid{grid-template-columns:repeat(4,1fr)}}
+.bal-c{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;text-align:center}
+.bal-n{font-size:22px;font-weight:600;font-family:'DM Mono',monospace}
+.bal-l{font-size:11px;color:var(--t2);margin-top:3px}
+/* LEAVE REPORT TABLE */
+.lrep-wrap{overflow-x:auto;margin-bottom:1rem}
+.lrep-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+.lrep-tbl th{font-size:11px;color:var(--t2);font-weight:600;padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap;background:var(--s2)}
+.lrep-tbl td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.lrep-tbl tr:hover td{background:rgba(255,255,255,0.02)}
+/* CALENDAR VIEW */
+.lv-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.cal-day{background:var(--s2);border-radius:4px;padding:4px;text-align:center;font-size:10px;min-height:36px;border:1px solid var(--bd)}
+.cal-day.has-leave{background:var(--am2);border-color:var(--am3)}
+.cal-day.approved{background:var(--gr2);border-color:var(--gr3)}
+.cal-day.rejected{background:var(--re2);border-color:var(--re3)}
+.cal-hdr{font-size:10px;color:var(--t3);text-align:center;padding:3px 0;font-weight:600}
+/* EMPTY */
 .empty{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
 .empty .ee{font-size:34px;margin-bottom:8px}
+.div{height:1px;background:var(--bd);margin:1rem 0}
 </style>
 </head>
 <body>
 
-<!-- ===== LOGIN ===== -->
-<div id="pg-login" class="page active">
+<!-- LOGIN -->
+<div id="pg-login" class="pg on">
   <div class="lwrap">
     <div class="lbrand">
-      <div class="llogo">📋</div>
+      <div class="lico">📋</div>
       <h1>FormTrack</h1>
       <p>Office Form System · Day &amp; Night Shift</p>
     </div>
-    <div class="lcard">
+    <div class="lbox">
       <p style="font-size:12px;color:var(--t2);margin-bottom:12px;font-weight:500">Select your role</p>
       <div class="rgrid">
-        <div class="rcard" id="rc-m" onclick="selR('m')">
-          <div class="ri">👤</div><div class="rl">Manager</div><div class="rd">Submit forms</div>
-        </div>
-        <div class="rcard" id="rc-a" onclick="selR('a')">
-          <div class="ri">🛡️</div><div class="rl">Admin</div><div class="rd">Full access</div>
-        </div>
+        <div class="rc" id="rc-m" onclick="selR('m')"><div class="ri">👤</div><div class="rl">Manager</div><div class="rd">Submit forms</div></div>
+        <div class="rc" id="rc-a" onclick="selR('a')"><div class="ri">🛡️</div><div class="rl">Admin</div><div class="rd">Full access</div></div>
       </div>
       <div id="mb" style="display:none">
         <div class="fg"><label>Manager ID</label><input type="text" id="l-id" placeholder="MGR-01" autocapitalize="characters"></div>
-        <div class="fg"><label>Password</label>
-          <div class="pw-w"><input type="password" id="l-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"><button class="pw-eye" onclick="tpw('l-pw',this)">👁</button></div>
-        </div>
+        <div class="fg"><label>Password</label><div class="pww"><input type="password" id="l-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-pw',this)">👁</button></div></div>
       </div>
       <div id="ab" style="display:none">
-        <div class="fg"><label>Admin Password</label>
-          <div class="pw-w"><input type="password" id="l-apw" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()"><button class="pw-eye" onclick="tpw('l-apw',this)">👁</button></div>
-        </div>
+        <div class="fg"><label>Admin Password</label><div class="pww"><input type="password" id="l-apw" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-apw',this)">👁</button></div></div>
       </div>
-      <button class="btn ba bfull" style="margin-top:4px" onclick="doLogin()">Continue →</button>
+      <button class="btn ba bfu" onclick="doLogin()">Continue →</button>
       <div class="err" id="lerr"></div>
       <p style="text-align:center;font-size:11px;color:var(--t3);margin-top:1rem;padding-top:1rem;border-top:1px solid var(--bd)">Day 8am–8pm · Night 8pm–8am</p>
     </div>
   </div>
 </div>
 
-<!-- ===== MANAGER PAGE ===== -->
-<div id="pg-mgr" class="page">
+<!-- MANAGER PAGE -->
+<div id="pg-mgr" class="pg">
   <div class="topbar">
-    <div class="tb-l">
-      <div class="tb-logo">📋</div>
-      <div><div class="tb-name" id="m-nm">—</div><div class="tb-sub" id="m-dp">—</div></div>
-    </div>
-    <button class="btn bg bsm" onclick="doLogout()">Logout</button>
+    <div class="tbl"><div class="tlo">📋</div><div><div class="tnm" id="m-nm">—</div><div class="tsb" id="m-dp">—</div></div></div>
+    <button class="btn bg2 bsm" onclick="doLogout()">Logout</button>
   </div>
   <div class="wrap">
     <div class="sec on" id="ms-sub">
@@ -242,68 +222,166 @@ textarea{resize:vertical;min-height:56px}
         <div class="fg" style="margin:0"><label>Date</label><input type="date" id="sub-d"></div>
         <div class="fg" style="margin:0"><label>Time (auto)</label><input type="text" id="sub-t" readonly style="background:var(--s2)"></div>
       </div>
-      <div class="card">
-        <div class="ct">Upload Forms by Category</div>
-        <div id="cat-area"></div>
-      </div>
+      <div class="card"><div class="ct">Upload Forms by Category</div><div id="cat-area"></div></div>
       <div class="fg"><label>Notes (optional)</label><textarea id="sub-n" placeholder="Any remarks..."></textarea></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn bg bsm" onclick="clrSub()">Clear</button>
+        <button class="btn bg2 bsm" onclick="clrSub()">Clear</button>
         <button class="btn ba" onclick="subForms()">✅ Submit Forms</button>
       </div>
-      <div class="suc" id="sub-msg"></div>
+      <div class="ok" id="sub-msg"></div>
     </div>
     <div class="sec" id="ms-rep"><div id="my-reps"></div></div>
+    <div class="sec" id="ms-lv">
+      <div class="card"><div class="ct">My Leave Balance</div><div class="bal-grid" id="mgr-bal"></div></div>
+      <div class="card">
+        <div class="ct">Apply for Leave</div>
+        <div class="fg"><label>Leave Type</label><select id="lv-type"></select></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="lv-from"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="lv-to"></div>
+        </div>
+        <div class="fg" style="margin-top:10px"><label>Reason</label><textarea id="lv-rsn" placeholder="Leave reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="applyLv()">📨 Apply Leave</button>
+        <div class="ok" id="lv-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Leave History</div>
+      <div id="my-lv-list"></div>
+    </div>
   </div>
-  <div class="bnav">
+    <div class="sec" id="ms-mist">
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Mistake Reports</div>
+      <div id="mgr-mist-list"></div>
+    </div>
+  </div>
+  <div class="bnav" id="mgr-bnav">
     <button class="nb on" id="mn-sub" onclick="mTab('sub',this)"><span class="ni">📤</span><span class="nl">Submit</span></button>
-    <button class="nb" id="mn-rep" onclick="mTab('rep',this)"><span class="ni">📋</span><span class="nl">My Reports</span></button>
+    <button class="nb" id="mn-rep" onclick="mTab('rep',this)"><span class="ni">📋</span><span class="nl">Reports</span></button>
+    <button class="nb" id="mn-lv" onclick="mTab('lv',this)"><span class="ni">🏖️</span><span class="nl">Leave</span></button>
+    <button class="nb" id="mn-mist" onclick="mTab('mist',this)" style="position:relative"><span class="ni">⚠️</span><span class="nl">Mistakes</span><span class="nbadge" id="mist-mgr-badge" style="display:none">0</span></button>
+    <button class="nb" id="mn-late" onclick="mTab('late',this)"><span class="ni">⏰</span><span class="nl">Late</span><span class="nbadge" id="late-mgr-badge" style="display:none">!</span></button>
   </div>
 </div>
 
-<!-- ===== ADMIN PAGE ===== -->
-<div id="pg-admin" class="page">
-  <div class="topbar">
-    <div class="tb-l">
-      <div class="tb-logo">🛡️</div>
-      <div><div class="tb-name">Admin</div><div class="tb-sub">FormTrack Dashboard</div></div>
+    <div class="sec" id="ms-late">
+      <div class="card">
+        <div class="ct">⏰ Late Entry Report Karo</div>
+        <div class="fg"><label>Date</label><input type="date" id="le-date"></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Shift</label>
+            <select id="le-shift">
+              <option value="day">☀️ Day Shift (8am–8pm)</option>
+              <option value="night">🌙 Night Shift (8pm–8am)</option>
+            </select>
+          </div>
+          <div class="fg" style="margin:0"><label>Late by (minutes)</label>
+            <input type="number" id="le-mins" min="1" max="480" placeholder="30">
+          </div>
+        </div>
+        <div class="fg"><label>Actual Arrival Time</label><input type="time" id="le-time"></div>
+        <div class="fg"><label>Reason</label><textarea id="le-reason" placeholder="Late aavana no reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="submitLateEntry()">📨 Submit Late Entry</button>
+        <div class="ok" id="le-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Late Entry History</div>
+      <div id="mgr-late-list"></div>
     </div>
-    <button class="btn bg bsm" onclick="doLogout()">Logout</button>
+
+<!-- ADMIN PAGE -->
+<div id="pg-admin" class="pg">
+  <div class="topbar">
+    <div class="tbl"><div class="tlo">🛡️</div><div><div class="tnm">Admin</div><div class="tsb">FormTrack Dashboard</div></div></div>
+    <button class="btn bg2 bsm" onclick="doLogout()">Logout</button>
   </div>
   <div class="wrap">
-    <div class="atabs" id="admin-tabs">
+    <div class="atabs" id="atabs">
       <button class="atab on" onclick="aTab('ov',this)">📊 Overview</button>
       <button class="atab" onclick="aTab('rp',this)">📁 Reports</button>
+      <button class="atab" onclick="aTab('lv',this)">🏖️ Leave <span id="lv-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" onclick="aTab('mist',this)">⚠️ Mistakes <span id="mist-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" onclick="aTab('mg',this)">👥 Managers</button>
       <button class="atab" onclick="aTab('dp',this)">🏬 Depts</button>
       <button class="atab" onclick="aTab('ct',this)">🏷️ Categories</button>
       <button class="atab" onclick="aTab('bk',this)">☁️ Backup</button>
+      <button class="atab" onclick="aTab('late',this)">⏰ Late Entry <span id="late-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" onclick="aTab('st',this)">⚙️ Settings</button>
     </div>
 
     <!-- OVERVIEW -->
     <div class="sec on" id="as-ov">
-      <div class="sgrid" id="a-stats"></div>
+      <div class="sg" id="a-stats"></div>
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Summary</div>
       <div id="a-sum"></div>
     </div>
 
-    <!-- REPORTS -->
+    <!-- FORM REPORTS -->
     <div class="sec" id="as-rp">
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="ff"></div>
-          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="ft"></div>
+          <div class="fg" style="margin:0"><label>From</label><input type="date" id="ff"></div>
+          <div class="fg" style="margin:0"><label>To</label><input type="date" id="ft"></div>
           <div class="fg" style="margin:0"><label>Shift</label><select id="fsh"><option value="">All shifts</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
           <div class="fg" style="margin:0"><label>Manager</label><select id="fm"><option value="">All</option></select></div>
           <div class="fg" style="margin:0"><label>Department</label><select id="fd"><option value="">All</option></select></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderReps()">Apply Filter</button>
-          <button class="btn bg bsm" onclick="clrF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderReps()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrF()">Reset</button>
         </div>
       </div>
       <div id="all-reps"></div>
+    </div>
+
+    <!-- LEAVE REPORTS -->
+    <div class="sec" id="as-lv">
+      <!-- Stats -->
+      <div class="sg3" id="lv-stats"></div>
+      <!-- Quick actions: pending -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Pending Approvals</div>
+      <div id="lv-pending-list"></div>
+      <div class="div"></div>
+      <!-- Full report -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Leave Report</div>
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Status</label><select id="lf-st"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Approved</option><option value="rejected">❌ Rejected</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><select id="lf-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Leave Type</label><select id="lf-tp"><option value="">All types</option></select></div>
+          <div class="fg" style="margin:0"><label>From Month</label><input type="date" id="lf-from"></div>
+          <div class="fg" style="margin:0"><label>To Month</label><input type="date" id="lf-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderLvReport()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrLvF()">Reset</button>
+        </div>
+      </div>
+      <!-- Leave Report Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="lrep-wrap"><table class="lrep-tbl" id="lv-rep-tbl">
+          <thead><tr><th>Manager</th><th>Dept</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th>Applied</th><th>Action</th></tr></thead>
+          <tbody id="lv-rep-body"></tbody>
+        </table></div>
+      </div>
+      <div class="ok" id="lv-admin-msg"></div>
+      <div class="div"></div>
+      <!-- Balance Summary -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Leave Balance Summary</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="lrep-wrap"><table class="lrep-tbl" id="lv-bal-tbl">
+          <thead><tr id="lv-bal-hdr"></tr></thead>
+          <tbody id="lv-bal-body"></tbody>
+        </table></div>
+      </div>
+      <!-- Admin: set balance -->
+      <div class="card" style="margin-top:1rem">
+        <div class="ct">🔧 Set Leave Balance</div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="sb-mg"><option value="">Select manager</option></select></div>
+          <div class="fg" style="margin:0"><label>Leave Type</label><select id="sb-tp"><option value="">Select type</option></select></div>
+        </div>
+        <div class="fg" style="margin-top:10px"><label>New Balance (days)</label><input type="number" id="sb-val" min="0" max="365" placeholder="e.g. 12"></div>
+        <button class="btn ba bsm" onclick="setBalance()">Set Balance</button>
+        <div class="ok" id="sb-msg"></div>
+      </div>
     </div>
 
     <!-- MANAGERS -->
@@ -316,23 +394,16 @@ textarea{resize:vertical;min-height:56px}
           <div class="fg" style="margin:0"><label>Department</label><select id="nd"><option value="">— Select —</option></select></div>
         </div>
         <div class="g2" style="margin-top:4px">
-          <div class="fg" style="margin:0"><label>Password</label>
-            <div class="pw-w"><input type="password" id="np" placeholder="Set password"><button class="pw-eye" onclick="tpw('np',this)">👁</button></div>
-          </div>
-          <div class="fg" style="margin:0"><label>Confirm Password</label>
-            <div class="pw-w"><input type="password" id="np2" placeholder="Repeat"><button class="pw-eye" onclick="tpw('np2',this)">👁</button></div>
-          </div>
+          <div class="fg" style="margin:0"><label>Password</label><div class="pww"><input type="password" id="np" placeholder="Set password"><button class="eye" onclick="tpw('np',this)">👁</button></div></div>
+          <div class="fg" style="margin:0"><label>Confirm Password</label><div class="pww"><input type="password" id="np2" placeholder="Repeat"><button class="eye" onclick="tpw('np2',this)">👁</button></div></div>
         </div>
         <button class="btn ba bsm" style="margin-top:4px" onclick="addMgr()">+ Add Manager</button>
-        <div class="suc" id="mg-msg"></div>
+        <div class="ok" id="mg-msg"></div>
       </div>
-      <div class="card">
-        <div class="ct">All Managers (<span id="mg-cnt">0</span>)</div>
-        <div id="mg-tbl"></div>
-      </div>
+      <div class="card"><div class="ct">All Managers (<span id="mg-cnt">0</span>)</div><div id="mg-tbl"></div></div>
     </div>
 
-    <!-- DEPARTMENTS -->
+    <!-- DEPTS -->
     <div class="sec" id="as-dp">
       <div class="card">
         <div class="ct">Add Department</div>
@@ -340,7 +411,7 @@ textarea{resize:vertical;min-height:56px}
           <div class="fg" style="flex:1;margin:0"><label>Department Name</label><input type="text" id="dn" placeholder="Production, Quality, HR..."></div>
           <button class="btn ba bsm" onclick="addDept()">+ Add</button>
         </div>
-        <div class="suc" id="dp-msg"></div>
+        <div class="ok" id="dp-msg"></div>
       </div>
       <div class="card"><div id="dp-tbl"></div></div>
     </div>
@@ -354,7 +425,7 @@ textarea{resize:vertical;min-height:56px}
           <div class="fg" style="margin:0"><label>Department</label><select id="cd"><option value="">— Select —</option></select></div>
         </div>
         <button class="btn ba bsm" onclick="addCat()">+ Add Category</button>
-        <div class="suc" id="ct-msg"></div>
+        <div class="ok" id="ct-msg"></div>
       </div>
       <div class="card"><div id="ct-list"></div></div>
     </div>
@@ -402,29 +473,137 @@ textarea{resize:vertical;min-height:56px}
       </div>
     </div>
 
+    <!-- MISTAKE REPORTS -->
+    <div class="sec" id="as-mist">
+      <!-- Add New Mistake Report -->
+      <div class="card">
+        <div class="ct">⚠️ Navo Mistake Report Add Karo</div>
+        <div class="g3r">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="mr-mg"><option value="">— Select Manager —</option></select></div>
+          <div class="fg" style="margin:0"><label>Date</label><input type="date" id="mr-dt"></div>
+          <div class="fg" style="margin:0"><label>Severity</label>
+            <select id="mr-sv">
+              <option value="minor">🟡 Minor</option>
+              <option value="moderate">🟠 Moderate</option>
+              <option value="major">🔴 Major</option>
+              <option value="critical">🚨 Critical</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label>Mistake Category</label>
+          <select id="mr-cat">
+            <option value="Form Error">Form Error</option>
+            <option value="Late Submission">Late Submission</option>
+            <option value="Missing Data">Missing Data</option>
+            <option value="Process Violation">Process Violation</option>
+            <option value="Safety Issue">Safety Issue</option>
+            <option value="Quality Issue">Quality Issue</option>
+            <option value="Attendance">Attendance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Description (mistake ni detail)</label><textarea id="mr-desc" placeholder="Shu mistake thayu te lakhao..."></textarea></div>
+        <div class="fg"><label>Action Taken / Remark</label><textarea id="mr-action" placeholder="Shu action levaya che..."></textarea></div>
+        <button class="btn ba bsm" onclick="addMistake()">⚠️ Add Report</button>
+        <div class="ok" id="mr-msg"></div>
+      </div>
+      <!-- Stats -->
+      <div class="sg" id="mist-stats"></div>
+      <!-- Filter -->
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="mf-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Severity</label><select id="mf-sv"><option value="">All</option><option value="minor">🟡 Minor</option><option value="moderate">🟠 Moderate</option><option value="major">🔴 Major</option><option value="critical">🚨 Critical</option></select></div>
+          <div class="fg" style="margin:0"><label>Category</label><select id="mf-cat"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="mf-from"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="mf-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderMistReport()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrMistF()">Reset</button>
+        </div>
+      </div>
+      <!-- Performance Summary Table -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Performance Summary</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="perf-tbl">
+          <thead><tr><th>Manager</th><th>Dept</th><th>Total</th><th>🟡 Minor</th><th>🟠 Moderate</th><th>🔴 Major</th><th>🚨 Critical</th><th>Score</th></tr></thead>
+          <tbody id="perf-body"></tbody>
+        </table></div>
+      </div>
+      <!-- Mistake List -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Mistake Reports</div>
+      <div id="mist-list"></div>
+    </div>
+
     <!-- SETTINGS -->
+    <!-- LATE ENTRY ADMIN -->
+    <div class="sec" id="as-late">
+      <div class="card">
+        <div class="ct">⏰ Late Entry Add Karo (Admin)</div>
+        <div class="g3r">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="al-mg"><option value="">— Select —</option></select></div>
+          <div class="fg" style="margin:0"><label>Date</label><input type="date" id="al-date"></div>
+          <div class="fg" style="margin:0"><label>Shift</label>
+            <select id="al-shift">
+              <option value="day">☀️ Day (8am–8pm)</option>
+              <option value="night">🌙 Night (8pm–8am)</option>
+            </select>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Late by (minutes)</label><input type="number" id="al-mins" min="1" max="480" placeholder="30"></div>
+          <div class="fg" style="margin:0"><label>Actual Arrival Time</label><input type="time" id="al-time"></div>
+        </div>
+        <div class="fg"><label>Reason</label><textarea id="al-reason" placeholder="Late aavana no reason..."></textarea></div>
+        <div class="fg"><label>Admin Remark</label><textarea id="al-remark" placeholder="Admin note..."></textarea></div>
+        <button class="btn ba bsm" onclick="adminAddLate()">⏰ Add Late Entry</button>
+        <div class="ok" id="al-msg"></div>
+      </div>
+      <!-- Stats -->
+      <div class="sg3" id="late-stats"></div>
+      <!-- Filter -->
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="lef-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="lef-sh"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>Status</label><select id="lef-st"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Excused</option><option value="unexcused">❌ Unexcused</option></select></div>
+          <div class="fg" style="margin:0"><label>From</label><input type="date" id="lef-from"></div>
+          <div class="fg" style="margin:0"><label>To</label><input type="date" id="lef-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderLateReport()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrLateF()">Reset</button>
+        </div>
+      </div>
+      <!-- Summary Table -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Late Summary</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>Manager</th><th>Dept</th><th>Total Late</th><th>Total Mins</th><th>Excused</th><th>Unexcused</th></tr></thead>
+          <tbody id="late-sum-body"></tbody>
+        </table></div>
+      </div>
+      <!-- Full List -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Late Entries</div>
+      <div id="late-list"></div>
+    </div>
+
     <div class="sec" id="as-st">
       <div class="card">
         <div class="ct">🔐 Change Admin Password</div>
-        <div class="fg"><label>Current Password</label>
-          <div class="pw-w"><input type="password" id="cp1" placeholder="Current"><button class="pw-eye" onclick="tpw('cp1',this)">👁</button></div>
-        </div>
-        <div class="fg"><label>New Password</label>
-          <div class="pw-w"><input type="password" id="cp2" placeholder="New"><button class="pw-eye" onclick="tpw('cp2',this)">👁</button></div>
-        </div>
-        <div class="fg"><label>Confirm New</label>
-          <div class="pw-w"><input type="password" id="cp3" placeholder="Repeat"><button class="pw-eye" onclick="tpw('cp3',this)">👁</button></div>
-        </div>
+        <div class="fg"><label>Current</label><div class="pww"><input type="password" id="cp1"><button class="eye" onclick="tpw('cp1',this)">👁</button></div></div>
+        <div class="fg"><label>New</label><div class="pww"><input type="password" id="cp2"><button class="eye" onclick="tpw('cp2',this)">👁</button></div></div>
+        <div class="fg"><label>Confirm</label><div class="pww"><input type="password" id="cp3"><button class="eye" onclick="tpw('cp3',this)">👁</button></div></div>
         <button class="btn ba bsm" onclick="chgPw()">Update Password</button>
-        <div class="suc" id="pw-msg"></div>
+        <div class="ok" id="pw-msg"></div>
       </div>
       <div class="card">
         <div class="ct">🗑️ Danger Zone</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Badha submissions delete karo (managers/departments safe raheshe)</p>
-        <button class="btn bd2 bsm" onclick="clrAll()">Delete All Submissions</button>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Badha submissions delete karo</p>
+        <button class="btn bre bsm" onclick="clrAll()">Delete All Submissions</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -434,140 +613,149 @@ textarea{resize:vertical;min-height:56px}
   <img id="lb-img" src="" alt="">
 </div>
 
-<!-- EDIT MODAL -->
+<!-- EDIT MANAGER MODAL -->
 <div class="mbg" id="edit-m">
   <div class="mbox">
-    <div class="mhandle"></div>
-    <div class="mtitle">✏️ Edit Manager</div>
-    <div class="fg"><label>ID (fixed)</label><input type="text" id="e-id" readonly style="opacity:.4;cursor:not-allowed"></div>
+    <div class="mhnd"></div>
+    <div class="mtit">✏️ Edit Manager</div>
+    <div class="fg"><label>ID</label><input type="text" id="e-id" readonly style="opacity:.4;cursor:not-allowed"></div>
     <div class="fg"><label>Full Name</label><input type="text" id="e-nm"></div>
-    <div class="fg"><label>Department</label><select id="e-dp"><option value="">— Select —</option></select></div>
+    <div class="fg"><label>Department</label><select id="e-dp"><option value="">—</option></select></div>
     <div class="div"></div>
-    <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Password change (khali chhodo = same raheshe)</p>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Password change (khali = same rahe)</p>
     <div class="g2">
-      <div class="fg" style="margin:0"><label>New Password</label>
-        <div class="pw-w"><input type="password" id="e-pw" placeholder="New"><button class="pw-eye" onclick="tpw('e-pw',this)">👁</button></div>
-      </div>
-      <div class="fg" style="margin:0"><label>Confirm</label>
-        <div class="pw-w"><input type="password" id="e-pw2" placeholder="Repeat"><button class="pw-eye" onclick="tpw('e-pw2',this)">👁</button></div>
-      </div>
+      <div class="fg" style="margin:0"><label>New Password</label><div class="pww"><input type="password" id="e-pw"><button class="eye" onclick="tpw('e-pw',this)">👁</button></div></div>
+      <div class="fg" style="margin:0"><label>Confirm</label><div class="pww"><input type="password" id="e-pw2"><button class="eye" onclick="tpw('e-pw2',this)">👁</button></div></div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-      <button class="btn bg" onclick="closeEdit()">Cancel</button>
-      <button class="btn ba" onclick="saveEdit()">Save Changes</button>
+      <button class="btn bg2" onclick="closeEdit()">Cancel</button>
+      <button class="btn ba" onclick="saveEdit()">Save</button>
     </div>
-    <div class="suc" id="e-msg"></div>
+    <div class="ok" id="e-msg"></div>
   </div>
 </div>
 
-<!-- GOOGLE API -->
-<script src="https://apis.google.com/js/api.js" async defer></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <script>
-/* ===== CONFIG ===== */
-// Google OAuth — dharmesh4848@gmail.com account ke liye
-// Ek var Google Cloud Console ma ek baar setup karvu padse
-// Niche CLIENT_ID update karo tamara account thi
-const GD_CLIENT_ID = '87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com'; // TODO: replace after setup
-const GD_SCOPES = 'https://www.googleapis.com/auth/drive.file';
-const GD_FOLDER = 'FormTrack_Backups';
+/* ============================================================
+   DATA
+============================================================ */
+const LEAVE_TYPES=['Casual Leave','Sick Leave','Earned Leave','Emergency Leave'];
+const DEF_BAL={'Casual Leave':12,'Sick Leave':10,'Earned Leave':15,'Emergency Leave':3};
+const GD_EMAIL='vanani.dharmesh4848@gmail.com';
+const GD_CLIENT_ID='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com';
+const GD_SCOPES='https://www.googleapis.com/auth/drive.file';
 
-/* ===== DB ===== */
-let db = {
-  managers:    JSON.parse(localStorage.getItem('ft5_mg') || 'null'),
-  departments: JSON.parse(localStorage.getItem('ft5_dp') || 'null'),
-  categories:  JSON.parse(localStorage.getItem('ft5_ct') || 'null'),
-  submissions: JSON.parse(localStorage.getItem('ft5_sb') || '[]'),
-  adminPw:     localStorage.getItem('ft5_apw') || 'admin123',
-  backup:      JSON.parse(localStorage.getItem('ft5_bk') || '{}')
+let db={
+  managers:    JSON.parse(ls('ft6_mg')||'null'),
+  departments: JSON.parse(ls('ft6_dp')||'null'),
+  categories:  JSON.parse(ls('ft6_ct')||'null'),
+  submissions: JSON.parse(ls('ft6_sb')||'[]'),
+  leaves:      JSON.parse(ls('ft6_lv')||'[]'),
+  leavebal:    JSON.parse(ls('ft6_lb')||'{}'),
+  adminPw:     ls('ft6_apw')||'admin123',
+  backup:      JSON.parse(ls('ft6_bk')||'{}')
 };
-if (!db.departments) db.departments = [{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
-if (!db.categories)  db.categories  = [
+function ls(k){return localStorage.getItem(k);}
+
+if(!db.departments) db.departments=[{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
+if(!db.categories)  db.categories=[
   {id:'c1',name:'Checklist',deptId:'d1'},{id:'c2',name:'Cross Tally',deptId:'d1'},{id:'c3',name:'Production Report',deptId:'d1'},
   {id:'c4',name:'Quality Check',deptId:'d2'},{id:'c5',name:'Whitemarking',deptId:'d2'},{id:'c6',name:'Safety Report',deptId:'d3'}
 ];
-if (!db.managers) {
-  db.managers = [];
-  for (let i=1; i<=10; i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'), name:'Manager '+i, deptId:'d1', pw:'pass'+String(i).padStart(2,'0')});
+if(!db.managers){
+  db.managers=[];
+  for(let i=1;i<=10;i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'),name:'Manager '+i,deptId:'d1',pw:'pass'+String(i).padStart(2,'0')});
 }
 
-let catFiles={}, curUser=null, editId=null, curRole=null;
-let gdToken=null, gdInited=false;
+let catFiles={}, curUser=null, editId=null, curRole=null, gdToken=null;
 
-function persist() {
-  try {
-    localStorage.setItem('ft5_mg', JSON.stringify(db.managers));
-    localStorage.setItem('ft5_dp', JSON.stringify(db.departments));
-    localStorage.setItem('ft5_ct', JSON.stringify(db.categories));
-    localStorage.setItem('ft5_sb', JSON.stringify(db.submissions));
-    localStorage.setItem('ft5_apw', db.adminPw);
-    localStorage.setItem('ft5_bk', JSON.stringify(db.backup));
-    // auto backup
-    if (db.backup.autoF === 'submit') {
-      if (db.backup.autoD === 'gdrive' && gdToken) setTimeout(gdBackup, 800);
-      if (db.backup.autoD === 'manual') setTimeout(expJSON, 800);
+function persist(){
+  try{
+    localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
+    localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
+    localStorage.setItem('ft6_ct',JSON.stringify(db.categories));
+    localStorage.setItem('ft6_sb',JSON.stringify(db.submissions));
+    localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
+    localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
+    localStorage.setItem('ft6_apw',db.adminPw);
+    localStorage.setItem('ft6_bk',JSON.stringify(db.backup));
+  }catch(e){alert('Storage full! Admin > Settings > Delete old submissions');}
+}
+
+/* ============================================================
+   UTILS
+============================================================ */
+const ini=n=>n.trim().split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const fmtD=d=>{if(!d)return'';const[y,m,dy]=d.split('-');return dy+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y;};
+const fmtDT=iso=>{const d=new Date(iso);return fmtD(d.toISOString().split('T')[0])+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const tod=()=>new Date().toISOString().split('T')[0];
+const nowT=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const dn=id=>{const d=db.departments.find(x=>x.id===id);return d?d.name:'—';};
+const showPg=id=>{document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);};
+const sm=(id,txt,err=false)=>{const el=document.getElementById(id);if(!el)return;el.textContent=txt;el.style.color=err?'var(--re)':'var(--gr)';setTimeout(()=>el.textContent='',4000);};
+function tpw(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁':'🙈';}
+function getLvBal(mid){if(!db.leavebal[mid])db.leavebal[mid]={...DEF_BAL};return db.leavebal[mid];}
+
+/* ============================================================
+   SESSION
+============================================================ */
+const SES='ft6_ses';
+function saveSession(r,uid){localStorage.setItem(SES,JSON.stringify({r,uid}));}
+function clearSession(){localStorage.removeItem(SES);}
+function restoreSession(){
+  try{
+    const s=JSON.parse(ls(SES)||'null');
+    if(!s)return false;
+    if(s.r==='a'){showPg('pg-admin');initAdmin();return true;}
+    if(s.r==='m'){
+      const m=db.managers.find(x=>x.id===s.uid);
+      if(!m){clearSession();return false;}
+      curUser=m;showPg('pg-mgr');initMgr();return true;
     }
-  } catch(e) { alert('Storage full! Admin > Settings > Delete old submissions, ya Export JSON karo'); }
+  }catch(e){clearSession();}
+  return false;
 }
 
-/* ===== UTILS ===== */
-const ini = n => n.trim().split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
-const fmtD = d => { if(!d) return ''; const [y,m,dy]=d.split('-'); return dy+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y; };
-const fmtDT = iso => { const d=new Date(iso); return fmtD(d.toISOString().split('T')[0])+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
-const tod = () => new Date().toISOString().split('T')[0];
-const nowT = () => { const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
-const dn = id => { const d=db.departments.find(x=>x.id===id); return d?d.name:'—'; };
-const showPg = id => { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); };
-const sm = (id, txt, err=false) => { const el=document.getElementById(id); if(!el) return; el.textContent=txt; el.style.color=err?'var(--re)':'var(--gr)'; setTimeout(()=>el.textContent='',4000); };
-function tpw(id, btn) { const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; btn.textContent=el.type==='password'?'👁':'🙈'; }
-
-/* ===== LOGIN ===== */
-function selR(r) {
-  curRole = r;
-  document.getElementById('rc-m').classList.toggle('sel', r==='m');
-  document.getElementById('rc-a').classList.toggle('sel', r==='a');
-  document.getElementById('mb').style.display = r==='m' ? 'block' : 'none';
-  document.getElementById('ab').style.display = r==='a' ? 'block' : 'none';
+/* ============================================================
+   LOGIN
+============================================================ */
+function selR(r){
+  curRole=r;
+  document.getElementById('rc-m').classList.toggle('on',r==='m');
+  document.getElementById('rc-a').classList.toggle('on',r==='a');
+  document.getElementById('mb').style.display=r==='m'?'block':'none';
+  document.getElementById('ab').style.display=r==='a'?'block':'none';
 }
-function doLogin() {
-  document.getElementById('lerr').textContent = '';
-  if (!curRole) { document.getElementById('lerr').textContent = 'Select a role'; return; }
-  if (curRole === 'm') {
-    const id = document.getElementById('l-id').value.trim().toUpperCase();
-    const pw = document.getElementById('l-pw').value;
-    const m  = db.managers.find(x => x.id === id);
-    if (!m)       { document.getElementById('lerr').textContent = 'Manager ID not found'; return; }
-    if (m.pw !== pw) { document.getElementById('lerr').textContent = 'Wrong password'; return; }
-    curUser = m;
-    showPg('pg-mgr');
-    initMgr();
-  } else {
-    if (document.getElementById('l-apw').value !== db.adminPw) { document.getElementById('lerr').textContent = 'Wrong admin password'; return; }
-    showPg('pg-admin');
-    initAdmin();
+function doLogin(){
+  document.getElementById('lerr').textContent='';
+  if(!curRole){document.getElementById('lerr').textContent='Select a role';return;}
+  if(curRole==='m'){
+    const id=document.getElementById('l-id').value.trim().toUpperCase();
+    const pw=document.getElementById('l-pw').value;
+    const m=db.managers.find(x=>x.id===id);
+    if(!m){document.getElementById('lerr').textContent='Manager ID not found';return;}
+    if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
+    curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
+  }else{
+    if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
+    saveSession('a','admin');showPg('pg-admin');initAdmin();
   }
 }
-function doLogout() {
-  curUser=null; catFiles={}; curRole=null;
-  ['l-id','l-pw','l-apw'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('lerr').textContent='';
-  document.getElementById('mb').style.display='none';
-  document.getElementById('ab').style.display='none';
-  document.getElementById('rc-m').classList.remove('sel');
-  document.getElementById('rc-a').classList.remove('sel');
-  showPg('pg-login');
-}
+function doLogout(){curUser=null;catFiles={};curRole=null;clearSession();showPg('pg-login');}
 
-/* ===== MANAGER ===== */
-function initMgr() {
-  document.getElementById('m-nm').textContent = curUser.name;
-  document.getElementById('m-dp').textContent = '🏬 '+dn(curUser.deptId)+' · '+curUser.id;
-  const h = new Date().getHours();
-  psh(h>=8&&h<20 ? 'day' : 'night');
-  document.getElementById('sub-d').value = tod();
-  document.getElementById('sub-t').value = nowT();
-  setInterval(() => { const el=document.getElementById('sub-t'); if(el) el.value=nowT(); }, 30000);
+/* ============================================================
+   MANAGER PAGE
+============================================================ */
+function initMgr(){
+  document.getElementById('m-nm').textContent=curUser.name;
+  document.getElementById('m-dp').textContent='🏬 '+dn(curUser.deptId)+' · '+curUser.id;
+  psh(new Date().getHours()>=8&&new Date().getHours()<20?'day':'night');
+  document.getElementById('sub-d').value=tod();
+  document.getElementById('sub-t').value=nowT();
+  setInterval(()=>{const el=document.getElementById('sub-t');if(el)el.value=nowT();},30000);
+  // populate leave type select
+  const lts=document.getElementById('lv-type');
+  if(lts){lts.innerHTML='';LEAVE_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;lts.appendChild(o);});}
   renderCats();
   // reset to submit tab
   document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
@@ -575,551 +763,1066 @@ function initMgr() {
   document.getElementById('ms-sub').classList.add('on');
   document.getElementById('mn-sub').classList.add('on');
 }
-function psh(s) {
-  document.getElementById('sh-d').className = 'so day' + (s==='day'?' on':'');
-  document.getElementById('sh-n').className = 'so night' + (s==='night'?' on':'');
-}
-const gsh = () => document.getElementById('sh-d').classList.contains('on') ? 'day' : 'night';
-function mTab(t, el) {
+function psh(s){document.getElementById('sh-d').className='so day'+(s==='day'?' on':'');document.getElementById('sh-n').className='so night'+(s==='night'?' on':'');}
+const gsh=()=>document.getElementById('sh-d').classList.contains('on')?'day':'night';
+function mTab(t,el){
   document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('ms-'+t).classList.add('on');
-  el.classList.add('on');
-  if (t==='rep') renderMyRep();
+  if(el)el.classList.add('on');
+  document.getElementById('ms-'+t)?.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='rep')renderMyRep();
+  if(t==='lv')renderMgrLv();
 }
-function renderCats() {
-  catFiles = {};
-  const myCats = db.categories.filter(c => c.deptId === curUser.deptId);
-  myCats.forEach(c => catFiles[c.id] = []);
-  if (!myCats.length) {
-    document.getElementById('cat-area').innerHTML = '<div class="empty"><div class="ee">📂</div><p>No categories in your dept<br><small>Contact admin</small></p></div>';
-    return;
-  }
-  document.getElementById('cat-area').innerHTML = myCats.map(c => `
+function renderCats(){
+  catFiles={};
+  const mc=db.categories.filter(c=>c.deptId===curUser.deptId);
+  mc.forEach(c=>catFiles[c.id]=[]);
+  if(!mc.length){document.getElementById('cat-area').innerHTML='<div class="empty"><div class="ee">📂</div><p>No categories — contact admin</p></div>';return;}
+  document.getElementById('cat-area').innerHTML=mc.map(c=>`
     <div class="ci" id="ci-${c.id}">
-      <div class="chdr">
-        <div class="cnm">📄 ${c.name}</div>
-        <span class="ccnt" id="cnt-${c.id}"></span>
-      </div>
-      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">
-        ⬆️ <span>Tap to upload photo / PDF</span>
+      <div class="chdr"><div class="cnm">📄 ${c.name}</div><span class="ccnt" id="cnt-${c.id}"></span></div>
+      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">⬆️ <span>Tap to upload photo / PDF</span>
         <input type="file" id="fu-${c.id}" multiple accept="image/*,.pdf" data-cid="${c.id}" onchange="onFile(this)">
       </div>
       <div class="chips" id="ch-${c.id}"></div>
     </div>`).join('');
 }
-function onFile(inp) {
-  const cid = inp.dataset.cid;
-  const fs  = Array.from(inp.files);
-  if (!catFiles[cid]) catFiles[cid] = [];
-  if (catFiles[cid].length + fs.length > 10) { alert('Max 10 files per category'); inp.value=''; return; }
-  let done = 0;
-  fs.forEach(f => {
-    const r = new FileReader();
-    r.onload = e => { catFiles[cid].push({name:f.name, type:f.type, data:e.target.result}); done++; if (done===fs.length) refCh(cid); };
-    r.readAsDataURL(f);
-  });
+function onFile(inp){
+  const cid=inp.dataset.cid;const fs=Array.from(inp.files);
+  if(!catFiles[cid])catFiles[cid]=[];
+  if(catFiles[cid].length+fs.length>10){alert('Max 10 files');inp.value='';return;}
+  let done=0;
+  fs.forEach(f=>{const r=new FileReader();r.onload=e=>{catFiles[cid].push({name:f.name,type:f.type,data:e.target.result});done++;if(done===fs.length)refCh(cid);};r.readAsDataURL(f);});
   inp.value='';
 }
-function refCh(cid) {
-  const items = catFiles[cid] || [];
-  const cnt = document.getElementById('cnt-'+cid);
-  if (cnt) { cnt.textContent = items.length+' file'+(items.length!==1?'s':''); cnt.style.display = items.length?'':'none'; }
-  document.getElementById('ci-'+cid)?.classList.toggle('hf', items.length>0);
-  const el = document.getElementById('ch-'+cid);
-  if (el) el.innerHTML = items.map((f,i) => `
-    <div class="chip">
-      ${f.type?.startsWith('image') ? `<img src="${f.data}" alt="">` : `<span style="font-size:14px">📄</span>`}
-      <span style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
-      <span class="cx" onclick="rmCh('${cid}',${i})">×</span>
-    </div>`).join('');
+function refCh(cid){
+  const items=catFiles[cid]||[];
+  const cnt=document.getElementById('cnt-'+cid);
+  if(cnt){cnt.textContent=items.length+' file'+(items.length!==1?'s':'');cnt.style.display=items.length?'':'none';}
+  document.getElementById('ci-'+cid)?.classList.toggle('hf',items.length>0);
+  const el=document.getElementById('ch-'+cid);
+  if(el)el.innerHTML=items.map((f,i)=>`<div class="chip">${f.type?.startsWith('image')?`<img src="${f.data}" alt="">`:'<span style="font-size:14px">📄</span>'}<span style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span><span class="cx" onclick="rmCh('${cid}',${i})">×</span></div>`).join('');
 }
-function rmCh(cid, i) { catFiles[cid].splice(i,1); refCh(cid); }
-function subForms() {
-  const date = document.getElementById('sub-d').value;
-  if (!date) { alert('Select a date'); return; }
-  const totalF = Object.values(catFiles).reduce((a,v)=>a+v.length, 0);
-  if (!totalF) { alert('Upload at least one form'); return; }
-  const cats = {};
-  db.categories.filter(c=>c.deptId===curUser.deptId).forEach(c => {
-    if (catFiles[c.id]?.length) cats[c.id] = {name:c.name, files:[...catFiles[c.id]]};
-  });
-  const now = new Date().toISOString();
-  db.submissions.unshift({id:Date.now(), mgrId:curUser.id, mgrName:curUser.name, deptId:curUser.deptId, deptName:dn(curUser.deptId), date, shift:gsh(), note:document.getElementById('sub-n').value, categories:cats, submittedAt:now});
-  persist();
-  sm('sub-msg', '✅ '+totalF+' forms submitted! — '+fmtDT(now));
-  renderCats();
-  document.getElementById('sub-n').value = '';
+function rmCh(cid,i){catFiles[cid].splice(i,1);refCh(cid);}
+function subForms(){
+  const date=document.getElementById('sub-d').value;
+  if(!date){alert('Select a date');return;}
+  const tf=Object.values(catFiles).reduce((a,v)=>a+v.length,0);
+  if(!tf){alert('Upload at least one form');return;}
+  const cats={};
+  db.categories.filter(c=>c.deptId===curUser.deptId).forEach(c=>{if(catFiles[c.id]?.length)cats[c.id]={name:c.name,files:[...catFiles[c.id]]};});
+  const now=new Date().toISOString();
+  db.submissions.unshift({id:Date.now(),mgrId:curUser.id,mgrName:curUser.name,deptId:curUser.deptId,deptName:dn(curUser.deptId),date,shift:gsh(),note:document.getElementById('sub-n').value,categories:cats,submittedAt:now});
+  persist();sm('sub-msg','✅ '+tf+' forms submitted! — '+fmtDT(now));renderCats();document.getElementById('sub-n').value='';
 }
-function clrSub() { renderCats(); document.getElementById('sub-n').value=''; }
-function renderMyRep() {
-  const subs = db.submissions.filter(s=>s.mgrId===curUser.id);
-  document.getElementById('my-reps').innerHTML = subs.length ? subs.map(s=>repCard(s,false)).join('') : '<div class="empty"><div class="ee">📭</div><p>No submissions yet</p></div>';
+function clrSub(){renderCats();document.getElementById('sub-n').value='';}
+function renderMyRep(){
+  const subs=db.submissions.filter(s=>s.mgrId===curUser.id);
+  document.getElementById('my-reps').innerHTML=subs.length?subs.map(s=>repCard(s,false)).join(''):'<div class="empty"><div class="ee">📭</div><p>No submissions yet</p></div>';
 }
 
-/* ===== REPORT CARD ===== */
-function repCard(s, isA) {
-  const cats = Object.values(s.categories||{});
-  const totF = cats.reduce((a,c)=>a+c.files.length, 0);
+/* ---- MANAGER LEAVE ---- */
+function renderMgrLv(){
+  if(!curUser)return;
+  const bal=getLvBal(curUser.id);
+  document.getElementById('mgr-bal').innerHTML=LEAVE_TYPES.map(t=>`
+    <div class="bal-c">
+      <div class="bal-n" style="color:${(bal[t]??DEF_BAL[t])>0?'var(--gr)':'var(--re)'}">${bal[t]??DEF_BAL[t]}</div>
+      <div class="bal-l">${t}</div>
+    </div>`).join('');
+  const myLv=db.leaves.filter(l=>l.mgrId===curUser.id).sort((a,b)=>b.appliedAt-a.appliedAt);
+  document.getElementById('my-lv-list').innerHTML=myLv.length?myLv.map(l=>lvRow(l,false)).join(''):'<div class="empty"><div class="ee">🏖️</div><p>No leave applications yet</p></div>';
+}
+function applyLv(){
+  const type=document.getElementById('lv-type').value;
+  const from=document.getElementById('lv-from').value;
+  const to=document.getElementById('lv-to').value;
+  const rsn=document.getElementById('lv-rsn').value.trim();
+  if(!from||!to){sm('lv-msg','From ane To date nakho',true);return;}
+  if(from>to){sm('lv-msg','From date To thi moti na hoi',true);return;}
+  if(!rsn){sm('lv-msg','Reason lakhao',true);return;}
+  const days=Math.round((new Date(to)-new Date(from))/(864e5))+1;
+  const bal=getLvBal(curUser.id);
+  if((bal[type]??DEF_BAL[type])<days){sm('lv-msg','Balance nathi! '+type+': '+(bal[type]??DEF_BAL[type])+' days baki',true);return;}
+  db.leaves.unshift({id:Date.now(),mgrId:curUser.id,mgrName:curUser.name,deptId:curUser.deptId,deptName:dn(curUser.deptId),type,from,to,days,reason:rsn,status:'pending',appliedAt:Date.now(),approvedAt:null,remark:''});
+  persist();
+  sm('lv-msg','✅ Leave submit thayi! Admin approve karshhe.');
+  document.getElementById('lv-from').value='';document.getElementById('lv-to').value='';document.getElementById('lv-rsn').value='';
+  renderMgrLv();updateLvBadge();
+}
+
+/* ============================================================
+   REPORT CARD
+============================================================ */
+function repCard(s,isA){
+  const cats=Object.values(s.categories||[]);
+  const tf=cats.reduce((a,c)=>a+c.files.length,0);
   return `<div class="rep">
     <div class="rt">
-      <div>
-        <div class="rnm">${isA ? s.mgrName : 'Submitted: '+fmtD(s.date)}</div>
-        ${isA ? `<div class="rid">${s.mgrId} · ${s.deptName||'—'}</div>` : ''}
-      </div>
+      <div><div class="rnm">${isA?s.mgrName:'Submitted: '+fmtD(s.date)}</div>${isA?`<div class="rid">${s.mgrId} · ${s.deptName||'—'}</div>`:''}</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
         <span class="badge ${s.shift==='day'?'b-day':'b-night'}">${s.shift==='day'?'☀️ Day':'🌙 Night'}</span>
-        ${isA ? `<button class="btn bd2 bxs" onclick="delSub(${s.id})">Delete</button>` : ''}
+        ${isA?`<button class="btn bre bxs" onclick="delSub(${s.id})">Delete</button>`:''}
       </div>
     </div>
-    <div class="rm"><span>📅 ${fmtD(s.date)}</span><span>🕐 ${fmtDT(s.submittedAt)}</span><span>📎 ${totF} files · ${cats.length} cats</span></div>
+    <div class="rm"><span>📅 ${fmtD(s.date)}</span><span>🕐 ${fmtDT(s.submittedAt)}</span><span>📎 ${tf} files · ${cats.length} cats</span></div>
     ${cats.map(c=>`<div class="cfg"><div class="cft">🏷️ ${c.name} (${c.files.length})</div>
       <div class="tr">${c.files.map(f=>f.type?.startsWith('image')
         ?`<img class="th" src="${f.data}" onclick="openLB('${f.data}')" title="${f.name}">`
         :`<div class="tp"><span style="font-size:18px">📄</span>${f.name.split('.').pop().toUpperCase()}</div>`
       ).join('')}</div></div>`).join('')}
-    ${s.note ? `<div class="nb2">${s.note}</div>` : ''}
+    ${s.note?`<div class="notebox">${s.note}</div>`:''}
   </div>`;
 }
-function openLB(src) { document.getElementById('lb-img').src=src; document.getElementById('lb').classList.add('open'); }
-function closeLB() { document.getElementById('lb').classList.remove('open'); }
-function delSub(id) { if(!confirm('Delete?'))return; db.submissions=db.submissions.filter(s=>s.id!==id); persist(); renderReps(); renderOv(); }
+function openLB(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');}
+function closeLB(){document.getElementById('lb').classList.remove('open');}
+function delSub(id){if(!confirm('Delete?'))return;db.submissions=db.submissions.filter(s=>s.id!==id);persist();renderReps();renderOv();}
 
-/* ===== ADMIN ===== */
-function initAdmin() {
-  // reset tabs
+/* ============================================================
+   LEAVE ROW
+============================================================ */
+function lvRow(l,isA){
+  const sb=l.status==='pending'?'<span class="badge b-am">⏳ Pending</span>':l.status==='approved'?'<span class="badge b-gr">✅ Approved</span>':'<span class="badge b-re">❌ Rejected</span>';
+  return `<div class="lv-row">
+    <div class="lv-top">
+      <div><div class="lv-name">${isA?l.mgrName:l.type}</div>${isA?`<div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${l.mgrId} · ${l.deptName}</div>`:''}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        ${sb}
+        ${isA&&l.status==='pending'?`<button class="btn bgr bxs" onclick="approveLv(${l.id})">✅ Approve</button><button class="btn bre bxs" onclick="rejectLv(${l.id})">❌ Reject</button>`:''}
+        ${isA?`<button class="btn bg2 bxs" onclick="delLv(${l.id})">🗑️</button>`:''}
+      </div>
+    </div>
+    <div class="lv-meta">
+      ${!isA?`<span>📋 ${l.type}</span>`:''}
+      <span>📅 ${fmtD(l.from)} → ${fmtD(l.to)}</span>
+      <span>🗓️ ${l.days} day${l.days>1?'s':''}</span>
+      <span>🕐 ${fmtDT(new Date(l.appliedAt).toISOString())}</span>
+    </div>
+    ${l.reason?`<div class="notebox">💬 ${l.reason}</div>`:''}
+    ${l.remark?`<div class="notebox" style="border-left-color:${l.status==='approved'?'var(--gr)':'var(--re)'}">📝 Admin: ${l.remark}</div>`:''}
+  </div>`;
+}
+function approveLv(id){
+  const l=db.leaves.find(x=>x.id===id);if(!l)return;
+  const rem=prompt('Approval remark (optional):')||'';
+  l.status='approved';l.approvedAt=Date.now();l.remark=rem;
+  const bal=getLvBal(l.mgrId);
+  bal[l.type]=Math.max(0,(bal[l.type]??DEF_BAL[l.type])-l.days);
+  db.leavebal[l.mgrId]=bal;
+  persist();sm('lv-admin-msg','✅ Leave approved for '+l.mgrName);renderAdminLv();
+}
+function rejectLv(id){
+  const l=db.leaves.find(x=>x.id===id);if(!l)return;
+  const rem=prompt('Rejection reason:')||'Not approved';
+  l.status='rejected';l.approvedAt=Date.now();l.remark=rem;
+  persist();sm('lv-admin-msg','Leave rejected for '+l.mgrName);renderAdminLv();
+}
+function delLv(id){if(!confirm('Delete?'))return;db.leaves=db.leaves.filter(l=>l.id!==id);persist();renderAdminLv();}
+function updateLvBadge(){
+  const p=db.leaves.filter(l=>l.status==='pending').length;
+  const b=document.getElementById('lv-badge');if(b){b.textContent=p;b.style.display=p?'inline':'none';}
+}
+
+/* ============================================================
+   ADMIN
+============================================================ */
+function initAdmin(){
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
   document.querySelector('.atab').classList.add('on');
   document.getElementById('as-ov').classList.add('on');
-  renderOv();
+  renderOv();updateLvBadge();
 }
-function aTab(t, el) {
+function aTab(t,el){
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('as-'+t).classList.add('on');
-  window.scrollTo(0,0);
-  if (t==='ov') renderOv();
-  if (t==='rp') { popF(); renderReps(); }
-  if (t==='mg') { popDs(['nd','e-dp']); renderMgTbl(); }
-  if (t==='dp') renderDpTbl();
-  if (t==='ct') { popD('cd'); renderCtList(); }
-  if (t==='bk') initBk();
-  if (t==='st') { ['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value=''); }
+  el.classList.add('on');document.getElementById('as-'+t).classList.add('on');window.scrollTo(0,0);
+  if(t==='ov')renderOv();
+  if(t==='rp'){popF();renderReps();}
+  if(t==='lv')renderAdminLv();
+  if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}
+  if(t==='dp')renderDpTbl();
+  if(t==='ct'){popD('cd');renderCtList();}
+  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
 }
 
 /* OVERVIEW */
-function renderOv() {
-  const s=db.submissions, td=tod();
+function renderOv(){
+  const s=db.submissions,td=tod();
   const tc=s.filter(x=>x.date===td).length;
   const tf=s.reduce((a,x)=>a+Object.values(x.categories||{}).reduce((b,c)=>b+c.files.length,0),0);
   document.getElementById('a-stats').innerHTML=`
-    <div class="sc"><div class="sn" style="color:var(--ac)">${s.length}</div><div class="sl">Total Submissions</div></div>
+    <div class="sc"><div class="sn" style="color:var(--ac)">${s.length}</div><div class="sl">Submissions</div></div>
     <div class="sc"><div class="sn" style="color:var(--gr)">${tc}</div><div class="sl">Today</div></div>
     <div class="sc"><div class="sn" style="color:var(--am)">${s.filter(x=>x.shift==='day').length}</div><div class="sl">Day Shift</div></div>
     <div class="sc"><div class="sn" style="color:var(--pu)">${tf}</div><div class="sl">Total Files</div></div>
   `;
-  document.getElementById('a-sum').innerHTML = db.managers.map(m => {
-    const ms=s.filter(x=>x.mgrId===m.id), last=ms[0];
+  document.getElementById('a-sum').innerHTML=db.managers.map(m=>{
+    const ms=s.filter(x=>x.mgrId===m.id),last=ms[0];
     const days=[...new Set(ms.map(x=>x.date))].length;
+    const pending=db.leaves.filter(l=>l.mgrId===m.id&&l.status==='pending').length;
     return `<div class="mr">
       <div class="av">${ini(m.name)}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600">${m.name} <span style="font-size:10px;color:var(--t3);font-family:'DM Mono'">${m.id}</span></div>
-        <div style="font-size:11px;color:var(--t2)">🏬 ${dn(m.deptId)} · ${ms.length} submissions · ${days} days</div>
+        <div style="font-size:11px;color:var(--t2)">🏬 ${dn(m.deptId)} · ${ms.length} submissions · ${days} days ${pending?`· <span style="color:var(--am)">⏳ ${pending} leave pending</span>`:''}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
-        ${ms.length
-          ? `<span class="badge b-gr">${ms.length} ✓</span><div style="font-size:10px;color:var(--t3);margin-top:3px">${last.date}</div>`
-          : `<span class="badge b-re">No submissions</span>`}
+        ${ms.length?`<span class="badge b-gr">${ms.length} ✓</span><div style="font-size:10px;color:var(--t3);margin-top:3px">${last.date}</div>`:`<span class="badge b-re">No subs</span>`}
       </div>
     </div>`;
   }).join('');
 }
 
-/* REPORTS */
-function popF() {
-  const ms=document.getElementById('fm'); ms.innerHTML='<option value="">All</option>'; db.managers.forEach(m=>ms.add(new Option(m.name,m.id)));
-  const ds=document.getElementById('fd'); ds.innerHTML='<option value="">All</option>'; db.departments.forEach(d=>ds.add(new Option(d.name,d.id)));
+/* FORM REPORTS */
+function popF(){
+  const ms=document.getElementById('fm');ms.innerHTML='<option value="">All</option>';db.managers.forEach(m=>ms.add(new Option(m.name,m.id)));
+  const ds=document.getElementById('fd');ds.innerHTML='<option value="">All</option>';db.departments.forEach(d=>ds.add(new Option(d.name,d.id)));
 }
-function renderReps() {
+function renderReps(){
   let data=[...db.submissions];
-  const from=document.getElementById('ff').value, to=document.getElementById('ft').value;
-  const sh=document.getElementById('fsh').value, mg=document.getElementById('fm').value, dp=document.getElementById('fd').value;
-  if(from) data=data.filter(s=>s.date>=from);
-  if(to)   data=data.filter(s=>s.date<=to);
-  if(sh)   data=data.filter(s=>s.shift===sh);
-  if(mg)   data=data.filter(s=>s.mgrId===mg);
-  if(dp)   data=data.filter(s=>s.deptId===dp);
-  document.getElementById('all-reps').innerHTML = data.length ? data.map(s=>repCard(s,true)).join('') : '<div class="empty"><div class="ee">🔍</div><p>No results</p></div>';
+  const from=document.getElementById('ff').value,to=document.getElementById('ft').value;
+  const sh=document.getElementById('fsh').value,mg=document.getElementById('fm').value,dp=document.getElementById('fd').value;
+  if(from)data=data.filter(s=>s.date>=from);if(to)data=data.filter(s=>s.date<=to);
+  if(sh)data=data.filter(s=>s.shift===sh);if(mg)data=data.filter(s=>s.mgrId===mg);if(dp)data=data.filter(s=>s.deptId===dp);
+  document.getElementById('all-reps').innerHTML=data.length?data.map(s=>repCard(s,true)).join(''):'<div class="empty"><div class="ee">🔍</div><p>No results</p></div>';
 }
-function clrF() { ['ff','ft','fsh','fm','fd'].forEach(id=>document.getElementById(id).value=''); renderReps(); }
+function clrF(){['ff','ft','fsh','fm','fd'].forEach(id=>document.getElementById(id).value='');renderReps();}
 
-/* MANAGERS */
-function popDs(ids) {
-  ids.forEach(sid => {
-    const sel=document.getElementById(sid); if(!sel) return;
-    const cur=sel.value; sel.innerHTML='<option value="">— Select —</option>';
-    db.departments.forEach(d=>sel.add(new Option(d.name,d.id)));
-    if(cur) sel.value=cur;
-  });
+/* ============================================================
+   ADMIN LEAVE REPORT
+============================================================ */
+function renderAdminLv(){
+  updateLvBadge();
+  // populate filters
+  const lmg=document.getElementById('lf-mg');
+  if(lmg.options.length<=1){db.managers.forEach(m=>lmg.add(new Option(m.name,m.id)));}
+  const ltp=document.getElementById('lf-tp');
+  if(ltp.options.length<=1){LEAVE_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;ltp.appendChild(o);});}
+  // populate balance set dropdowns
+  const sbmg=document.getElementById('sb-mg');
+  if(sbmg.options.length<=1){db.managers.forEach(m=>sbmg.add(new Option(m.name,m.id)));}
+  const sbtp=document.getElementById('sb-tp');
+  if(sbtp.options.length<=1){LEAVE_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sbtp.appendChild(o);});}
+
+  // STATS
+  const pend=db.leaves.filter(l=>l.status==='pending').length;
+  const appr=db.leaves.filter(l=>l.status==='approved').length;
+  const rejt=db.leaves.filter(l=>l.status==='rejected').length;
+  document.getElementById('lv-stats').innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--am)">${pend}</div><div class="sl">⏳ Pending</div></div>
+    <div class="sc"><div class="sn" style="color:var(--gr)">${appr}</div><div class="sl">✅ Approved</div></div>
+    <div class="sc"><div class="sn" style="color:var(--re)">${rejt}</div><div class="sl">❌ Rejected</div></div>
+  `;
+
+  // PENDING LIST (quick actions)
+  const pendList=db.leaves.filter(l=>l.status==='pending').sort((a,b)=>b.appliedAt-a.appliedAt);
+  document.getElementById('lv-pending-list').innerHTML=pendList.length
+    ?pendList.map(l=>lvRow(l,true)).join('')
+    :'<div class="empty" style="padding:1rem"><div class="ee">✅</div><p>No pending approvals</p></div>';
+
+  // LEAVE REPORT TABLE (filtered)
+  renderLvReport();
+
+  // BALANCE TABLE
+  const hdr=document.getElementById('lv-bal-hdr');
+  hdr.innerHTML='<th>Manager</th><th>Dept</th>'+LEAVE_TYPES.map(t=>`<th>${t}</th>`).join('')+'<th>Total Used</th>';
+  document.getElementById('lv-bal-body').innerHTML=db.managers.map(m=>{
+    const bal=getLvBal(m.id);
+    const used=db.leaves.filter(l=>l.mgrId===m.id&&l.status==='approved').reduce((a,l)=>a+l.days,0);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+      <td><span class="badge b-te" style="font-size:10px">${dn(m.deptId)}</span></td>
+      ${LEAVE_TYPES.map(t=>`<td style="text-align:center"><span style="font-weight:600;color:${(bal[t]??DEF_BAL[t])>0?'var(--gr)':'var(--re)'}">${bal[t]??DEF_BAL[t]}</span></td>`).join('')}
+      <td style="text-align:center;font-weight:600;color:var(--am)">${used}</td>
+    </tr>`;
+  }).join('');
 }
-function addMgr() {
+
+function renderLvReport(){
+  let data=[...db.leaves].sort((a,b)=>b.appliedAt-a.appliedAt);
+  const st=document.getElementById('lf-st')?.value;
+  const mg=document.getElementById('lf-mg')?.value;
+  const tp=document.getElementById('lf-tp')?.value;
+  const from=document.getElementById('lf-from')?.value;
+  const to=document.getElementById('lf-to')?.value;
+  if(st)data=data.filter(l=>l.status===st);
+  if(mg)data=data.filter(l=>l.mgrId===mg);
+  if(tp)data=data.filter(l=>l.type===tp);
+  if(from)data=data.filter(l=>l.from>=from);
+  if(to)data=data.filter(l=>l.to<=to);
+
+  const tbody=document.getElementById('lv-rep-body');
+  if(!data.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--t3);padding:1.5rem">No records found</td></tr>`;return;}
+  const sb=s=>s==='pending'?'<span class="badge b-am">⏳</span>':s==='approved'?'<span class="badge b-gr">✅</span>':'<span class="badge b-re">❌</span>';
+  tbody.innerHTML=data.map(l=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:6px"><div class="av" style="width:24px;height:24px;font-size:9px">${ini(l.mgrName)}</div>${l.mgrName}</div></td>
+    <td style="color:var(--t2)">${l.deptName||'—'}</td>
+    <td><span class="badge b-te" style="font-size:10px">${l.type}</span></td>
+    <td>${fmtD(l.from)}</td>
+    <td>${fmtD(l.to)}</td>
+    <td style="text-align:center;font-weight:600">${l.days}</td>
+    <td>${sb(l.status)}</td>
+    <td style="color:var(--t2)">${fmtDT(new Date(l.appliedAt).toISOString())}</td>
+    <td style="white-space:nowrap">
+      ${l.status==='pending'?`<button class="btn bgr bxs" onclick="approveLv(${l.id})" style="margin-right:3px">✅</button><button class="btn bre bxs" onclick="rejectLv(${l.id})">❌</button>`:''}
+      <button class="btn bg2 bxs" onclick="delLv(${l.id})" style="margin-left:3px">🗑️</button>
+    </td>
+  </tr>`).join('');
+}
+function clrLvF(){['lf-st','lf-mg','lf-tp','lf-from','lf-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderLvReport();}
+
+function setBalance(){
+  const mid=document.getElementById('sb-mg').value;
+  const tp=document.getElementById('sb-tp').value;
+  const val=parseInt(document.getElementById('sb-val').value);
+  if(!mid||!tp){sm('sb-msg','Manager ane type select karo',true);return;}
+  if(isNaN(val)||val<0){sm('sb-msg','Valid number nakho',true);return;}
+  const bal=getLvBal(mid);bal[tp]=val;db.leavebal[mid]=bal;persist();
+  sm('sb-msg','✅ Balance set: '+val+' days for '+tp);renderAdminLv();
+}
+
+/* ============================================================
+   MANAGERS
+============================================================ */
+function popDs(ids){ids.forEach(sid=>{const sel=document.getElementById(sid);if(!sel)return;const cur=sel.value;sel.innerHTML='<option value="">— Select —</option>';db.departments.forEach(d=>sel.add(new Option(d.name,d.id)));if(cur)sel.value=cur;});}
+function addMgr(){
   const id=document.getElementById('ni').value.trim().toUpperCase();
   const nm=document.getElementById('nn').value.trim();
   const dp=document.getElementById('nd').value;
   const pw=document.getElementById('np').value;
   const pw2=document.getElementById('np2').value;
-  if(!id||!nm) { sm('mg-msg','Fill ID and Name',true); return; }
-  if(!dp) { sm('mg-msg','Select department',true); return; }
-  if(!pw) { sm('mg-msg','Set a password',true); return; }
-  if(pw!==pw2) { sm('mg-msg','Passwords do not match',true); return; }
-  if(db.managers.find(m=>m.id===id)) { sm('mg-msg','ID already exists',true); return; }
-  if(db.managers.length>=50) { sm('mg-msg','Max 50 managers',true); return; }
-  db.managers.push({id,name:nm,deptId:dp,pw});
-  persist();
-  ['ni','nn','np','np2'].forEach(x=>document.getElementById(x).value='');
-  document.getElementById('nd').value='';
-  sm('mg-msg','✅ '+nm+' added! Password: '+pw);
-  renderMgTbl();
+  if(!id||!nm){sm('mg-msg','Fill ID and Name',true);return;}
+  if(!dp){sm('mg-msg','Select department',true);return;}
+  if(!pw){sm('mg-msg','Set password',true);return;}
+  if(pw!==pw2){sm('mg-msg','Passwords do not match',true);return;}
+  if(db.managers.find(m=>m.id===id)){sm('mg-msg','ID already exists',true);return;}
+  if(db.managers.length>=50){sm('mg-msg','Max 50',true);return;}
+  db.managers.push({id,name:nm,deptId:dp,pw});persist();
+  ['ni','nn','np','np2'].forEach(x=>document.getElementById(x).value='');document.getElementById('nd').value='';
+  sm('mg-msg','✅ '+nm+' added!');renderMgTbl();
 }
-function renderMgTbl() {
-  document.getElementById('mg-cnt').textContent = db.managers.length;
-  document.getElementById('mg-tbl').innerHTML = db.managers.length ? `
-    <table class="tbl">
-      <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Subs</th><th>PW</th><th></th></tr></thead>
-      <tbody>${db.managers.map(m=>`<tr>
-        <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${m.id}</td>
-        <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:28px;height:28px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
-        <td><span class="badge b-te">${dn(m.deptId)}</span></td>
-        <td><span class="badge b-gr">${db.submissions.filter(s=>s.mgrId===m.id).length}</span></td>
-        <td><span style="font-size:11px;color:var(--t3)">${m.pw?'🔒':'⚠️'}</span></td>
-        <td style="white-space:nowrap">
-          <button class="btn bw bxs" onclick="openEdit('${m.id}')" style="margin-right:4px">Edit</button>
-          <button class="btn bd2 bxs" onclick="delMgr('${m.id}')">Delete</button>
-        </td>
-      </tr>`).join('')}</tbody>
-    </table>` : '<div class="empty" style="padding:1.5rem"><p>No managers yet</p></div>';
+function renderMgTbl(){
+  document.getElementById('mg-cnt').textContent=db.managers.length;
+  document.getElementById('mg-tbl').innerHTML=db.managers.length?`<table class="tbl">
+    <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Subs</th><th></th></tr></thead>
+    <tbody>${db.managers.map(m=>`<tr>
+      <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${m.id}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+      <td><span class="badge b-te">${dn(m.deptId)}</span></td>
+      <td><span class="badge b-gr">${db.submissions.filter(s=>s.mgrId===m.id).length}</span></td>
+      <td style="white-space:nowrap"><button class="btn bam bxs" onclick="openEdit('${m.id}')" style="margin-right:4px">Edit</button><button class="btn bre bxs" onclick="delMgr('${m.id}')">Delete</button></td>
+    </tr>`).join('')}</tbody></table>`:'<div class="empty" style="padding:1.5rem"><p>No managers yet</p></div>';
 }
-function openEdit(id) {
-  const m=db.managers.find(x=>x.id===id); if(!m) return;
-  editId=id; popDs(['e-dp']);
-  document.getElementById('e-id').value=m.id;
-  document.getElementById('e-nm').value=m.name;
-  document.getElementById('e-dp').value=m.deptId||'';
-  document.getElementById('e-pw').value='';
-  document.getElementById('e-pw2').value='';
+function openEdit(id){
+  const m=db.managers.find(x=>x.id===id);if(!m)return;editId=id;popDs(['e-dp']);
+  document.getElementById('e-id').value=m.id;document.getElementById('e-nm').value=m.name;
+  document.getElementById('e-dp').value=m.deptId||'';document.getElementById('e-pw').value='';document.getElementById('e-pw2').value='';
   document.getElementById('edit-m').classList.add('open');
 }
-function closeEdit() { document.getElementById('edit-m').classList.remove('open'); editId=null; }
-function saveEdit() {
-  const nm=document.getElementById('e-nm').value.trim();
-  const dp=document.getElementById('e-dp').value;
-  const pw=document.getElementById('e-pw').value;
-  const pw2=document.getElementById('e-pw2').value;
-  if(!nm||!dp) { sm('e-msg','Fill all fields',true); return; }
-  if(pw && pw!==pw2) { sm('e-msg','Passwords do not match',true); return; }
-  const m=db.managers.find(x=>x.id===editId); if(!m) return;
-  m.name=nm; m.deptId=dp; if(pw) m.pw=pw;
-  persist(); closeEdit();
-  sm('mg-msg','✅ '+nm+' updated!'); renderMgTbl();
+function closeEdit(){document.getElementById('edit-m').classList.remove('open');editId=null;}
+function saveEdit(){
+  const nm=document.getElementById('e-nm').value.trim();const dp=document.getElementById('e-dp').value;
+  const pw=document.getElementById('e-pw').value;const pw2=document.getElementById('e-pw2').value;
+  if(!nm||!dp){sm('e-msg','Fill all fields',true);return;}
+  if(pw&&pw!==pw2){sm('e-msg','Passwords do not match',true);return;}
+  const m=db.managers.find(x=>x.id===editId);if(!m)return;
+  m.name=nm;m.deptId=dp;if(pw)m.pw=pw;persist();closeEdit();sm('mg-msg','✅ '+nm+' updated!');renderMgTbl();
 }
-function delMgr(id) {
-  if(!confirm('Delete this manager?')) return;
-  db.managers=db.managers.filter(m=>m.id!==id);
-  persist(); renderMgTbl(); renderOv();
-}
+function delMgr(id){if(!confirm('Delete?'))return;db.managers=db.managers.filter(m=>m.id!==id);persist();renderMgTbl();renderOv();}
 
-/* DEPARTMENTS */
-function addDept() {
-  const nm=document.getElementById('dn').value.trim(); if(!nm) return;
-  if(db.departments.find(d=>d.name.toLowerCase()===nm.toLowerCase())) { sm('dp-msg','Already exists',true); return; }
-  db.departments.push({id:'d'+Date.now(),name:nm}); persist();
-  document.getElementById('dn').value='';
-  sm('dp-msg','✅ '+nm+' added!');
-  renderDpTbl(); popDs(['nd','e-dp']); popD('cd');
+/* ============================================================
+   DEPARTMENTS & CATEGORIES
+============================================================ */
+function addDept(){
+  const nm=document.getElementById('dn').value.trim();if(!nm)return;
+  if(db.departments.find(d=>d.name.toLowerCase()===nm.toLowerCase())){sm('dp-msg','Already exists',true);return;}
+  db.departments.push({id:'d'+Date.now(),name:nm});persist();
+  document.getElementById('dn').value='';sm('dp-msg','✅ '+nm+' added!');renderDpTbl();popDs(['nd','e-dp']);popD('cd');
 }
-function renderDpTbl() {
-  document.getElementById('dp-tbl').innerHTML = db.departments.length ? `
-    <table class="tbl">
-      <thead><tr><th>Department</th><th>Managers</th><th>Categories</th><th></th></tr></thead>
-      <tbody>${db.departments.map(d=>`<tr>
-        <td><span class="badge b-te">🏬 ${d.name}</span></td>
-        <td>${db.managers.filter(m=>m.deptId===d.id).length}</td>
-        <td>${db.categories.filter(c=>c.deptId===d.id).length}</td>
-        <td style="text-align:right"><button class="btn bd2 bxs" onclick="delDept('${d.id}')">Delete</button></td>
-      </tr>`).join('')}</tbody>
-    </table>` : '<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
+function renderDpTbl(){
+  document.getElementById('dp-tbl').innerHTML=db.departments.length?`<table class="tbl">
+    <thead><tr><th>Department</th><th>Managers</th><th>Categories</th><th></th></tr></thead>
+    <tbody>${db.departments.map(d=>`<tr>
+      <td><span class="badge b-te">🏬 ${d.name}</span></td>
+      <td>${db.managers.filter(m=>m.deptId===d.id).length}</td>
+      <td>${db.categories.filter(c=>c.deptId===d.id).length}</td>
+      <td style="text-align:right"><button class="btn bre bxs" onclick="delDept('${d.id}')">Delete</button></td>
+    </tr>`).join('')}</tbody></table>`:'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
 }
-function delDept(id) {
-  if(db.categories.filter(c=>c.deptId===id).length||db.managers.filter(m=>m.deptId===id).length) { alert('Remove all managers & categories in this dept first'); return; }
-  if(!confirm('Delete?')) return;
-  db.departments=db.departments.filter(d=>d.id!==id); persist(); renderDpTbl();
+function delDept(id){
+  if(db.categories.filter(c=>c.deptId===id).length||db.managers.filter(m=>m.deptId===id).length){alert('Remove managers & categories first');return;}
+  if(!confirm('Delete?'))return;db.departments=db.departments.filter(d=>d.id!==id);persist();renderDpTbl();
 }
-
-/* CATEGORIES */
-function popD(sid) {
-  const sel=document.getElementById(sid); if(!sel) return;
-  const cur=sel.value; sel.innerHTML='<option value="">— Select —</option>';
-  db.departments.forEach(d=>sel.add(new Option(d.name,d.id))); if(cur) sel.value=cur;
+function popD(sid){const sel=document.getElementById(sid);if(!sel)return;const cur=sel.value;sel.innerHTML='<option value="">— Select —</option>';db.departments.forEach(d=>sel.add(new Option(d.name,d.id)));if(cur)sel.value=cur;}
+function addCat(){
+  const nm=document.getElementById('cn').value.trim();const dp=document.getElementById('cd').value;
+  if(!nm||!dp){sm('ct-msg','Fill name and select dept',true);return;}
+  if(db.categories.find(c=>c.name.toLowerCase()===nm.toLowerCase()&&c.deptId===dp)){sm('ct-msg','Already exists',true);return;}
+  db.categories.push({id:'c'+Date.now(),name:nm,deptId:dp});persist();document.getElementById('cn').value='';sm('ct-msg','✅ '+nm+' added!');renderCtList();
 }
-function addCat() {
-  const nm=document.getElementById('cn').value.trim();
-  const dp=document.getElementById('cd').value;
-  if(!nm||!dp) { sm('ct-msg','Fill name and select dept',true); return; }
-  if(db.categories.find(c=>c.name.toLowerCase()===nm.toLowerCase()&&c.deptId===dp)) { sm('ct-msg','Already exists in this dept',true); return; }
-  db.categories.push({id:'c'+Date.now(),name:nm,deptId:dp}); persist();
-  document.getElementById('cn').value='';
-  sm('ct-msg','✅ '+nm+' added!'); renderCtList();
-}
-function renderCtList() {
-  document.getElementById('ct-list').innerHTML = db.departments.map(d => {
+function renderCtList(){
+  document.getElementById('ct-list').innerHTML=db.departments.map(d=>{
     const cats=db.categories.filter(c=>c.deptId===d.id);
-    return `<div style="margin-bottom:1rem">
-      <div style="font-size:12px;font-weight:600;color:var(--te);margin-bottom:7px">🏬 ${d.name}</div>
-      ${cats.length
-        ? `<div style="display:flex;flex-wrap:wrap">${cats.map(c=>`
-            <div style="display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:5px 10px;margin:3px;font-size:12px">
-              🏷️ ${c.name}
-              <button class="btn bd2 bxs" style="padding:2px 7px;margin-left:3px" onclick="delCat('${c.id}')">✕</button>
-            </div>`).join('')}</div>`
-        : '<p style="font-size:12px;color:var(--t3);padding:4px">No categories</p>'}
+    return `<div style="margin-bottom:1rem"><div style="font-size:12px;font-weight:600;color:var(--te);margin-bottom:7px">🏬 ${d.name}</div>
+    ${cats.length?`<div style="display:flex;flex-wrap:wrap">${cats.map(c=>`<div style="display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:5px 10px;margin:3px;font-size:12px">🏷️ ${c.name}<button class="btn bre bxs" style="padding:2px 7px;margin-left:3px" onclick="delCat('${c.id}')">✕</button></div>`).join('')}</div>`:'<p style="font-size:12px;color:var(--t3);padding:4px">No categories</p>'}
     </div>`;
-  }).join('') || '<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
+  }).join('')||'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
 }
-function delCat(id) { if(!confirm('Delete?'))return; db.categories=db.categories.filter(c=>c.id!==id); persist(); renderCtList(); }
+function delCat(id){if(!confirm('Delete?'))return;db.categories=db.categories.filter(c=>c.id!==id);persist();renderCtList();}
 
-/* ===== SETTINGS ===== */
-function chgPw() {
-  const c=document.getElementById('cp1').value;
-  const n=document.getElementById('cp2').value;
-  const r=document.getElementById('cp3').value;
-  if(c!==db.adminPw) { sm('pw-msg','Wrong current password',true); return; }
-  if(n.length<4) { sm('pw-msg','Min 4 characters',true); return; }
-  if(n!==r) { sm('pw-msg','Passwords do not match',true); return; }
-  db.adminPw=n; persist(); sm('pw-msg','✅ Password updated!');
-  ['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
+/* ============================================================
+   SETTINGS
+============================================================ */
+function chgPw(){
+  const c=document.getElementById('cp1').value,n=document.getElementById('cp2').value,r=document.getElementById('cp3').value;
+  if(c!==db.adminPw){sm('pw-msg','Wrong current password',true);return;}
+  if(n.length<4){sm('pw-msg','Min 4 characters',true);return;}
+  if(n!==r){sm('pw-msg','Passwords do not match',true);return;}
+  db.adminPw=n;persist();sm('pw-msg','✅ Password updated!');['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
 }
-function clrAll() {
-  if(!confirm('DELETE ALL SUBMISSIONS? Cannot undo!')) return;
-  db.submissions=[]; persist(); renderOv(); alert('All submissions deleted.');
+function clrAll(){if(!confirm('DELETE ALL? Cannot undo!'))return;db.submissions=[];persist();renderOv();alert('Done.');}
+
+/* ============================================================
+   GOOGLE DRIVE
+============================================================ */
+let tclient=null;
+function gdUI(){
+  const ok=!!gdToken;
+  ['gd-bk','gd-rs','gd-out'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=ok?'inline-flex':'none';});
+  document.getElementById('gd-dot').style.background=ok?'var(--gr)':'var(--re)';
+  document.getElementById('gd-txt').textContent=ok?'✅ Connected — Ready to backup':'Not signed in';
 }
-
-/* ===== GOOGLE DRIVE BACKUP ===== */
-let tokenClient=null;
-
-function initBk() {
-  // load auto backup settings
-  if(db.backup.autoF) document.getElementById('ab-f').value=db.backup.autoF;
-  if(db.backup.autoD) document.getElementById('ab-d').value=db.backup.autoD;
-  updateGDUI();
+function gdSignIn(){
+  if(GD_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID_HERE'){sm('gd-msg','⚠️ Setup Google Cloud Console first — see steps below',true);return;}
+  const go=()=>{tclient=google.accounts.oauth2.initTokenClient({client_id:GD_CLIENT_ID,scope:GD_SCOPES,hint:GD_EMAIL,callback:(r)=>{if(r.error){sm('gd-msg','Sign-in failed',true);return;}gdToken=r.access_token;gdUI();sm('gd-msg','✅ Connected!');}}); tclient.requestAccessToken({prompt:'consent'});};
+  typeof google!=='undefined'?go():(()=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=go;document.head.appendChild(s);})();
 }
-
-function updateGDUI() {
-  const signed = !!gdToken;
-  document.getElementById('gd-bk-btn').style.display = signed ? 'inline-flex' : 'none';
-  document.getElementById('gd-rs-btn').style.display = signed ? 'inline-flex' : 'none';
-  document.getElementById('gd-out-btn').style.display = signed ? 'inline-flex' : 'none';
-  if (signed) {
-    document.getElementById('gd-st').innerHTML = '<span class="dot ok"></span><span>✅ Signed in — Ready to backup</span>';
-  } else {
-    document.getElementById('gd-st').innerHTML = '<span class="dot no"></span><span>Not signed in — tap "Sign in with Google"</span>';
-  }
+function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
+async function gdBackup(){
+  if(!gdToken){sm('gd-msg','Sign in first',true);return;}
+  document.getElementById('gd-txt').textContent='Uploading...';
+  try{
+    const q=encodeURIComponent(`name='FormTrack_Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+    const fr=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`,{headers:{'Authorization':'Bearer '+gdToken}});
+    const fd=await fr.json();
+    let fid=fd.files?.[0]?.id;
+    if(!fid){const cr=await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Authorization':'Bearer '+gdToken,'Content-Type':'application/json'},body:JSON.stringify({name:'FormTrack_Backups',mimeType:'application/vnd.google-apps.folder'})});const cd=await cr.json();fid=cd.id;}
+    const payload=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,mistakes:db.mistakes,lateEntries:db.lateEntries,backupAt:new Date().toISOString()});
+    const fname='FormTrack_'+tod()+'.json';
+    const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:fname,mimeType:'application/json',parents:[fid]})],{type:'application/json'}));form.append('file',new Blob([payload],{type:'application/json'}));
+    const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+gdToken},body:form});
+    const d=await res.json();
+    if(d.id){sm('gd-msg','✅ Backup saved: '+fname);gdUI();}else throw new Error(d.error?.message||'Failed');
+  }catch(e){sm('gd-msg','Error: '+e.message,true);gdUI();}
 }
-
-function gdSignIn() {
-  // Check if GD_CLIENT_ID is set
-  if (GD_CLIENT_ID != '87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com') {
-    // Show setup instructions
-    document.getElementById('gd-st').innerHTML = '<span class="dot no"></span><span>⚠️ Setup needed — see instructions below</span>';
-    sm('gd-msg', '⚠️ Niche setup guide follow karo — ek var Client ID set karvo padse', true);
-    showGDSetup();
-    return;
-  }
-  document.getElementById('gd-st').innerHTML = '<span class="dot ld"></span><span>Connecting to Google...</span>';
-  // Load GIS
-  const initGIS = () => {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: GD_CLIENT_ID,
-      scope: GD_SCOPES,
-      hint: 'dharmesh4848@gmail.com',
-      callback: (resp) => {
-        if (resp.error) { sm('gd-msg', 'Sign-in failed: '+resp.error, true); updateGDUI(); return; }
-        gdToken = resp.access_token;
-        updateGDUI();
-        sm('gd-msg', '✅ Google Drive connected! Ready to backup.');
-      }
-    });
-    tokenClient.requestAccessToken({prompt:'consent'});
-  };
-  if (typeof google !== 'undefined' && google.accounts) { initGIS(); }
-  else {
-    const s=document.createElement('script');
-    s.src='https://accounts.google.com/gsi/client';
-    s.onload=initGIS;
-    document.head.appendChild(s);
-  }
+async function gdRestore(){
+  if(!gdToken){sm('gd-msg','Sign in first',true);return;}
+  try{
+    const q=encodeURIComponent(`name contains 'FormTrack_' and trashed=false`);
+    const res=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&orderBy=createdTime+desc&fields=files(id,name)`,{headers:{'Authorization':'Bearer '+gdToken}});
+    const d=await res.json();
+    if(!d.files?.length){sm('gd-msg','No backup found',true);return;}
+    if(!confirm('Restore from: '+d.files[0].name+'?'))return;
+    const fr=await fetch(`https://www.googleapis.com/drive/v3/files/${d.files[0].id}?alt=media`,{headers:{'Authorization':'Bearer '+gdToken}});
+    const bk=await fr.json();
+    if(bk.managers)db.managers=bk.managers;if(bk.departments)db.departments=bk.departments;
+    if(bk.categories)db.categories=bk.categories;if(bk.submissions)db.submissions=bk.submissions;
+    if(bk.leaves)db.leaves=bk.leaves;if(bk.leavebal)db.leavebal=bk.leavebal;
+    if(bk.mistakes)db.mistakes=bk.mistakes;if(bk.lateEntries)db.lateEntries=bk.lateEntries;
+    persist();persistLate();sm('gd-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
+  }catch(e){sm('gd-msg','Error: '+e.message,true);}
 }
-
-function gdSignOut() {
-  if (gdToken) google.accounts.oauth2.revoke(gdToken, ()=>{});
-  gdToken = null;
-  updateGDUI();
-  sm('gd-msg', 'Signed out from Google Drive');
+function expJSON(){
+  const a=document.createElement('a');
+  a.href='data:application/json,'+encodeURIComponent(JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,mistakes:db.mistakes,lateEntries:db.lateEntries,exportedAt:new Date().toISOString()}));
+  a.download='FormTrack_'+tod()+'.json';a.click();sm('mn-msg','✅ Downloaded!');
 }
-
-async function gdBackup() {
-  if (!gdToken) { sm('gd-msg','Sign in first',true); return; }
-  document.getElementById('gd-st').innerHTML = '<span class="dot ld"></span><span>Uploading backup to Drive...</span>';
-  try {
-    // Find or create FormTrack_Backups folder
-    const folderId = await gdGetOrCreateFolder();
-    // Create backup file
-    const payload = JSON.stringify({
-      managers:db.managers, departments:db.departments,
-      categories:db.categories, submissions:db.submissions,
-      backupAt:new Date().toISOString(), version:'5'
-    });
-    const fname = 'FormTrack_backup_'+tod()+'.json';
-    const meta = {name:fname, mimeType:'application/json', parents:[folderId]};
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(meta)],{type:'application/json'}));
-    form.append('file', new Blob([payload],{type:'application/json'}));
-    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method:'POST',
-      headers:{'Authorization':'Bearer '+gdToken},
-      body:form
-    });
-    const d = await res.json();
-    if (d.id) {
-      document.getElementById('gd-st').innerHTML = '<span class="dot ok"></span><span>✅ Backup saved: '+fname+'</span>';
-      sm('gd-msg','✅ Backup saved to Google Drive → FormTrack_Backups/'+fname);
-      db.backup.lastGD = new Date().toISOString();
-      persist();
-    } else {
-      throw new Error(d.error?.message||'Upload failed');
-    }
-  } catch(e) {
-    document.getElementById('gd-st').innerHTML = '<span class="dot no"></span><span>Backup failed</span>';
-    sm('gd-msg','Error: '+e.message,true);
-    if(e.message.includes('401')) { gdToken=null; updateGDUI(); sm('gd-msg','Session expired — sign in again',true); }
-  }
+function impJSON(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{
+    try{const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
+    if(!confirm('Restore? This replaces all data!'))return;
+    if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
+    if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
+    if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
+    if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
+    persist();persistLate();sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
+    }catch(e){sm('mn-msg','Invalid JSON',true);}
+  };r.readAsText(f);inp.value='';
 }
 
-async function gdGetOrCreateFolder() {
-  // Search for existing folder
-  const q = encodeURIComponent(`name='${GD_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
-    headers:{'Authorization':'Bearer '+gdToken}
-  });
-  const d = await res.json();
-  if (d.files?.length) return d.files[0].id;
-  // Create folder
-  const cr = await fetch('https://www.googleapis.com/drive/v3/files', {
-    method:'POST',
-    headers:{'Authorization':'Bearer '+gdToken,'Content-Type':'application/json'},
-    body:JSON.stringify({name:GD_FOLDER, mimeType:'application/vnd.google-apps.folder'})
-  });
-  const fd = await cr.json();
-  return fd.id;
-}
-
-async function gdRestore() {
-  if (!gdToken) { sm('gd-msg','Sign in first',true); return; }
-  document.getElementById('gd-st').innerHTML = '<span class="dot ld"></span><span>Fetching backup list...</span>';
-  try {
-    const q = encodeURIComponent(`name contains 'FormTrack_backup' and trashed=false`);
-    const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&orderBy=createdTime+desc&fields=files(id,name,createdTime)`, {
-      headers:{'Authorization':'Bearer '+gdToken}
-    });
-    const d = await res.json();
-    if (!d.files?.length) { sm('gd-msg','No backup files found in Drive',true); updateGDUI(); return; }
-    const latest = d.files[0];
-    if (!confirm('Restore from: '+latest.name+'?\nThis will replace all current data!')) { updateGDUI(); return; }
-    const fr = await fetch(`https://www.googleapis.com/drive/v3/files/${latest.id}?alt=media`, {
-      headers:{'Authorization':'Bearer '+gdToken}
-    });
-    const bk = await fr.json();
-    db.managers=bk.managers||db.managers;
-    db.departments=bk.departments||db.departments;
-    db.categories=bk.categories||db.categories;
-    db.submissions=bk.submissions||db.submissions;
-    persist();
-    sm('gd-msg','✅ Data restored from '+latest.name+' — Refreshing...');
-    setTimeout(()=>location.reload(), 2000);
-  } catch(e) {
-    sm('gd-msg','Restore error: '+e.message,true);
-    updateGDUI();
-  }
-}
-
-function showGDSetup() {
-  const existing = document.getElementById('gd-setup-guide');
-  if (existing) { existing.style.display='block'; return; }
-  const div = document.createElement('div');
-  div.id = 'gd-setup-guide';
-  div.style.cssText = 'margin-top:12px';
-  div.innerHTML = `
-    <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">One-Time Setup — 5 minutes</div>
-    <div style="background:var(--s2);border-radius:var(--rs);padding:11px;margin-bottom:7px;border-left:3px solid var(--ac)">
-      <div style="font-size:11px;font-weight:600;color:var(--ac);margin-bottom:4px">Step 1</div>
-      <div style="font-size:12px;color:var(--t2)">console.cloud.google.com kholo → New Project → Name: "FormTrack"</div>
-    </div>
-    <div style="background:var(--s2);border-radius:var(--rs);padding:11px;margin-bottom:7px;border-left:3px solid var(--ac)">
-      <div style="font-size:11px;font-weight:600;color:var(--ac);margin-bottom:4px">Step 2</div>
-      <div style="font-size:12px;color:var(--t2)">APIs & Services → Enable APIs → "Google Drive API" enable karo</div>
-    </div>
-    <div style="background:var(--s2);border-radius:var(--rs);padding:11px;margin-bottom:7px;border-left:3px solid var(--ac)">
-      <div style="font-size:11px;font-weight:600;color:var(--ac);margin-bottom:4px">Step 3</div>
-      <div style="font-size:12px;color:var(--t2)">Credentials → OAuth 2.0 Client ID → Web Application → Authorized origins ma tamaro site URL nakho (ex: https://yourusername.github.io)</div>
-    </div>
-    <div style="background:var(--s2);border-radius:var(--rs);padding:11px;margin-bottom:7px;border-left:3px solid var(--ac)">
-      <div style="font-size:11px;font-weight:600;color:var(--ac);margin-bottom:4px">Step 4</div>
-      <div style="font-size:12px;color:var(--t2)">Client ID copy karo → index.html kholo → line ma <code style="background:var(--bg);padding:2px 5px;border-radius:3px;color:var(--te)">52224266990-4cmj0lmpkgu65iiegf9au9oktg0ms3cu.apps.googleusercontent.com'</code> ma replace karo</div>
-    </div>
-    <div style="background:var(--s2);border-radius:var(--rs);padding:11px;border-left:3px solid var(--gr)">
-      <div style="font-size:11px;font-weight:600;color:var(--gr);margin-bottom:4px">✅ Done!</div>
-      <div style="font-size:12px;color:var(--t2)">File save karo → GitHub par re-upload karo → "Sign in with Google" tap karo → dharmesh4848@gmail.com saathe sign in karo</div>
-    </div>
-    <p style="font-size:11px;color:var(--t3);margin-top:8px">Abhi mate Manual Export/Import vaparo — niche che</p>
-  `;
-  document.querySelector('#as-bk .card').appendChild(div);
-}
-
-/* MANUAL BACKUP */
-function expJSON() {
-  const data = JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,exportedAt:new Date().toISOString()});
-  const a = document.createElement('a');
-  a.href = 'data:application/json,'+encodeURIComponent(data);
-  a.download = 'FormTrack_'+tod()+'.json';
-  a.click();
-  sm('mn-msg','✅ Backup JSON downloaded!');
-}
-function impJSON(inp) {
-  const f=inp.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=e=>{
-    try {
-      const d=JSON.parse(e.target.result);
-      if(!d.managers) { sm('mn-msg','Invalid file',true); return; }
-      if(!confirm('Restore from file? This replaces all data!')) return;
-      db.managers=d.managers||db.managers;
-      db.departments=d.departments||db.departments;
-      db.categories=d.categories||db.categories;
-      db.submissions=d.submissions||db.submissions;
-      persist();
-      sm('mn-msg','✅ Data restored! Refreshing...');
-      setTimeout(()=>location.reload(),2000);
-    } catch(err) { sm('mn-msg','Invalid JSON',true); }
-  };
-  r.readAsText(f); inp.value='';
-}
-function saveAuto() {
-  db.backup.autoF=document.getElementById('ab-f').value;
-  db.backup.autoD=document.getElementById('ab-d').value;
-  persist(); sm('ab-msg','✅ Auto backup saved!');
-}
+/* ============================================================
+   INIT — restore session on load
+============================================================ */
+window.addEventListener('DOMContentLoaded',()=>{
+  if(!restoreSession()) showPg('pg-login');
+});
 </script>
 </body>
 </html>
+<style>
+/* MISTAKE STYLES */
+.mist-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.mist-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.mist-name{font-weight:600;font-size:14px}
+.mist-meta{font-size:11px;color:var(--t2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.sv-minor{background:rgba(251,191,36,0.15);color:#FBBF24}
+.sv-moderate{background:rgba(251,146,60,0.15);color:#FB923C}
+.sv-major{background:rgba(248,113,113,0.15);color:#F87171}
+.sv-critical{background:rgba(220,38,38,0.2);color:#EF4444;font-weight:600}
+.score-bar{height:6px;border-radius:3px;background:var(--s2);margin-top:4px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px;transition:width .3s}
+.perf-good{color:var(--gr)}.perf-ok{color:var(--am)}.perf-bad{color:var(--re)}
+</style>
+
+<script>
+/* ============================================================
+   MISTAKE REPORT SYSTEM
+============================================================ */
+const MISTAKE_CATS=['Form Error','Late Submission','Missing Data','Process Violation','Safety Issue','Quality Issue','Attendance','Other'];
+
+// Init mistake data
+if(!db.mistakes) db.mistakes=JSON.parse(localStorage.getItem('ft6_mist')||'[]');
+
+function persistMist(){
+  localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
+}
+
+// Severity config
+const SV_CONFIG={
+  minor:   {label:'🟡 Minor',   cls:'sv-minor',   weight:1},
+  moderate:{label:'🟠 Moderate',cls:'sv-moderate', weight:2},
+  major:   {label:'🔴 Major',   cls:'sv-major',    weight:3},
+  critical:{label:'🚨 Critical',cls:'sv-critical', weight:5}
+};
+
+/* ---- MANAGER: show own mistakes ---- */
+function renderMgrMist(){
+  if(!curUser) return;
+  const myM = db.mistakes.filter(m=>m.mgrId===curUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  // update badge
+  const newOnes = myM.filter(m=>!m.seenByMgr).length;
+  const badge = document.getElementById('mist-mgr-badge');
+  if(badge){badge.textContent=newOnes;badge.style.display=newOnes?'inline':'none';}
+  document.getElementById('mgr-mist-list').innerHTML = myM.length
+    ? myM.map(m=>mistCard(m,false)).join('')
+    : '<div class="empty"><div class="ee">✅</div><p>Koi mistake report nathi</p></div>';
+  // mark as seen
+  myM.forEach(m=>{if(!m.seenByMgr){m.seenByMgr=true;}});
+  persistMist();
+}
+
+/* ---- ADMIN: add new mistake ---- */
+function addMistake(){
+  const mgrId   = document.getElementById('mr-mg').value;
+  const dt      = document.getElementById('mr-dt').value;
+  const sv      = document.getElementById('mr-sv').value;
+  const cat     = document.getElementById('mr-cat').value;
+  const desc    = document.getElementById('mr-desc').value.trim();
+  const action  = document.getElementById('mr-action').value.trim();
+  if(!mgrId){sm('mr-msg','Manager select karo',true);return;}
+  if(!dt){sm('mr-msg','Date nakho',true);return;}
+  if(!desc){sm('mr-msg','Description lakhao',true);return;}
+  const mgr = db.managers.find(m=>m.id===mgrId);
+  db.mistakes.unshift({
+    id:Date.now(),
+    mgrId, mgrName:mgr.name,
+    deptId:mgr.deptId, deptName:dn(mgr.deptId),
+    date:dt, severity:sv, category:cat,
+    description:desc, actionTaken:action,
+    addedBy:'admin', addedAt:new Date().toISOString(),
+    seenByMgr:false
+  });
+  persistMist();
+  sm('mr-msg','✅ Mistake report add thayi — '+mgr.name+' ne notification thashe');
+  ['mr-desc','mr-action'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mr-mg').value='';
+  document.getElementById('mr-dt').value='';
+  renderMistReport();
+  updateMistBadge();
+}
+
+/* ---- ADMIN: render report ---- */
+function renderMistReport(){
+  // populate filters
+  const mfmg=document.getElementById('mf-mg');
+  if(mfmg && mfmg.options.length<=1) db.managers.forEach(m=>mfmg.add(new Option(m.name,m.id)));
+  const mfcat=document.getElementById('mf-cat');
+  if(mfcat && mfcat.options.length<=1) MISTAKE_CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;mfcat.appendChild(o);});
+  // populate add-form manager dropdown
+  const mrmg=document.getElementById('mr-mg');
+  if(mrmg && mrmg.options.length<=1) db.managers.forEach(m=>mrmg.add(new Option(m.name+' ('+m.id+')',m.id)));
+
+  // Stats
+  const total=db.mistakes.length;
+  const crit=db.mistakes.filter(m=>m.severity==='critical').length;
+  const major=db.mistakes.filter(m=>m.severity==='major').length;
+  const uniq=[...new Set(db.mistakes.map(m=>m.mgrId))].length;
+  document.getElementById('mist-stats').innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--re)">${total}</div><div class="sl">Total Reports</div></div>
+    <div class="sc"><div class="sn" style="color:#EF4444">${crit}</div><div class="sl">🚨 Critical</div></div>
+    <div class="sc"><div class="sn" style="color:var(--re)">${major}</div><div class="sl">🔴 Major</div></div>
+    <div class="sc"><div class="sn" style="color:var(--am)">${uniq}</div><div class="sl">Managers</div></div>
+  `;
+
+  // Performance summary table
+  const tbody=document.getElementById('perf-body');
+  tbody.innerHTML=db.managers.map(m=>{
+    const ms=db.mistakes.filter(x=>x.mgrId===m.id);
+    const cnt={minor:0,moderate:0,major:0,critical:0};
+    ms.forEach(x=>cnt[x.severity]=(cnt[x.severity]||0)+1);
+    const score=ms.reduce((a,x)=>a+(SV_CONFIG[x.severity]?.weight||0),0);
+    // Performance rating: lower score = better
+    const maxScore=db.mistakes.length*5||1;
+    const pct=Math.min(100,Math.round(score/Math.max(maxScore*0.3,1)*100));
+    const perf=score===0?'Excellent':score<=3?'Good':score<=8?'Average':score<=15?'Poor':'Critical';
+    const perfCls=score===0?'perf-good':score<=3?'perf-good':score<=8?'perf-ok':'perf-bad';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+      <td><span class="badge b-te" style="font-size:10px">${dn(m.deptId)}</span></td>
+      <td style="text-align:center;font-weight:600;color:${ms.length?'var(--re)':'var(--gr)'}">${ms.length}</td>
+      <td style="text-align:center;color:var(--am)">${cnt.minor||0}</td>
+      <td style="text-align:center;color:#FB923C">${cnt.moderate||0}</td>
+      <td style="text-align:center;color:var(--re)">${cnt.major||0}</td>
+      <td style="text-align:center;color:#EF4444;font-weight:600">${cnt.critical||0}</td>
+      <td style="min-width:90px">
+        <div class="score-fill" style="background:${score===0?'var(--gr)':score<=5?'var(--am)':'var(--re)'}"></div>
+        <span class="${perfCls}" style="font-size:11px;font-weight:600">${perf}</span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Filtered list
+  let data=[...db.mistakes].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const fmg=document.getElementById('mf-mg')?.value;
+  const fsv=document.getElementById('mf-sv')?.value;
+  const fcat=document.getElementById('mf-cat')?.value;
+  const ffrom=document.getElementById('mf-from')?.value;
+  const fto=document.getElementById('mf-to')?.value;
+  if(fmg)data=data.filter(m=>m.mgrId===fmg);
+  if(fsv)data=data.filter(m=>m.severity===fsv);
+  if(fcat)data=data.filter(m=>m.category===fcat);
+  if(ffrom)data=data.filter(m=>m.date>=ffrom);
+  if(fto)data=data.filter(m=>m.date<=fto);
+
+  document.getElementById('mist-list').innerHTML=data.length
+    ?data.map(m=>mistCard(m,true)).join('')
+    :'<div class="empty"><div class="ee">✅</div><p>No mistake reports found</p></div>';
+}
+
+function clrMistF(){
+  ['mf-mg','mf-sv','mf-cat','mf-from','mf-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderMistReport();
+}
+
+/* ---- MISTAKE CARD ---- */
+function mistCard(m, isAdmin){
+  const sv=SV_CONFIG[m.severity]||SV_CONFIG.minor;
+  return `<div class="mist-row" style="border-left:3px solid ${m.severity==='critical'?'#EF4444':m.severity==='major'?'var(--re)':m.severity==='moderate'?'#FB923C':'var(--am)'}">
+    <div class="mist-top">
+      <div>
+        <div class="mist-name">${isAdmin?m.mgrName:'Mistake Report'}</div>
+        ${isAdmin?`<div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${m.mgrId} · ${m.deptName}</div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        <span class="badge ${sv.cls}">${sv.label}</span>
+        ${isAdmin?`<button class="btn bre bxs" onclick="delMist(${m.id})">🗑️</button>`:''}
+      </div>
+    </div>
+    <div class="mist-meta">
+      <span>📅 ${fmtD(m.date)}</span>
+      <span>📋 ${m.category}</span>
+      <span>🕐 ${fmtDT(m.addedAt)}</span>
+    </div>
+    <div style="font-size:13px;margin-bottom:${m.actionTaken?'6px':'0'};padding:8px 10px;background:var(--s2);border-radius:var(--rs)">
+      <div style="font-size:10px;font-weight:600;color:var(--t3);margin-bottom:3px">DESCRIPTION</div>
+      ${m.description}
+    </div>
+    ${m.actionTaken?`<div style="font-size:12px;padding:8px 10px;background:var(--gr-bg);border-radius:var(--rs);border-left:2px solid var(--gr);margin-top:6px">
+      <div style="font-size:10px;font-weight:600;color:var(--gr);margin-bottom:3px">ACTION TAKEN</div>
+      ${m.actionTaken}
+    </div>`:''}
+  </div>`;
+}
+
+function delMist(id){
+  if(!confirm('Delete?'))return;
+  db.mistakes=db.mistakes.filter(m=>m.id!==id);
+  persistMist();renderMistReport();updateMistBadge();
+}
+
+function updateMistBadge(){
+  // Admin badge — total mistakes
+  const b=document.getElementById('mist-badge');
+  if(b){b.textContent=db.mistakes.length;b.style.display=db.mistakes.length?'inline':'none';}
+}
+
+/* ---- PATCH aTab for mist ---- */
+const _origATab2=aTab;
+aTab=function(t,el){
+  if(t==='mist'){
+    document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('as-mist').classList.add('on');
+    window.scrollTo(0,0);
+    renderMistReport();
+    return;
+  }
+  _origATab2(t,el);
+};
+
+/* ---- PATCH mTab for mist ---- */
+const _origMTab2=mTab;
+mTab=function(t,el){
+  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
+  if(el)el.classList.add('on');
+  document.getElementById('ms-'+t)?.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='rep')renderMyRep();
+  if(t==='lv')renderMgrLv();
+  if(t==='mist')renderMgrMist();
+};
+
+/* ---- PATCH initMgr for mistake badge ---- */
+const _origInitMgr2=initMgr;
+initMgr=function(){
+  _origInitMgr2();
+  // show badge if unseen mistakes
+  setTimeout(()=>{
+    if(!curUser)return;
+    const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
+    const b=document.getElementById('mist-mgr-badge');
+    if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
+  },200);
+};
+
+/* ---- PATCH initAdmin for mistake badge ---- */
+const _origInitAdmin2=initAdmin;
+initAdmin=function(){
+  _origInitAdmin2();
+  updateMistBadge();
+};
+
+/* ---- PATCH restoreSession for mistake ---- */
+const _origRest2=restoreSession;
+restoreSession=function(){
+  const r=_origRest2();
+  if(r){
+    setTimeout(()=>{
+      if(curUser){
+        const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
+        const b=document.getElementById('mist-mgr-badge');
+        if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
+      } else {
+        updateMistBadge();
+      }
+    },300);
+  }
+  return r;
+};
+</script><style>
+.late-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.late-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.late-name{font-weight:600;font-size:14px}
+.late-meta{font-size:11px;color:var(--t2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.b-exc{background:var(--gr2);color:var(--gr)}.b-unexc{background:var(--re2);color:var(--re)}.b-pend{background:var(--am2);color:var(--am)}
+</style>
+<script>
+/* ═══════════════════ LATE ENTRY SYSTEM ═══════════════════ */
+if(!db.lateEntries) db.lateEntries = JSON.parse(localStorage.getItem('ft7_late')||'[]');
+
+function persistLate(){
+  localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
+}
+
+// ── Manager: submit late entry ──
+function submitLateEntry(){
+  if(!curUser) return;
+  const date  = document.getElementById('le-date').value;
+  const shift = document.getElementById('le-shift').value;
+  const mins  = parseInt(document.getElementById('le-mins').value);
+  const time  = document.getElementById('le-time').value;
+  const reason= document.getElementById('le-reason').value.trim();
+  if(!date){sm('le-msg','Date nakho',true);return;}
+  if(!mins||mins<1){sm('le-msg','Late minutes nakho',true);return;}
+  if(!reason){sm('le-msg','Reason lakhao',true);return;}
+  db.lateEntries.unshift({
+    id:Date.now(), mgrId:curUser.id, mgrName:curUser.name,
+    deptId:curUser.deptId, deptName:dn(curUser.deptId),
+    date, shift, lateMinutes:mins, arrivalTime:time, reason,
+    status:'pending', remark:'', addedBy:'manager',
+    submittedAt:new Date().toISOString()
+  });
+  persistLate();
+  sm('le-msg','✅ Late entry submit thayi! Admin review karshhe.');
+  document.getElementById('le-date').value='';
+  document.getElementById('le-mins').value='';
+  document.getElementById('le-time').value='';
+  document.getElementById('le-reason').value='';
+  renderMgrLate();
+  updateLateBadges();
+}
+
+// ── Manager: view own late entries ──
+function renderMgrLate(){
+  if(!curUser) return;
+  const myL = db.lateEntries.filter(l=>l.mgrId===curUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el = document.getElementById('mgr-late-list');
+  if(el) el.innerHTML = myL.length ? myL.map(l=>lateCard(l,false)).join('') : '<div class="empty"><div class="ee">⏰</div><p>Koi late entry nathi</p></div>';
+}
+
+// ── Admin: add late entry ──
+function adminAddLate(){
+  const mgrId  = document.getElementById('al-mg').value;
+  const date   = document.getElementById('al-date').value;
+  const shift  = document.getElementById('al-shift').value;
+  const mins   = parseInt(document.getElementById('al-mins').value);
+  const time   = document.getElementById('al-time').value;
+  const reason = document.getElementById('al-reason').value.trim();
+  const remark = document.getElementById('al-remark').value.trim();
+  if(!mgrId){sm('al-msg','Manager select karo',true);return;}
+  if(!date){sm('al-msg','Date nakho',true);return;}
+  if(!mins||mins<1){sm('al-msg','Late minutes nakho',true);return;}
+  if(!reason){sm('al-msg','Reason lakhao',true);return;}
+  const mgr = db.managers.find(m=>m.id===mgrId);
+  db.lateEntries.unshift({
+    id:Date.now(), mgrId, mgrName:mgr.name,
+    deptId:mgr.deptId, deptName:dn(mgr.deptId),
+    date, shift, lateMinutes:mins, arrivalTime:time, reason,
+    status:'pending', remark, addedBy:'admin',
+    submittedAt:new Date().toISOString()
+  });
+  persistLate();
+  sm('al-msg','✅ Late entry add thayi — '+mgr.name);
+  ['al-mg','al-date','al-mins','al-time','al-reason','al-remark'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  renderLateReport();
+  updateLateBadges();
+}
+
+// ── Admin: approve/reject/delete ──
+function excuseLate(id){
+  const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
+  const rem=prompt('Excuse remark (optional):')||'Excused by admin';
+  l.status='approved';l.remark=rem;
+  persistLate();renderLateReport();
+}
+function unexcuseLate(id){
+  const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
+  const rem=prompt('Reason for unexcused:')||'Not acceptable';
+  l.status='unexcused';l.remark=rem;
+  persistLate();renderLateReport();
+}
+function delLate(id){
+  if(!confirm('Delete?'))return;
+  db.lateEntries=db.lateEntries.filter(l=>l.id!==id);
+  persistLate();renderLateReport();updateLateBadges();
+}
+
+// ── Late Card ──
+function lateCard(l, isAdmin){
+  const sb = l.status==='pending'
+    ?'<span class="badge b-pend">⏳ Pending</span>'
+    :l.status==='approved'
+    ?'<span class="badge b-exc">✅ Excused</span>'
+    :'<span class="badge b-unexc">❌ Unexcused</span>';
+  return `<div class="late-row" style="border-left:3px solid ${l.status==='approved'?'var(--gr)':l.status==='unexcused'?'var(--re)':'var(--am)'}">
+    <div class="late-top">
+      <div>
+        <div class="late-name">${isAdmin?l.mgrName:'Late Entry'}</div>
+        ${isAdmin?`<div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${l.mgrId} · ${l.deptName}</div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        ${sb}
+        ${isAdmin&&l.status==='pending'?`<button class="btn bgr bxs" onclick="excuseLate(${l.id})">✅ Excuse</button><button class="btn bre bxs" onclick="unexcuseLate(${l.id})">❌ Unexcuse</button>`:''}
+        ${isAdmin?`<button class="btn bg2 bxs" onclick="delLate(${l.id})">🗑️</button>`:''}
+      </div>
+    </div>
+    <div class="late-meta">
+      <span>📅 ${fmtD(l.date)}</span>
+      <span>${l.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+      <span>⏱️ ${l.lateMinutes} minutes late</span>
+      ${l.arrivalTime?`<span>🕐 Arrived: ${l.arrivalTime}</span>`:''}
+      <span>📝 ${l.addedBy==='admin'?'Admin added':'Self reported'}</span>
+    </div>
+    ${l.reason?`<div class="notebox">💬 ${l.reason}</div>`:''}
+    ${l.remark?`<div class="notebox" style="border-left-color:${l.status==='approved'?'var(--gr)':'var(--re)'}">📝 Admin: ${l.remark}</div>`:''}
+  </div>`;
+}
+
+// ── Admin: render full late report ──
+function renderLateReport(){
+  updateLateBadges();
+  // populate manager dropdowns
+  const almg=document.getElementById('al-mg');
+  if(almg&&almg.options.length<=1) db.managers.forEach(m=>almg.add(new Option(m.name+' ('+m.id+')',m.id)));
+  const lefmg=document.getElementById('lef-mg');
+  if(lefmg&&lefmg.options.length<=1) db.managers.forEach(m=>lefmg.add(new Option(m.name,m.id)));
+
+  const total=db.lateEntries.length;
+  const pend=db.lateEntries.filter(l=>l.status==='pending').length;
+  const excused=db.lateEntries.filter(l=>l.status==='approved').length;
+  const unexcused=db.lateEntries.filter(l=>l.status==='unexcused').length;
+  const statsEl=document.getElementById('late-stats');
+  if(statsEl) statsEl.innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--am)">${total}</div><div class="sl">Total Late</div></div>
+    <div class="sc"><div class="sn" style="color:var(--am)">${pend}</div><div class="sl">⏳ Pending</div></div>
+    <div class="sc"><div class="sn" style="color:var(--gr)">${excused}</div><div class="sl">✅ Excused</div></div>
+    <div class="sc"><div class="sn" style="color:var(--re)">${unexcused}</div><div class="sl">❌ Unexcused</div></div>
+  `;
+
+  // Summary table
+  const sumBody=document.getElementById('late-sum-body');
+  if(sumBody) sumBody.innerHTML=db.managers.map(m=>{
+    const ml=db.lateEntries.filter(l=>l.mgrId===m.id);
+    const totalMins=ml.reduce((a,l)=>a+l.lateMinutes,0);
+    const exc=ml.filter(l=>l.status==='approved').length;
+    const unexc=ml.filter(l=>l.status==='unexcused').length;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+      <td><span class="badge b-te" style="font-size:10px">${dn(m.deptId)}</span></td>
+      <td style="text-align:center;font-weight:600;color:${ml.length?'var(--am)':'var(--gr)'}">${ml.length}</td>
+      <td style="text-align:center;color:var(--am)">${totalMins} min</td>
+      <td style="text-align:center;color:var(--gr)">${exc}</td>
+      <td style="text-align:center;color:var(--re)">${unexc}</td>
+    </tr>`;
+  }).join('');
+
+  // Filtered list
+  let data=[...db.lateEntries].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const fmg=document.getElementById('lef-mg')?.value;
+  const fsh=document.getElementById('lef-sh')?.value;
+  const fst=document.getElementById('lef-st')?.value;
+  const ffrom=document.getElementById('lef-from')?.value;
+  const fto=document.getElementById('lef-to')?.value;
+  if(fmg)data=data.filter(l=>l.mgrId===fmg);
+  if(fsh)data=data.filter(l=>l.shift===fsh);
+  if(fst)data=data.filter(l=>l.status===fst);
+  if(ffrom)data=data.filter(l=>l.date>=ffrom);
+  if(fto)data=data.filter(l=>l.date<=fto);
+
+  const listEl=document.getElementById('late-list');
+  if(listEl) listEl.innerHTML=data.length
+    ?data.map(l=>lateCard(l,true)).join('')
+    :'<div class="empty"><div class="ee">⏰</div><p>Koi late entry nathi</p></div>';
+}
+function clrLateF(){
+  ['lef-mg','lef-sh','lef-st','lef-from','lef-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderLateReport();
+}
+
+// ── Badges ──
+function updateLateBadges(){
+  const pend=db.lateEntries.filter(l=>l.status==='pending').length;
+  const ab=document.getElementById('late-badge');
+  if(ab){ab.textContent=pend;ab.style.display=pend?'inline':'none';}
+  if(curUser){
+    const myNew=db.lateEntries.filter(l=>l.mgrId===curUser.id&&l.status!=='pending').length;
+    const mb=document.getElementById('late-mgr-badge');
+    if(mb){mb.style.display='none';}
+  }
+}
+
+// ── Patch mTab for late ──
+const _origMTab3=mTab;
+mTab=function(t,el){
+  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const sec=document.getElementById('ms-'+t);
+  if(sec)sec.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='rep')renderMyRep();
+  if(t==='lv')renderMgrLv();
+  if(t==='mist')renderMgrMist();
+  if(t==='late'){
+    document.getElementById('le-date').value=tod();
+    const h=new Date().getHours();
+    const sh=document.getElementById('le-shift');
+    if(sh)sh.value=h>=8&&h<20?'day':'night';
+    renderMgrLate();
+  }
+};
+
+// ── Patch aTab for late ──
+const _origATab3=aTab;
+aTab=function(t,el){
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  const sec=document.getElementById('as-'+t);
+  if(sec)sec.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='ov')renderOv();
+  if(t==='rp'){popF();renderReps();}
+  if(t==='lv')renderAdminLv();
+  if(t==='mist')renderMistReport();
+  if(t==='late')renderLateReport();
+  if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}
+  if(t==='dp')renderDpTbl();
+  if(t==='ct'){popD('cd');renderCtList();}
+  if(t==='bk')initBkTab();
+  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
+};
+
+// ── Patch initMgr for late ──
+const _origInitMgr3=initMgr;
+initMgr=function(){
+  _origInitMgr3();
+  updateLateBadges();
+};
+
+// ── Patch initAdmin for late ──
+const _origInitAdmin3=initAdmin;
+initAdmin=function(){
+  _origInitAdmin3();
+  updateLateBadges();
+};
+
+// ── Patch persist to include late ──
+const _origPersist=persist;
+persist=function(){
+  _origPersist();
+  persistLate();
+};
+
+// ── Patch expJSON to include late ──
+const _origExp=expJSON;
+expJSON=function(){
+  const data=JSON.stringify({
+    managers:db.managers,departments:db.departments,categories:db.categories,
+    submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,
+    mistakes:db.mistakes,lateEntries:db.lateEntries,
+    exportedAt:new Date().toISOString()
+  });
+  const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(data);
+  a.download='FormTrack_'+tod()+'.json';a.click();
+  const now=new Date().toISOString();localStorage.setItem('ft7_lastbk',now);
+  const el=document.getElementById('last-bk-txt');if(el)el.textContent='Last backup: '+new Date(now).toLocaleString()+' ✅';
+  sm('mn-msg','✅ Backup JSON downloaded!');
+};
+
+// ── Patch impJSON to include late ──
+const _origImp=impJSON;
+impJSON=function(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
+      if(!confirm('Restore? This replaces all data!'))return;
+      if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
+      if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
+      if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
+      if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
+      _origPersist();persistLate();
+      sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
+    }catch(e){sm('mn-msg','Invalid JSON',true);}
+  };r.readAsText(f);inp.value='';
+};
+</script>
