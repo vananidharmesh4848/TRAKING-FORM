@@ -326,6 +326,8 @@ textarea{resize:vertical;min-height:56px}
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderReps()">Apply</button>
           <button class="btn bg2 bsm" onclick="clrF()">Reset</button>
+          <button class="btn bgr bsm" onclick="dlFormRepPDF()">📄 PDF Download</button>
+          <button class="btn bam bsm" onclick="dlFormRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <div id="all-reps"></div>
@@ -352,6 +354,8 @@ textarea{resize:vertical;min-height:56px}
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderLvReport()">Apply</button>
           <button class="btn bg2 bsm" onclick="clrLvF()">Reset</button>
+          <button class="btn bgr bsm" onclick="dlLeaveRepPDF()">📄 PDF Download</button>
+          <button class="btn bam bsm" onclick="dlLeaveRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <!-- Leave Report Table -->
@@ -521,6 +525,8 @@ textarea{resize:vertical;min-height:56px}
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderMistReport()">Apply</button>
           <button class="btn bg2 bsm" onclick="clrMistF()">Reset</button>
+          <button class="btn bgr bsm" onclick="dlMistRepPDF()">📄 PDF Download</button>
+          <button class="btn bam bsm" onclick="dlMistRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <!-- Performance Summary Table -->
@@ -574,6 +580,8 @@ textarea{resize:vertical;min-height:56px}
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderLateReport()">Apply</button>
           <button class="btn bg2 bsm" onclick="clrLateF()">Reset</button>
+          <button class="btn bgr bsm" onclick="dlLateRepPDF()">📄 PDF Download</button>
+          <button class="btn bam bsm" onclick="dlLateRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <!-- Summary Table -->
@@ -743,10 +751,10 @@ function doLogin(){
     const m=db.managers.find(x=>x.id===id);
     if(!m){document.getElementById('lerr').textContent='Manager ID not found';return;}
     if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
-    curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();setTimeout(()=>{if(!gdToken)gdSignIn()},800);
+    curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
   }else{
     if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
-    saveSession('a','admin');showPg('pg-admin');initAdmin();setTimeout(()=>{if(!gdToken)gdSignIn()},800);
+    saveSession('a','admin');showPg('pg-admin');initAdmin();
   }
 }
 function doLogout(){curUser=null;catFiles={};curRole=null;clearSession();showPg('pg-login');}
@@ -823,12 +831,6 @@ function subForms(){
   const now=new Date().toISOString();
   db.submissions.unshift({id:Date.now(),mgrId:curUser.id,mgrName:curUser.name,deptId:curUser.deptId,deptName:dn(curUser.deptId),date,shift:gsh(),note:document.getElementById('sub-n').value,categories:cats,submittedAt:now});
   persist();sm('sub-msg','✅ '+tf+' forms submitted! — '+fmtDT(now));renderCats();document.getElementById('sub-n').value='';
-  // Auto backup to Google Drive after every submit
-  if(gdToken){
-    gdBackup(true);
-  } else {
-    sm('sub-msg','✅ Submitted! Google Drive sign in karo backup mate.',false);
-  }
 }
 function clrSub(){renderCats();document.getElementById('sub-n').value='';}
 function renderMyRep(){
@@ -1253,7 +1255,7 @@ function gdSignIn(){
   }
 }
 function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
-async function gdBackup(silent=false){
+async function gdBackup(){
   if(!gdToken){sm('gd-msg','Sign in first',true);return;}
   const stEl2=document.getElementById('gd-st-txt');if(stEl2)stEl2.textContent='Uploading...';
   try{
@@ -1267,7 +1269,7 @@ async function gdBackup(silent=false){
     const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:fname,mimeType:'application/json',parents:[fid]})],{type:'application/json'}));form.append('file',new Blob([payload],{type:'application/json'}));
     const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+gdToken},body:form});
     const d=await res.json();
-    if(d.id){if(!silent)sm('gd-msg','✅ Backup saved: '+fname);gdUI();}else throw new Error(d.error?.message||'Failed');
+    if(d.id){sm('gd-msg','✅ Backup saved: '+fname);gdUI();}else throw new Error(d.error?.message||'Failed');
   }catch(e){sm('gd-msg','Error: '+e.message,true);gdUI();}
 }
 async function gdRestore(){
@@ -1292,12 +1294,6 @@ function initBkTab(){
   const lastbk=localStorage.getItem('ft7_lastbk');
   const el=document.getElementById('last-bk-txt');
   if(el)el.textContent=lastbk?'Last backup: '+new Date(lastbk).toLocaleString()+' ✅':'Last backup: Never';
-  // Set defaults
-  const abf=document.getElementById('ab-f');
-  const abd=document.getElementById('ab-d');
-  const saved=db.backup||{};
-  if(abf)abf.value=saved.autoF||'submit';
-  if(abd)abd.value=saved.autoD||'gdrive';
 }
 function saveAuto(){
   const f=document.getElementById('ab-f');
@@ -1899,4 +1895,157 @@ impJSON=function(inp){
     }catch(e){sm('mn-msg','Invalid JSON',true);}
   };r.readAsText(f);inp.value='';
 };
+
+/* ============================================================
+   PDF & EXCEL DOWNLOAD FUNCTIONS
+============================================================ */
+
+// ── Helper: load jsPDF and SheetJS dynamically ──
+function loadScript(url,cb){
+  if(document.querySelector('script[src="'+url+'"]')){cb();return;}
+  const s=document.createElement('script');s.src=url;s.onload=cb;document.head.appendChild(s);
+}
+
+// ── PDF helper: dark-theme table PDF ──
+function makePDF(title,headers,rows,filename){
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>{
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js',()=>{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    // Header bar
+    doc.setFillColor(26,29,39);doc.rect(0,0,297,20,'F');
+    doc.setTextColor(240,242,255);doc.setFontSize(13);doc.setFont('helvetica','bold');
+    doc.text('FormTrack — '+title,10,13);
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(139,144,167);
+    doc.text('Downloaded: '+new Date().toLocaleString(),200,13);
+    doc.autoTable({
+      head:[headers],body:rows,startY:24,
+      styles:{fontSize:8,cellPadding:3,fillColor:[22,25,35],textColor:[240,242,255],lineColor:[42,47,69],lineWidth:0.3},
+      headStyles:{fillColor:[34,38,58],textColor:[240,242,255],fontStyle:'bold',fontSize:8},
+      alternateRowStyles:{fillColor:[26,29,39]},
+      margin:{left:10,right:10}
+    });
+    doc.save(filename);
+  });});
+}
+
+// ── Excel helper ──
+function makeExcel(title,headers,rows,filename){
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',()=>{
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet([['FormTrack — '+title,'Downloaded: '+new Date().toLocaleString()],[],...([headers,...rows])]);
+    // column widths
+    ws['!cols']=headers.map(()=>({wch:20}));
+    XLSX.utils.book_append_sheet(wb,ws,title.substring(0,31));
+    XLSX.writeFile(wb,filename);
+  });
+}
+
+// ── Formatted date helper ──
+const dlFmtD=d=>{if(!d)return'—';try{const x=new Date(d);return x.toLocaleDateString('en-IN');}catch(e){return d;}};
+
+/* ==== FORM REPORTS ==== */
+function getFormRepData(){
+  let data=[...db.submissions];
+  const from=document.getElementById('ff').value,to=document.getElementById('ft').value;
+  const sh=document.getElementById('fsh').value,mg=document.getElementById('fm').value,dp=document.getElementById('fd').value;
+  if(from)data=data.filter(s=>s.date>=from);if(to)data=data.filter(s=>s.date<=to);
+  if(sh)data=data.filter(s=>s.shift===sh);if(mg)data=data.filter(s=>s.mgrId===mg);if(dp)data=data.filter(s=>s.deptId===dp);
+  return data;
+}
+function dlFormRepPDF(){
+  const data=getFormRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Date','Shift','Files','Categories','Submitted At','Note'];
+  const rows=data.map(s=>{
+    const cats=Object.values(s.categories||{});
+    const tf=cats.reduce((a,c)=>a+c.files.length,0);
+    return[s.mgrName,s.deptName||'—',dlFmtD(s.date),s.shift==='day'?'Day':'Night',tf,cats.length,new Date(s.submittedAt).toLocaleString('en-IN'),s.note||''];
+  });
+  makePDF('Form Reports',headers,rows,'FormTrack_FormReports_'+tod()+'.pdf');
+}
+function dlFormRepExcel(){
+  const data=getFormRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Date','Shift','Total Files','Categories','Submitted At','Note'];
+  const rows=data.map(s=>{
+    const cats=Object.values(s.categories||{});
+    const tf=cats.reduce((a,c)=>a+c.files.length,0);
+    return[s.mgrName,s.deptName||'—',dlFmtD(s.date),s.shift==='day'?'Day':'Night',tf,cats.length,new Date(s.submittedAt).toLocaleString('en-IN'),s.note||''];
+  });
+  makeExcel('Form Reports',headers,rows,'FormTrack_FormReports_'+tod()+'.xlsx');
+}
+
+/* ==== LEAVE REPORTS ==== */
+function getLvRepData(){
+  let data=[...db.leaves];
+  const st=document.getElementById('lf-st')?.value;const mg=document.getElementById('lf-mg')?.value;
+  const tp=document.getElementById('lf-tp')?.value;const fr=document.getElementById('lf-from')?.value;const to=document.getElementById('lf-to')?.value;
+  if(st)data=data.filter(l=>l.status===st);if(mg)data=data.filter(l=>l.mgrId===mg);
+  if(tp)data=data.filter(l=>l.type===tp);if(fr)data=data.filter(l=>l.from>=fr);if(to)data=data.filter(l=>l.to<=to);
+  return data;
+}
+function dlLeaveRepPDF(){
+  const data=getLvRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Type','From','To','Days','Status','Reason','Admin Remark'];
+  const rows=data.map(l=>[l.mgrName,l.mgrId,l.deptName||'—',l.type,dlFmtD(l.from),dlFmtD(l.to),l.days,l.status==='approved'?'Approved':l.status==='rejected'?'Rejected':'Pending',l.reason||'',l.remark||'']);
+  makePDF('Leave Report',headers,rows,'FormTrack_LeaveReport_'+tod()+'.pdf');
+}
+function dlLeaveRepExcel(){
+  const data=getLvRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Type','From','To','Days','Status','Reason','Admin Remark','Applied At'];
+  const rows=data.map(l=>[l.mgrName,l.mgrId,l.deptName||'—',l.type,dlFmtD(l.from),dlFmtD(l.to),l.days,l.status==='approved'?'Approved':l.status==='rejected'?'Rejected':'Pending',l.reason||'',l.remark||'',new Date(l.appliedAt).toLocaleString('en-IN')]);
+  makeExcel('Leave Report',headers,rows,'FormTrack_LeaveReport_'+tod()+'.xlsx');
+}
+
+/* ==== MISTAKE REPORTS ==== */
+function getMistRepData(){
+  let data=[...db.mistakes];
+  const mg=document.getElementById('mf-mg')?.value;const sv=document.getElementById('mf-sv')?.value;
+  const cat=document.getElementById('mf-cat')?.value;const fr=document.getElementById('mf-from')?.value;const to=document.getElementById('mf-to')?.value;
+  if(mg)data=data.filter(m=>m.mgrId===mg);if(sv)data=data.filter(m=>m.severity===sv);
+  if(cat)data=data.filter(m=>m.category===cat);if(fr)data=data.filter(m=>m.date>=fr);if(to)data=data.filter(m=>m.date<=to);
+  return data;
+}
+function dlMistRepPDF(){
+  const data=getMistRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Date','Severity','Category','Description','Action Taken'];
+  const rows=data.map(m=>[m.mgrName||'—',m.deptName||'—',dlFmtD(m.date),m.severity||'—',m.category||'—',m.description||'—',m.action||'—']);
+  makePDF('Mistake Report',headers,rows,'FormTrack_MistakeReport_'+tod()+'.pdf');
+}
+function dlMistRepExcel(){
+  const data=getMistRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Date','Severity','Category','Description','Action Taken','Added At'];
+  const rows=data.map(m=>[m.mgrName||'—',m.mgrId||'—',m.deptName||'—',dlFmtD(m.date),m.severity||'—',m.category||'—',m.description||'—',m.action||'—',new Date(m.addedAt||m.id).toLocaleString('en-IN')]);
+  makeExcel('Mistake Report',headers,rows,'FormTrack_MistakeReport_'+tod()+'.xlsx');
+}
+
+/* ==== LATE ENTRY REPORTS ==== */
+function getLateRepData(){
+  let data=[...db.lateEntries];
+  const mg=document.getElementById('lef-mg')?.value;const sh=document.getElementById('lef-sh')?.value;
+  const st=document.getElementById('lef-st')?.value;const fr=document.getElementById('lef-from')?.value;const to=document.getElementById('lef-to')?.value;
+  if(mg)data=data.filter(l=>l.mgrId===mg);if(sh)data=data.filter(l=>l.shift===sh);
+  if(st)data=data.filter(l=>l.status===st);if(fr)data=data.filter(l=>l.date>=fr);if(to)data=data.filter(l=>l.date<=to);
+  return data;
+}
+function dlLateRepPDF(){
+  const data=getLateRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Date','Shift','Late (mins)','Arrival Time','Status','Reason','Admin Remark'];
+  const rows=data.map(l=>[l.mgrName||'—',l.deptName||'—',dlFmtD(l.date),l.shift==='day'?'Day':'Night',l.lateMinutes||'—',l.actualTime||'—',l.status==='approved'?'Excused':l.status==='unexcused'?'Unexcused':'Pending',l.reason||'',l.remark||'']);
+  makePDF('Late Entry Report',headers,rows,'FormTrack_LateReport_'+tod()+'.pdf');
+}
+function dlLateRepExcel(){
+  const data=getLateRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Date','Shift','Late (mins)','Arrival Time','Status','Reason','Admin Remark'];
+  const rows=data.map(l=>[l.mgrName||'—',l.mgrId||'—',l.deptName||'—',dlFmtD(l.date),l.shift==='day'?'Day':'Night',l.lateMinutes||'—',l.actualTime||'—',l.status==='approved'?'Excused':l.status==='unexcused'?'Unexcused':'Pending',l.reason||'',l.remark||'']);
+  makeExcel('Late Entry Report',headers,rows,'FormTrack_LateReport_'+tod()+'.xlsx');
+}
+
 </script>
