@@ -600,8 +600,16 @@ textarea{resize:vertical;min-height:56px}
       </div>
       <div class="card">
         <div class="ct">🗑️ Danger Zone</div>
-        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Badha submissions delete karo</p>
-        <button class="btn bre bsm" onclick="clrAll()">Delete All Submissions</button>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Date range ma submissions delete karo</p>
+        <div class="fgrid" style="margin-bottom:10px">
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="del-from"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="del-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <button class="btn bre bsm" onclick="clrRange()">🗑️ Delete by Date Range</button>
+          <button class="btn bre bsm" onclick="clrAll()">Delete All Submissions</button>
+        </div>
+        <div class="ok" id="del-msg" style="min-height:16px"></div>
       </div>
     </div>
   </div>
@@ -1183,6 +1191,21 @@ function chgPw(){
   db.adminPw=n;persist();sm('pw-msg','✅ Password updated!');['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
 }
 function clrAll(){if(!confirm('DELETE ALL? Cannot undo!'))return;db.submissions=[];persist();renderOv();alert('Done.');}
+function clrRange(){
+  const fr=document.getElementById('del-from').value;
+  const to=document.getElementById('del-to').value;
+  if(!fr||!to){sm('del-msg','From date ane To date banne bharo!',true);return;}
+  if(fr>to){sm('del-msg','From date, To date karta nani hovi joie!',true);return;}
+  const before=db.submissions.length;
+  db.submissions=db.submissions.filter(s=>{const d=s.date||'';return d<fr||d>to;});
+  const removed=before-db.submissions.length;
+  if(!removed){sm('del-msg','Aa range ma koi submission nathi mili.',true);return;}
+  if(!confirm(removed+' submissions delete thase ('+fr+' to '+to+'). Confirm?'))return;
+  persist();renderOv();
+  sm('del-msg','✅ '+removed+' submissions delete thayi!');
+  document.getElementById('del-from').value='';
+  document.getElementById('del-to').value='';
+}
 
 /* ============================================================
    GOOGLE DRIVE
