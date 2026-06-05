@@ -743,10 +743,10 @@ function doLogin(){
     const m=db.managers.find(x=>x.id===id);
     if(!m){document.getElementById('lerr').textContent='Manager ID not found';return;}
     if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
-    curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
+    curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();setTimeout(()=>{if(!gdToken)gdSignIn()},800);
   }else{
     if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
-    saveSession('a','admin');showPg('pg-admin');initAdmin();
+    saveSession('a','admin');showPg('pg-admin');initAdmin();setTimeout(()=>{if(!gdToken)gdSignIn()},800);
   }
 }
 function doLogout(){curUser=null;catFiles={};curRole=null;clearSession();showPg('pg-login');}
@@ -823,6 +823,12 @@ function subForms(){
   const now=new Date().toISOString();
   db.submissions.unshift({id:Date.now(),mgrId:curUser.id,mgrName:curUser.name,deptId:curUser.deptId,deptName:dn(curUser.deptId),date,shift:gsh(),note:document.getElementById('sub-n').value,categories:cats,submittedAt:now});
   persist();sm('sub-msg','✅ '+tf+' forms submitted! — '+fmtDT(now));renderCats();document.getElementById('sub-n').value='';
+  // Auto backup to Google Drive after every submit
+  if(gdToken){
+    gdBackup(true);
+  } else {
+    sm('sub-msg','✅ Submitted! Google Drive sign in karo backup mate.',false);
+  }
 }
 function clrSub(){renderCats();document.getElementById('sub-n').value='';}
 function renderMyRep(){
@@ -1247,7 +1253,7 @@ function gdSignIn(){
   }
 }
 function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
-async function gdBackup(){
+async function gdBackup(silent=false){
   if(!gdToken){sm('gd-msg','Sign in first',true);return;}
   const stEl2=document.getElementById('gd-st-txt');if(stEl2)stEl2.textContent='Uploading...';
   try{
@@ -1261,7 +1267,7 @@ async function gdBackup(){
     const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:fname,mimeType:'application/json',parents:[fid]})],{type:'application/json'}));form.append('file',new Blob([payload],{type:'application/json'}));
     const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+gdToken},body:form});
     const d=await res.json();
-    if(d.id){sm('gd-msg','✅ Backup saved: '+fname);gdUI();}else throw new Error(d.error?.message||'Failed');
+    if(d.id){if(!silent)sm('gd-msg','✅ Backup saved: '+fname);gdUI();}else throw new Error(d.error?.message||'Failed');
   }catch(e){sm('gd-msg','Error: '+e.message,true);gdUI();}
 }
 async function gdRestore(){
@@ -1286,6 +1292,12 @@ function initBkTab(){
   const lastbk=localStorage.getItem('ft7_lastbk');
   const el=document.getElementById('last-bk-txt');
   if(el)el.textContent=lastbk?'Last backup: '+new Date(lastbk).toLocaleString()+' ✅':'Last backup: Never';
+  // Set defaults
+  const abf=document.getElementById('ab-f');
+  const abd=document.getElementById('ab-d');
+  const saved=db.backup||{};
+  if(abf)abf.value=saved.autoF||'submit';
+  if(abd)abd.value=saved.autoD||'gdrive';
 }
 function saveAuto(){
   const f=document.getElementById('ab-f');
