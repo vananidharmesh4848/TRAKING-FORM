@@ -293,7 +293,8 @@ textarea{resize:vertical;min-height:56px}
     
     <!-- TOP TABS (Admin jevi) -->
     <div class="atabs" id="mtabs">
-      <button class="atab on" id="mn-sub" onclick="mTab('sub',this)">📤 Submit</button>
+      <button class="atab on" id="mn-dash" onclick="mTab('dash',this)">📊 Dashboard</button>
+      <button class="atab" id="mn-sub" onclick="mTab('sub',this)">📤 Submit</button>
       <button class="atab" id="mn-rep" onclick="mTab('rep',this)">📋 Reports</button>
       <button class="atab" id="mn-lv" onclick="mTab('lv',this)">🏖️ Leave</button>
       <button class="atab" id="mn-mist" onclick="mTab('mist',this)">⚠️ Mistakes <span class="nbadge" id="mist-mgr-badge" style="display:none;position:static;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
@@ -303,8 +304,36 @@ textarea{resize:vertical;min-height:56px}
       <button class="atab" id="mn-hrs" onclick="mTab('hrs',this)">⏱️ Hours</button>
     </div>
 
+    <!-- MANAGER DASHBOARD -->
+    <div class="sec on" id="ms-dash">
+      <div class="pg-header">
+        <div class="pg-title">📊 Maru Dashboard</div>
+      </div>
+      <div class="sg" id="mgr-dash-stats"></div>
+      <div class="panels-row">
+        <div class="panel">
+          <div class="panel-title">📄 Recent Submissions</div>
+          <div id="mgr-dash-recent"><div class="panel-empty">કોઈ submission નથી</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">⭐ Maru Rating</div>
+          <div id="mgr-dash-rating"><div class="panel-empty">Haji rating nathi</div></div>
+        </div>
+      </div>
+      <div class="panels-row" style="margin-top:16px">
+        <div class="panel">
+          <div class="panel-title">🏖️ Mara Leaves</div>
+          <div id="mgr-dash-leaves"><div class="panel-empty">Koi leave nathi</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">⚠️ Mistakes &amp; ⏰ Late</div>
+          <div id="mgr-dash-mist"><div class="panel-empty">Koi record nathi</div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- SUBMIT FORMS -->
-    <div class="sec on" id="ms-sub">
+    <div class="sec" id="ms-sub">
       <div class="stog">
         <button class="so on day" id="sh-d" onclick="psh('day')">☀️ Day 8am–8pm</button>
         <button class="so night" id="sh-n" onclick="psh('night')">🌙 Night 8pm–8am</button>
@@ -846,29 +875,34 @@ textarea{resize:vertical;min-height:56px}
     <!-- RATING -->
     <div class="sec" id="as-rtng">
       <div class="card">
-        <div class="ct">⭐ Manager Rating Add Karo</div>
-        <div class="g3r">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="rt-mg"><option value="">— Select Manager —</option></select></div>
-          <div class="fg" style="margin:0"><label>Month</label><input type="month" id="rt-month"></div>
-          <div class="fg" style="margin:0"><label>Rating (1–5 Star)</label>
-            <select id="rt-star">
-              <option value="5">⭐⭐⭐⭐⭐ Excellent (5)</option>
-              <option value="4">⭐⭐⭐⭐ Good (4)</option>
-              <option value="3">⭐⭐⭐ Average (3)</option>
-              <option value="2">⭐⭐ Poor (2)</option>
-              <option value="1">⭐ Very Poor (1)</option>
-            </select>
+        <div class="ct">⭐ Manager Rating — Auto Calculate</div>
+        <!-- Formula Info Banner -->
+        <div style="background:linear-gradient(135deg,var(--ac2),var(--pu2));border:1px solid var(--ac3);border-radius:var(--rs);padding:10px 14px;margin-bottom:14px;font-size:12px">
+          <div style="font-weight:700;color:var(--ac);margin-bottom:6px">📐 Auto Rating Formula (5 Star Max)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:var(--gr2);color:var(--gr);border:1px solid var(--gr3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">✅ Form Submit × 0.5 pts</span>
+            <span style="background:var(--re2);color:var(--re);border:1px solid var(--re3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">⚠️ Mistake − 1 star each</span>
+            <span style="background:var(--am2);color:var(--am);border:1px solid var(--am3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">⏰ Late Entry − 0.5 star each</span>
+            <span style="background:var(--or2);color:var(--or);border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">🏖️ Leave Days − 0.25 star each</span>
           </div>
         </div>
-        <div class="fg"><label>Rating Note / Feedback</label><textarea id="rt-note" placeholder="Rating mate reason lakhao..."></textarea></div>
-        <button class="btn ba bsm" onclick="addRating()">⭐ Save Rating</button>
+        <div class="g3r">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="rt-mg" onchange="previewAutoRating()"><option value="">— Select Manager —</option></select></div>
+          <div class="fg" style="margin:0"><label>Month</label><input type="month" id="rt-month" onchange="previewAutoRating()"></div>
+          <div class="fg" style="margin:0">
+            <label>Auto Preview</label>
+            <div id="rt-preview" style="background:var(--s2);border:1.5px solid var(--bd);border-radius:var(--rs);padding:9px 13px;min-height:40px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t3)">Manager & Month select karo…</div>
+          </div>
+        </div>
+        <div class="fg"><label>Rating Note / Feedback (Optional)</label><textarea id="rt-note" placeholder="Note lakhao (optional)..."></textarea></div>
+        <button class="btn ba bsm" onclick="addRating()">⚡ Auto Save Rating</button>
         <div class="ok" id="rt-msg"></div>
       </div>
       <!-- Office Leaderboard -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏆 Office Leaderboard (All Departments)</div>
       <div class="card" style="padding:0;overflow:hidden">
         <div style="overflow-x:auto"><table class="tbl" id="rtng-tbl">
-          <thead><tr><th>#</th><th>Manager</th><th>Dept</th><th>Avg Rating</th><th>Submissions</th><th>Leave Days</th><th>Late Count</th><th>Performance Score</th></tr></thead>
+          <thead><tr><th>#</th><th>Manager</th><th>Dept</th><th>Avg Rating</th><th>Submissions</th><th>Mistakes</th><th>Leave Days</th><th>Late Count</th><th>Performance Score</th></tr></thead>
           <tbody id="rtng-body"></tbody>
         </table></div>
       </div>
@@ -1094,8 +1128,9 @@ function initMgr(){
   // reset to submit tab
   document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('ms-sub').classList.add('on');
-  document.getElementById('mn-sub').classList.add('on');
+  document.getElementById('ms-dash').classList.add('on');
+  document.getElementById('mn-dash').classList.add('on');
+  renderMgrDash();
 }
 function psh(s){document.getElementById('sh-d').className='so day'+(s==='day'?' on':'');document.getElementById('sh-n').className='so night'+(s==='night'?' on':'');}
 const gsh=()=>document.getElementById('sh-d').classList.contains('on')?'day':'night';
@@ -2550,13 +2585,48 @@ function persistRatings(){localStorage.setItem('ft8_rtng',JSON.stringify(db.rati
 
 function starHTML(n){n=Math.round(n);return '<span style="color:#FBBF24;font-size:16px">'+'⭐'.repeat(n)+'</span>';}
 
-function calcPerfScore(mgrId){
-  const subs=db.submissions.filter(s=>s.mgrId===mgrId).length;
-  const leaveDays=db.leaves.filter(l=>l.mgrId===mgrId&&l.status==='approved').reduce((a,l)=>a+l.days,0);
-  const lateCount=db.lateEntries.filter(l=>l.mgrId===mgrId).length;
-  const mistakePenalty=db.mistakes.filter(m=>m.mgrId===mgrId).reduce((a,m)=>a+(SV_CONFIG[m.severity]?.weight||1),0);
-  const score=Math.max(0,subs*2-leaveDays*2-lateCount*3-mistakePenalty*4);
-  return{score,subs,leaveDays,lateCount};
+function calcPerfScore(mgrId,month){
+  // month = 'YYYY-MM' — if provided, filter by that month; else use all data
+  const mf=month?s=>s.startsWith(month):()=>true;
+  const subs=db.submissions.filter(s=>s.mgrId===mgrId&&mf(s.date||s.submittedAt||'')).length;
+  const leaveDays=db.leaves.filter(l=>l.mgrId===mgrId&&l.status==='approved'&&mf(l.fromDate||l.date||'')).reduce((a,l)=>a+l.days,0);
+  const lateCount=db.lateEntries.filter(l=>l.mgrId===mgrId&&mf(l.date||l.entryDate||'')).length;
+  const mistakeCount=db.mistakes.filter(m=>m.mgrId===mgrId&&mf(m.date||m.reportedAt||'')).length;
+  const score=Math.max(0,subs*2-leaveDays*2-lateCount*3-mistakeCount*4);
+  return{score,subs,leaveDays,lateCount,mistakeCount};
+}
+
+// Auto-calculate stars for a manager+month based on form data
+function calcAutoStars(mgrId,month){
+  const{subs,leaveDays,lateCount,mistakeCount}=calcPerfScore(mgrId,month);
+  // Base: each submission gives 0.5 pts (max 5 from 10 subs)
+  let stars=subs*0.5;
+  // Penalties
+  stars-=mistakeCount*1;      // mistake = −1 star each
+  stars-=lateCount*0.5;       // late entry = −0.5 star each
+  stars-=leaveDays*0.25;      // leave day = −0.25 star each
+  stars=Math.min(5,Math.max(1,Math.round(stars)));
+  return{stars,subs,leaveDays,lateCount,mistakeCount};
+}
+
+// Preview auto-rating in the form when manager/month changes
+function previewAutoRating(){
+  const mgrId=document.getElementById('rt-mg').value;
+  const month=document.getElementById('rt-month').value;
+  const el=document.getElementById('rt-preview');
+  if(!el)return;
+  if(!mgrId||!month){el.innerHTML='<span style="color:var(--t3)">Manager & Month select karo…</span>';return;}
+  const{stars,subs,leaveDays,lateCount,mistakeCount}=calcAutoStars(mgrId,month);
+  el.innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;width:100%">
+      <div>${'⭐'.repeat(stars)}<span style="font-size:12px;color:var(--t2);margin-left:4px">${stars}/5</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11px">
+        <span style="background:var(--gr2);color:var(--gr);border-radius:20px;padding:2px 8px">📋 ${subs} forms</span>
+        <span style="background:var(--re2);color:var(--re);border-radius:20px;padding:2px 8px">⚠️ ${mistakeCount} mistakes</span>
+        <span style="background:var(--am2);color:var(--am);border-radius:20px;padding:2px 8px">⏰ ${lateCount} late</span>
+        <span style="background:var(--or2);color:var(--or);border-radius:20px;padding:2px 8px">🏖️ ${leaveDays} leave days</span>
+      </div>
+    </div>`;
 }
 
 function getAvgRating(mgrId){
@@ -2568,16 +2638,19 @@ function getAvgRating(mgrId){
 function addRating(){
   const mgrId=document.getElementById('rt-mg').value;
   const month=document.getElementById('rt-month').value;
-  const stars=parseInt(document.getElementById('rt-star').value);
   const note=document.getElementById('rt-note').value.trim();
   if(!mgrId){sm('rt-msg','Manager select karo',true);return;}
   if(!month){sm('rt-msg','Month select karo',true);return;}
+  // Auto-calculate stars based on form data
+  const{stars,subs,leaveDays,lateCount,mistakeCount}=calcAutoStars(mgrId,month);
   db.ratings=db.ratings.filter(r=>!(r.mgrId===mgrId&&r.month===month));
   const mgr=db.managers.find(m=>m.id===mgrId);
-  db.ratings.unshift({id:Date.now(),mgrId,mgrName:mgr.name,deptId:mgr.deptId,deptName:dn(mgr.deptId),month,stars,note,addedAt:new Date().toISOString()});
+  const autoNote=`Auto: ${subs} forms, ${mistakeCount} mistakes, ${lateCount} late, ${leaveDays} leave days`+(note?' | '+note:'');
+  db.ratings.unshift({id:Date.now(),mgrId,mgrName:mgr.name,deptId:mgr.deptId,deptName:dn(mgr.deptId),month,stars,note:autoNote,addedAt:new Date().toISOString()});
   persistRatings();
-  sm('rt-msg','✅ Rating saved — '+mgr.name+' → '+stars+' Star');
-  document.getElementById('rt-mg').value='';document.getElementById('rt-note').value='';
+  sm('rt-msg','✅ Auto Rating saved — '+mgr.name+' → '+'⭐'.repeat(stars)+' ('+stars+'/5)');
+  document.getElementById('rt-mg').value='';document.getElementById('rt-month').value='';document.getElementById('rt-note').value='';
+  const prev=document.getElementById('rt-preview');if(prev)prev.innerHTML='<span style="color:var(--t3)">Manager & Month select karo…</span>';
   renderAdminRating();
 }
 
@@ -2585,8 +2658,8 @@ function renderAdminRating(){
   const rtmg=document.getElementById('rt-mg');
   if(rtmg&&rtmg.options.length<=1)db.managers.forEach(m=>rtmg.add(new Option(m.name+' ('+m.id+')',m.id)));
   const ranked=db.managers.map(m=>{
-    const avg=getAvgRating(m.id);const{score,subs,leaveDays,lateCount}=calcPerfScore(m.id);
-    return{m,avg,score,subs,leaveDays,lateCount};
+    const avg=getAvgRating(m.id);const{score,subs,leaveDays,lateCount,mistakeCount}=calcPerfScore(m.id);
+    return{m,avg,score,subs,leaveDays,lateCount,mistakeCount};
   }).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
   document.getElementById('rtng-body').innerHTML=ranked.map((x,i)=>{
     const rankCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
@@ -2598,6 +2671,7 @@ function renderAdminRating(){
       <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(x.m.name)}</div>${x.m.name}</div></td>
       <td><span class="badge b-te" style="font-size:10px">${dn(x.m.deptId)}</span></td>
       <td>${stars}</td><td style="text-align:center;color:var(--ac)">${x.subs}</td>
+      <td style="text-align:center;color:${x.mistakeCount?'var(--re)':'var(--gr)'}">${x.mistakeCount}</td>
       <td style="text-align:center;color:${x.leaveDays?'var(--am)':'var(--gr)'}">${x.leaveDays}</td>
       <td style="text-align:center;color:${x.lateCount?'var(--re)':'var(--gr)'}">${x.lateCount}</td>
       <td style="font-weight:600;color:${perfColor}">${x.score} pts</td>
@@ -2689,16 +2763,104 @@ mTab=function(t,el){
   if(el)el.classList.add('on');
   const sec=document.getElementById('ms-'+t);if(sec)sec.classList.add('on');
   window.scrollTo(0,0);
+  if(t==='dash')renderMgrDash();
   if(t==='rep')renderMyRep();if(t==='lv')renderMgrLv();if(t==='mist')renderMgrMist();
   if(t==='late'){document.getElementById('le-date').value=tod();const h=new Date().getHours();const sh=document.getElementById('le-shift');if(sh)sh.value=h>=8&&h<20?'day':'night';renderMgrLate();}
   if(t==='prob')renderMgrProb();if(t==='rtng')renderMgrRating();
 };
 
+function renderMgrDash(){
+  if(!curUser)return;
+  const mid=curUser.id;
+  const mySubs=db.submissions.filter(s=>s.mgrId===mid);
+  const myLeaves=db.leaves.filter(l=>l.mgrId===mid);
+  const myMist=(db.mistakes||[]).filter(m=>m.mgrId===mid);
+  const myLate=(db.lateEntries||[]).filter(l=>l.mgrId===mid);
+  const myHrs=(db.workHours||[]).filter(h=>h.mgrId===mid);
+  const pendingLeaves=myLeaves.filter(l=>l.status==='pending').length;
+  const approvedLeaves=myLeaves.filter(l=>l.status==='approved').reduce((a,l)=>a+l.days,0);
+  const otHrs=(myHrs.reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
+  const avgRat=getAvgRating(mid);
+  const{score}=calcPerfScore(mid);
+  const thisMonth=new Date().toISOString().slice(0,7);
+  const thisMonthSubs=mySubs.filter(s=>(s.date||s.submittedAt||'').startsWith(thisMonth)).length;
+
+  // Stats cards
+  document.getElementById('mgr-dash-stats').innerHTML=`
+    <div class="sc sc-blue"><div class="sc-ico">📋</div><div class="sn">${mySubs.length}</div><div class="sl">Total Submissions</div></div>
+    <div class="sc sc-purple"><div class="sc-ico">📅</div><div class="sn">${thisMonthSubs}</div><div class="sl">This Month</div></div>
+    <div class="sc sc-orange"><div class="sc-ico">🏖️</div><div class="sn">${pendingLeaves}</div><div class="sl">Pending Leaves</div></div>
+    <div class="sc sc-green"><div class="sc-ico">✅</div><div class="sn">${approvedLeaves}</div><div class="sl">Approved Leave Days</div></div>
+    <div class="sc sc-red"><div class="sc-ico">⚠️</div><div class="sn">${myMist.length}</div><div class="sl">Mistakes</div></div>
+    <div class="sc sc-amber"><div class="sc-ico">⏰</div><div class="sn">${myLate.length}</div><div class="sl">Late Entries</div></div>
+    <div class="sc sc-teal"><div class="sc-ico">⏱️</div><div class="sn">${otHrs}h</div><div class="sl">OT Hours</div></div>
+    <div class="sc sc-yellow"><div class="sc-ico">⭐</div><div class="sn">${avgRat!==null?avgRat.toFixed(1):'—'}</div><div class="sl">My Rating</div></div>
+  `;
+
+  // Recent submissions panel
+  const recent=mySubs.slice(0,5);
+  document.getElementById('mgr-dash-recent').innerHTML=recent.length?recent.map(s=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd)">
+      <div style="width:32px;height:32px;background:var(--ac2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${s.shift==='day'?'☀️':'🌙'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600">${s.date}</div>
+        <div style="font-size:11px;color:var(--t2)">${s.shift==='day'?'Day Shift':'Night Shift'} · ${Object.values(s.categories||{}).reduce((a,c)=>a+c.files.length,0)} files</div>
+      </div>
+      <span class="badge b-gr" style="font-size:10px">✓</span>
+    </div>`).join(''):'<div class="panel-empty">Koi submission nathi</div>';
+
+  // Rating panel
+  const myRatings=(db.ratings||[]).filter(r=>r.mgrId===mid).sort((a,b)=>b.month?.localeCompare(a.month||''));
+  document.getElementById('mgr-dash-rating').innerHTML=`
+    <div style="text-align:center;padding:8px 0 12px">
+      <div style="font-size:26px;margin-bottom:4px">${avgRat!==null?starHTML(Math.round(avgRat)):'<span style="font-size:14px;color:var(--t3)">Haji rating nathi</span>'}</div>
+      ${avgRat!==null?`<div style="font-size:12px;color:var(--t2)">${avgRat.toFixed(1)} / 5.0 Average</div>`:''}
+      <div style="margin-top:8px;font-size:12px;color:var(--ac);font-weight:600">Performance: ${score} pts</div>
+    </div>
+    ${myRatings.slice(0,3).map(r=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid var(--bd)">
+        <span style="font-size:11px;color:var(--t2)">📅 ${r.month}</span>
+        ${starHTML(r.stars)}
+      </div>`).join('')}`;
+
+  // Leaves panel
+  const recentLeaves=myLeaves.slice(0,4);
+  document.getElementById('mgr-dash-leaves').innerHTML=recentLeaves.length?recentLeaves.map(l=>{
+    const sc=l.status==='approved'?'b-gr':l.status==='rejected'?'b-re':'b-am';
+    const si=l.status==='approved'?'✅':l.status==='rejected'?'❌':'⏳';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600">${l.type}</div>
+        <div style="font-size:11px;color:var(--t2)">${l.fromDate||l.from||'—'} · ${l.days} day(s)</div>
+      </div>
+      <span class="badge ${sc}" style="font-size:10px">${si} ${l.status}</span>
+    </div>`;}).join(''):'<div class="panel-empty">Koi leave apply nathi</div>';
+
+  // Mistakes + Late panel
+  const mistList=myMist.slice(0,3).map(m=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:16px">⚠️</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--re)">${m.severity||'Mistake'}</div>
+        <div style="font-size:11px;color:var(--t2)">${m.date||m.reportedAt||'—'}</div>
+      </div>
+    </div>`).join('');
+  const lateList=myLate.slice(0,3).map(l=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:16px">⏰</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--am)">Late Entry</div>
+        <div style="font-size:11px;color:var(--t2)">${l.date||l.entryDate||'—'}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('mgr-dash-mist').innerHTML=(mistList||lateList)?mistList+lateList:'<div class="panel-empty">Koi mistake ya late entry nathi 🎉</div>';
+}
+
 /* ── Patch initAdmin + initMgr ── */
 const _origInitAdminFinal=initAdmin;
 initAdmin=function(){_origInitAdminFinal();updateProbBadge();};
 const _origInitMgrFinal=initMgr;
-initMgr=function(){_origInitMgrFinal();setTimeout(()=>{updateProbBadge();const rm=document.getElementById('rt-month');if(rm&&!rm.value)rm.value=new Date().toISOString().slice(0,7);},200);};
+initMgr=function(){_origInitMgrFinal();setTimeout(()=>{updateProbBadge();renderMgrDash();const rm=document.getElementById('rt-month');if(rm&&!rm.value)rm.value=new Date().toISOString().slice(0,7);},200);};
 
 /* ── Patch persist ── */
 const _origPersistFinal=persist;
