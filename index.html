@@ -223,6 +223,7 @@ textarea{resize:vertical;min-height:56px}
       <button class="atab" id="mn-late" onclick="mTab('late',this)">⏰ Late</button>
       <button class="atab" id="mn-prob" onclick="mTab('prob',this)">🔧 Problems <span class="nbadge" id="prob-mgr-badge" style="display:none;position:static;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" id="mn-rtng" onclick="mTab('rtng',this)">⭐ Rating</button>
+      <button class="atab" id="mn-hrs" onclick="mTab('hrs',this)">⏱️ Hours</button>
     </div>
 
     <!-- SUBMIT FORMS -->
@@ -342,90 +343,50 @@ textarea{resize:vertical;min-height:56px}
       </div>
     </div>
 
-  </div>
-</div>
-    <!-- Manager: My Problems section -->
-    <div class="sec" id="ms-prob">
+    <!-- HOURS (MANAGER) -->
+    <div class="sec" id="ms-hrs">
       <div class="card">
-        <div class="ct">🔧 Admin ne Problem / Complaint Moklo</div>
-        <div class="fg"><label>Category</label>
-          <select id="mgr-pr-cat">
-            <option value="Work Issue">Work Issue</option>
-            <option value="Behavior Issue">Behavior Issue</option>
-            <option value="Process Issue">Process Issue</option>
-            <option value="Communication Issue">Communication Issue</option>
-            <option value="Quality Issue">Quality Issue</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="fg"><label>Problem / Complaint (shu problem che te lakhao)</label>
-          <textarea id="mgr-pr-desc" placeholder="Tamari problem ya complaint detail ma lakhao..."></textarea>
-        </div>
-        <button class="btn ba bsm" onclick="mgrSubmitProblem()">📨 Submit Problem</button>
-        <div class="ok" id="mgr-pr-msg"></div>
-      </div>
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Mara Problem Reports / Admin Solutions</div>
-      <div id="mgr-prob-list"></div>
-    </div>
-
-    <!-- Manager: Rating section -->
-    <div class="sec" id="ms-rtng">
-      <!-- My Rating Card -->
-      <div class="card" id="mgr-my-rating-card">
-        <div class="ct">⭐ Maru Rating</div>
-        <div id="mgr-my-rating"></div>
-      </div>
-      <!-- Department Leaderboard -->
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏬 Mara Department na Managers</div>
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="overflow-x:auto"><table class="tbl" id="dept-rtng-tbl">
-          <thead><tr><th>#</th><th>Manager</th><th>Avg Rating</th><th>Perf Score</th></tr></thead>
-          <tbody id="dept-rtng-body"></tbody>
-        </table></div>
-      </div>
-      <!-- Office Leaderboard -->
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">🏆 Office Leaderboard</div>
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="overflow-x:auto"><table class="tbl" id="office-rtng-tbl">
-          <thead><tr><th>#</th><th>Manager</th><th>Dept</th><th>Avg Rating</th><th>Perf Score</th></tr></thead>
-          <tbody id="office-rtng-body"></tbody>
-        </table></div>
-      </div>
-    </div>
-  <div class="bnav" id="mgr-bnav">
-    <button class="nb on" id="mn-sub" onclick="mTab('sub',this)"><span class="ni">📤</span><span class="nl">Submit</span></button>
-    <button class="nb" id="mn-rep" onclick="mTab('rep',this)"><span class="ni">📋</span><span class="nl">Reports</span></button>
-    <button class="nb" id="mn-lv" onclick="mTab('lv',this)"><span class="ni">🏖️</span><span class="nl">Leave</span></button>
-    <button class="nb" id="mn-mist" onclick="mTab('mist',this)" style="position:relative"><span class="ni">⚠️</span><span class="nl">Mistakes</span><span class="nbadge" id="mist-mgr-badge" style="display:none">0</span></button>
-    <button class="nb" id="mn-late" onclick="mTab('late',this)"><span class="ni">⏰</span><span class="nl">Late</span><span class="nbadge" id="late-mgr-badge" style="display:none">!</span></button>
-    <button class="nb" id="mn-prob" onclick="mTab('prob',this)" style="position:relative"><span class="ni">🔧</span><span class="nl">Problems</span><span class="nbadge" id="prob-mgr-badge" style="display:none">0</span></button>
-    <button class="nb" id="mn-rtng" onclick="mTab('rtng',this)"><span class="ni">⭐</span><span class="nl">Rating</span></button>
-  </div>
-</div>
-
-    <div class="sec" id="ms-late">
-      <div class="card">
-        <div class="ct">⏰ Late Entry Report Karo</div>
-        <div class="fg"><label>Date</label><input type="date" id="le-date"></div>
+        <div class="ct">⏱️ Aaj na Kaam na Kalako</div>
         <div class="g2">
+          <div class="fg" style="margin:0"><label>Date</label><input type="date" id="hrs-date"></div>
           <div class="fg" style="margin:0"><label>Shift</label>
-            <select id="le-shift">
-              <option value="day">☀️ Day Shift (8am–8pm)</option>
-              <option value="night">🌙 Night Shift (8pm–8am)</option>
+            <select id="hrs-shift">
+              <option value="day">☀️ Day (8am–8pm)</option>
+              <option value="night">🌙 Night (8pm–8am)</option>
             </select>
           </div>
-          <div class="fg" style="margin:0"><label>Late by (minutes)</label>
-            <input type="number" id="le-mins" min="1" max="480" placeholder="30">
+        </div>
+        <div class="g2" style="margin-top:10px">
+          <div class="fg" style="margin:0"><label>Kaam na Kalako (Hours Worked)</label>
+            <input type="number" id="hrs-worked" min="0.5" max="24" step="0.5" placeholder="e.g. 9" oninput="chkOT()">
+          </div>
+          <div class="fg" style="margin:0"><label>OT Kalako (Auto-calculated)</label>
+            <input type="number" id="hrs-ot" readonly style="background:var(--s3);color:var(--am);font-weight:600" placeholder="0">
           </div>
         </div>
-        <div class="fg"><label>Actual Arrival Time</label><input type="time" id="le-time"></div>
-        <div class="fg"><label>Reason</label><textarea id="le-reason" placeholder="Late aavana no reason lakhao..."></textarea></div>
-        <button class="btn ba bsm" onclick="submitLateEntry()">📨 Submit Late Entry</button>
-        <div class="ok" id="le-msg"></div>
+        <div id="hrs-ot-wrap" style="display:none;margin-top:6px">
+          <div class="fg"><label>OT Remark <span style="color:var(--re);font-size:11px">⚠️ OT hoy to FARAJIYAT</span></label>
+            <textarea id="hrs-remark" placeholder="OT kema aapyu te lakhao (mandatory if OT > 0)..."></textarea>
+          </div>
+        </div>
+        <div class="fg" style="margin-top:6px"><label>Extra Note (optional)</label>
+          <textarea id="hrs-note" placeholder="Aaj koi khaas kaam karyu..." style="min-height:44px"></textarea>
+        </div>
+        <button class="btn ba bsm" onclick="submitHours()">✅ Hours Submit Karo</button>
+        <div class="ok" id="hrs-msg"></div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Late Entry History</div>
-      <div id="mgr-late-list"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Month:</div>
+        <input type="month" id="hrs-month" style="flex:1;max-width:180px" oninput="renderMgrHrs()">
+        <button class="btn bg2 bsm" onclick="document.getElementById('hrs-month').value='';renderMgrHrs()">All</button>
+      </div>
+      <div class="sg" id="hrs-my-stats"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Mara Hours — History</div>
+      <div id="mgr-hrs-list"></div>
     </div>
+
+  </div>
+</div>
 
 <!-- ADMIN PAGE -->
 <div id="pg-admin" class="pg">
@@ -446,6 +407,7 @@ textarea{resize:vertical;min-height:56px}
       <button class="atab" onclick="aTab('late',this)">⏰ Late Entry <span id="late-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" onclick="aTab('prob',this)">🔧 Problem/Solution <span id="prob-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" onclick="aTab('rtng',this)">⭐ Rating</button>
+      <button class="atab" onclick="aTab('hrs',this)">⏱️ Hours</button>
       <button class="atab" onclick="aTab('st',this)">⚙️ Settings</button>
     </div>
 
@@ -819,6 +781,34 @@ textarea{resize:vertical;min-height:56px}
         <div class="ok" id="del-msg" style="min-height:16px"></div>
       </div>
     </div>
+
+    <!-- HOURS REPORT (ADMIN) -->
+    <div class="sec" id="as-hrs">
+      <div class="sg" id="hrs-stats"></div>
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="hrf-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="hrf-sh"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>OT Filter</label><select id="hrf-ot"><option value="">All entries</option><option value="1">OT Only</option></select></div>
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="hrf-from"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="hrf-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderHrsReport()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrHrsF()">Reset</button>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Hours Summary</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>Manager</th><th>Dept</th><th>Days</th><th>Total Hrs</th><th>OT Hrs</th><th>Avg/Day</th></tr></thead>
+          <tbody id="hrs-sum-body"></tbody>
+        </table></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Hours Entries</div>
+      <div id="hrs-list"></div>
+    </div>
+
   </div>
 </div>
 
@@ -2569,4 +2559,285 @@ impJSON=function(inp){
 window.addEventListener('DOMContentLoaded',()=>{
   const rm=document.getElementById('rt-month');if(rm)rm.value=new Date().toISOString().slice(0,7);
 });
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   WORK HOURS PATCH — FormTrack97
+   Manager: daily hours entry, OT auto-calc, month view
+   Admin: full report with filters + summary table
+═══════════════════════════════════════════════════ */
+
+/* ── Data init ── */
+if(!db.workHours) db.workHours = JSON.parse(localStorage.getItem('ft7_hrs')||'[]');
+
+function persistHrs(){
+  try{ localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); }catch(e){}
+}
+
+/* ── OT Auto-calculation (>8h = OT) ── */
+function chkOT(){
+  const w = parseFloat(document.getElementById('hrs-worked')?.value)||0;
+  const ot = w > 8 ? Math.round((w - 8)*2)/2 : 0;
+  const otEl = document.getElementById('hrs-ot');
+  const otWrap = document.getElementById('hrs-ot-wrap');
+  if(otEl) otEl.value = ot > 0 ? ot : '';
+  if(otWrap) otWrap.style.display = ot > 0 ? 'block' : 'none';
+}
+
+/* ── Manager: Submit Hours ── */
+function submitHours(){
+  if(!curUser){ sm('hrs-msg','Login required',true); return; }
+  const date    = document.getElementById('hrs-date')?.value;
+  const shift   = document.getElementById('hrs-shift')?.value;
+  const worked  = parseFloat(document.getElementById('hrs-worked')?.value);
+  const ot      = parseFloat(document.getElementById('hrs-ot')?.value)||0;
+  const remark  = document.getElementById('hrs-remark')?.value.trim();
+  const note    = document.getElementById('hrs-note')?.value.trim();
+
+  if(!date)        { sm('hrs-msg','Date nakho',true); return; }
+  if(!worked||worked<0.5) { sm('hrs-msg','Hours nakho (min 0.5)',true); return; }
+  if(ot > 0 && !remark)  { sm('hrs-msg','OT hoy to remark farajiyat che!',true); return; }
+
+  /* prevent duplicate date+shift for same manager */
+  const dup = db.workHours.find(h=>h.mgrId===curUser.id&&h.date===date&&h.shift===shift);
+  if(dup){ sm('hrs-msg','Aa date+shift mate already entry che!',true); return; }
+
+  db.workHours.unshift({
+    id: Date.now(),
+    mgrId: curUser.id, mgrName: curUser.name,
+    deptId: curUser.deptId, deptName: dn(curUser.deptId),
+    date, shift, workedHours: worked, otHours: ot,
+    remarkOT: remark, note,
+    submittedAt: new Date().toISOString()
+  });
+  persistHrs();
+  sm('hrs-msg','✅ Hours save thaya!');
+
+  /* clear form */
+  document.getElementById('hrs-worked').value='';
+  document.getElementById('hrs-ot').value='';
+  document.getElementById('hrs-note').value='';
+  const rem=document.getElementById('hrs-remark'); if(rem) rem.value='';
+  const ow=document.getElementById('hrs-ot-wrap'); if(ow) ow.style.display='none';
+  renderMgrHrs();
+}
+
+/* ── Manager: Render own hours ── */
+function renderMgrHrs(){
+  if(!curUser) return;
+  const month = document.getElementById('hrs-month')?.value; // "YYYY-MM" or ""
+  let data = db.workHours.filter(h=>h.mgrId===curUser.id);
+  if(month) data = data.filter(h=>h.date.startsWith(month));
+  data.sort((a,b)=>b.date.localeCompare(a.date));
+
+  /* stats */
+  const totH  = data.reduce((a,h)=>a+h.workedHours,0);
+  const totOT = data.reduce((a,h)=>a+(h.otHours||0),0);
+  const days  = [...new Set(data.map(h=>h.date))].length;
+  const statsEl = document.getElementById('hrs-my-stats');
+  if(statsEl) statsEl.innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--ac)">${data.length}</div><div class="sl">Entries</div></div>
+    <div class="sc"><div class="sn" style="color:var(--gr)">${totH.toFixed(1)}</div><div class="sl">Total Hrs</div></div>
+    <div class="sc"><div class="sn" style="color:${totOT>0?'var(--am)':'var(--gr)'}">${totOT.toFixed(1)}</div><div class="sl">OT Hrs</div></div>
+    <div class="sc"><div class="sn" style="color:var(--pu)">${days}</div><div class="sl">Days</div></div>
+  `;
+
+  const listEl = document.getElementById('mgr-hrs-list');
+  if(!listEl) return;
+  if(!data.length){
+    listEl.innerHTML='<div class="empty"><div class="ee">⏱️</div><p>Haji koi hours submit nathi karya'+(month?' (aa month ma)':'')+'</p></div>';
+    return;
+  }
+  listEl.innerHTML = data.map(h=>`
+    <div class="lv-row" style="border-left:3px solid ${h.otHours>0?'var(--am)':'var(--ac)'}">
+      <div class="lv-top">
+        <div>
+          <div class="lv-name">
+            ${fmtD(h.date)}
+            ${h.otHours>0?`<span class="badge b-am" style="font-size:10px;margin-left:6px">OT: ${h.otHours}h</span>`:''}
+          </div>
+          <div class="lv-meta">
+            <span>${h.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+            <span>🕐 ${fmtDT(h.submittedAt)}</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ac)">${h.workedHours}h</div>
+          <div style="font-size:10px;color:var(--t3)">worked</div>
+        </div>
+      </div>
+      ${h.remarkOT?`<div class="notebox" style="border-left-color:var(--am)">⏱️ OT Remark: ${h.remarkOT}</div>`:''}
+      ${h.note?`<div class="notebox">${h.note}</div>`:''}
+      <button class="btn bre bxs" style="margin-top:8px" onclick="delHrs(${h.id})">🗑️ Delete</button>
+    </div>
+  `).join('');
+}
+
+/* ── Manager: delete own entry ── */
+function delHrs(id){
+  if(!confirm('Delete?'))return;
+  db.workHours = db.workHours.filter(h=>h.id!==id);
+  persistHrs(); renderMgrHrs();
+}
+
+/* ── Admin: Render Hours Report ── */
+function renderHrsReport(){
+  /* populate manager filter */
+  const hfmg = document.getElementById('hrf-mg');
+  if(hfmg && hfmg.options.length<=1){
+    db.managers.forEach(m=>hfmg.add(new Option(m.name, m.id)));
+  }
+
+  let data = [...db.workHours].sort((a,b)=>b.date.localeCompare(a.date));
+  const fmg  = document.getElementById('hrf-mg')?.value;
+  const fsh  = document.getElementById('hrf-sh')?.value;
+  const fot  = document.getElementById('hrf-ot')?.value;
+  const from = document.getElementById('hrf-from')?.value;
+  const to   = document.getElementById('hrf-to')?.value;
+  if(fmg)  data = data.filter(h=>h.mgrId===fmg);
+  if(fsh)  data = data.filter(h=>h.shift===fsh);
+  if(fot==='1') data = data.filter(h=>h.otHours>0);
+  if(from) data = data.filter(h=>h.date>=from);
+  if(to)   data = data.filter(h=>h.date<=to);
+
+  /* stats */
+  const totH  = data.reduce((a,h)=>a+h.workedHours,0);
+  const totOT = data.reduce((a,h)=>a+(h.otHours||0),0);
+  const uniqM = [...new Set(data.map(h=>h.mgrId))].length;
+  const statsEl = document.getElementById('hrs-stats');
+  if(statsEl) statsEl.innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--ac)">${data.length}</div><div class="sl">Entries</div></div>
+    <div class="sc"><div class="sn" style="color:var(--gr)">${totH.toFixed(1)}</div><div class="sl">Total Hours</div></div>
+    <div class="sc"><div class="sn" style="color:${totOT>0?'var(--am)':'var(--gr)'}">${totOT.toFixed(1)}</div><div class="sl">OT Hours</div></div>
+    <div class="sc"><div class="sn" style="color:var(--pu)">${uniqM}</div><div class="sl">Managers</div></div>
+  `;
+
+  /* summary table */
+  const sumEl = document.getElementById('hrs-sum-body');
+  if(sumEl) sumEl.innerHTML = db.managers.map(m=>{
+    const mH = data.filter(h=>h.mgrId===m.id);
+    if(!mH.length) return `<tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td><td><span class="badge b-te">${dn(m.deptId)}</span></td><td colspan="4" style="color:var(--t3)">No entries</td></tr>`;
+    const tH  = mH.reduce((a,h)=>a+h.workedHours,0);
+    const tOT = mH.reduce((a,h)=>a+(h.otHours||0),0);
+    const days = [...new Set(mH.map(h=>h.date))].length;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
+      <td><span class="badge b-te">${dn(m.deptId)}</span></td>
+      <td style="text-align:center;font-weight:600">${days}</td>
+      <td style="text-align:center;font-weight:600;color:var(--ac)">${tH.toFixed(1)}</td>
+      <td style="text-align:center;font-weight:600;color:${tOT>0?'var(--am)':'var(--gr)'}">${tOT.toFixed(1)}</td>
+      <td style="text-align:center;color:var(--t2)">${(tH/Math.max(days,1)).toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+
+  /* full list */
+  const listEl = document.getElementById('hrs-list');
+  if(!listEl) return;
+  listEl.innerHTML = data.length
+    ? data.map(h=>`
+      <div class="lv-row" style="border-left:3px solid ${h.otHours>0?'var(--am)':'var(--ac)'}">
+        <div class="lv-top">
+          <div>
+            <div class="lv-name">${h.mgrName}
+              <span style="font-size:11px;color:var(--t2);font-family:'DM Mono',monospace;margin-left:6px">${h.mgrId}</span>
+              ${h.otHours>0?`<span class="badge b-am" style="font-size:10px;margin-left:4px">OT: ${h.otHours}h</span>`:''}
+            </div>
+            <div class="lv-meta">
+              <span><span class="badge b-te" style="font-size:10px">${h.deptName}</span></span>
+              <span>${h.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+              <span>📅 ${fmtD(h.date)}</span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ac)">${h.workedHours}h</div>
+            <div style="font-size:10px;color:var(--t3)">${fmtDT(h.submittedAt)}</div>
+          </div>
+        </div>
+        ${h.remarkOT?`<div class="notebox" style="border-left-color:var(--am)">⏱️ OT Remark: ${h.remarkOT}</div>`:''}
+        ${h.note?`<div class="notebox">${h.note}</div>`:''}
+      </div>`).join('')
+    : '<div class="empty"><div class="ee">⏱️</div><p>No hours entries found</p></div>';
+}
+
+function clrHrsF(){
+  ['hrf-mg','hrf-sh','hrf-ot','hrf-from','hrf-to'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  renderHrsReport();
+}
+
+/* ── Patch mTab ── */
+const _origMTabHrs = mTab;
+mTab = function(t, el){
+  _origMTabHrs(t, el);
+  if(t==='hrs'){
+    /* auto-fill date + shift */
+    const hd=document.getElementById('hrs-date');
+    if(hd&&!hd.value) hd.value=tod();
+    const hs=document.getElementById('hrs-shift');
+    if(hs){const h=new Date().getHours();hs.value=(h>=8&&h<20)?'day':'night';}
+    /* default month filter to current month */
+    const hm=document.getElementById('hrs-month');
+    if(hm&&!hm.value) hm.value=new Date().toISOString().slice(0,7);
+    renderMgrHrs();
+  }
+};
+
+/* ── Patch aTab ── */
+const _origATabHrs = aTab;
+aTab = function(t, el){
+  _origATabHrs(t, el);
+  if(t==='hrs') renderHrsReport();
+};
+
+/* ── Patch persist ── */
+const _origPersistHrs = persist;
+persist = function(){ _origPersistHrs(); persistHrs(); };
+
+/* ── Patch expJSON ── */
+const _origExpHrs = expJSON;
+expJSON = function(){
+  const data = JSON.stringify({
+    managers:db.managers, departments:db.departments, categories:db.categories,
+    submissions:db.submissions, leaves:db.leaves, leavebal:db.leavebal,
+    mistakes:db.mistakes||[], lateEntries:db.lateEntries||[],
+    problems:db.problems||[], ratings:db.ratings||[],
+    workHours:db.workHours,
+    exportedAt:new Date().toISOString()
+  });
+  const a=document.createElement('a');
+  a.href='data:application/json,'+encodeURIComponent(data);
+  a.download='FormTrack_'+tod()+'.json'; a.click();
+  sm('mn-msg','✅ Backup downloaded!');
+};
+
+/* ── Patch impJSON ── */
+const _origImpHrs = impJSON;
+impJSON = function(inp){
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d.managers){sm('mn-msg','Invalid file',true);return;}
+      if(!confirm('Restore? This replaces all data!'))return;
+      if(d.managers)    db.managers=d.managers;
+      if(d.departments) db.departments=d.departments;
+      if(d.categories)  db.categories=d.categories;
+      if(d.submissions) db.submissions=d.submissions;
+      if(d.leaves)      db.leaves=d.leaves;
+      if(d.leavebal)    db.leavebal=d.leavebal;
+      if(d.mistakes)    db.mistakes=d.mistakes;
+      if(d.lateEntries) db.lateEntries=d.lateEntries;
+      if(d.problems)    db.problems=d.problems;
+      if(d.ratings)     db.ratings=d.ratings;
+      if(d.workHours){ db.workHours=d.workHours; persistHrs(); }
+      persist();
+      sm('mn-msg','✅ Restored! Refreshing...');
+      setTimeout(()=>location.reload(),2000);
+    }catch(e){ sm('mn-msg','Invalid JSON',true); }
+  };
+  r.readAsText(f); inp.value='';
+};
 </script>
