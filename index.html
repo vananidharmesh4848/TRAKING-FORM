@@ -718,6 +718,8 @@ textarea{resize:vertical;min-height:56px}
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderProblems()">Apply</button>
           <button class="btn bg2 bsm" onclick="clrProbF()">Reset</button>
+          <button class="btn bgr bsm" onclick="dlProbRepPDF()">📄 PDF Download</button>
+          <button class="btn bam bsm" onclick="dlProbRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <!-- Problem List (Admin sees all, can reply) -->
@@ -754,7 +756,13 @@ textarea{resize:vertical;min-height:56px}
         </table></div>
       </div>
       <!-- Rating History -->
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">Rating History</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:1rem 0 10px">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Rating History</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn bgr bsm" onclick="dlRtngRepPDF()">📄 PDF</button>
+          <button class="btn bam bsm" onclick="dlRtngRepExcel()">📊 Excel</button>
+        </div>
+      </div>
       <div id="rtng-list"></div>
     </div>
 
@@ -796,6 +804,8 @@ textarea{resize:vertical;min-height:56px}
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderHrsReport()">Apply</button>
           <button class="btn bg2 bsm" onclick="clrHrsF()">Reset</button>
+          <button class="btn bgr bsm" onclick="dlHrsRepPDF()">📄 PDF Download</button>
+          <button class="btn bam bsm" onclick="dlHrsRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Hours Summary</div>
@@ -2812,32 +2822,119 @@ expJSON = function(){
   sm('mn-msg','✅ Backup downloaded!');
 };
 
-/* ── Patch impJSON ── */
-const _origImpHrs = impJSON;
-impJSON = function(inp){
-  const f=inp.files[0]; if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      const d=JSON.parse(e.target.result);
-      if(!d.managers){sm('mn-msg','Invalid file',true);return;}
-      if(!confirm('Restore? This replaces all data!'))return;
-      if(d.managers)    db.managers=d.managers;
-      if(d.departments) db.departments=d.departments;
-      if(d.categories)  db.categories=d.categories;
-      if(d.submissions) db.submissions=d.submissions;
-      if(d.leaves)      db.leaves=d.leaves;
-      if(d.leavebal)    db.leavebal=d.leavebal;
-      if(d.mistakes)    db.mistakes=d.mistakes;
-      if(d.lateEntries) db.lateEntries=d.lateEntries;
-      if(d.problems)    db.problems=d.problems;
-      if(d.ratings)     db.ratings=d.ratings;
-      if(d.workHours){ db.workHours=d.workHours; persistHrs(); }
-      persist();
-      sm('mn-msg','✅ Restored! Refreshing...');
-      setTimeout(()=>location.reload(),2000);
-    }catch(e){ sm('mn-msg','Invalid JSON',true); }
-  };
-  r.readAsText(f); inp.value='';
-};
+/* ── Hours: get filtered data (reuse from renderHrsReport filters) ── */
+function getHrsRepData(){
+  let data=[...db.workHours].sort((a,b)=>b.date.localeCompare(a.date));
+  const fmg=document.getElementById('hrf-mg')?.value;
+  const fsh=document.getElementById('hrf-sh')?.value;
+  const fot=document.getElementById('hrf-ot')?.value;
+  const from=document.getElementById('hrf-from')?.value;
+  const to=document.getElementById('hrf-to')?.value;
+  if(fmg)  data=data.filter(h=>h.mgrId===fmg);
+  if(fsh)  data=data.filter(h=>h.shift===fsh);
+  if(fot==='1') data=data.filter(h=>h.otHours>0);
+  if(from) data=data.filter(h=>h.date>=from);
+  if(to)   data=data.filter(h=>h.date<=to);
+  return data;
+}
+
+function dlHrsRepPDF(){
+  const data=getHrsRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Date','Shift','Worked Hrs','OT Hrs','OT Remark','Note'];
+  const rows=data.map(h=>[
+    h.mgrName,h.mgrId,h.deptName||'—',dlFmtD(h.date),
+    h.shift==='day'?'Day':'Night',
+    h.workedHours,h.otHours||0,h.remarkOT||'',h.note||''
+  ]);
+  makePDF('Work Hours Report',headers,rows,'FormTrack_HoursReport_'+tod()+'.pdf');
+}
+
+function dlHrsRepExcel(){
+  const data=getHrsRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Date','Shift','Worked Hrs','OT Hrs','OT Remark','Note','Submitted At'];
+  const rows=data.map(h=>[
+    h.mgrName,h.mgrId,h.deptName||'—',dlFmtD(h.date),
+    h.shift==='day'?'Day':'Night',
+    h.workedHours,h.otHours||0,h.remarkOT||'',h.note||'',
+    new Date(h.submittedAt).toLocaleString('en-IN')
+  ]);
+  makeExcel('Work Hours Report',headers,rows,'FormTrack_HoursReport_'+tod()+'.xlsx');
+}
+
+/* ── Problem/Solution: PDF + Excel ── */
+function getProbRepData(){
+  let data=[...db.problems||[]];
+  const mg=document.getElementById('prf-mg')?.value;
+  const cat=document.getElementById('prf-cat')?.value;
+  const st=document.getElementById('prf-st')?.value;
+  const from=document.getElementById('prf-from')?.value;
+  const to=document.getElementById('prf-to')?.value;
+  if(mg)  data=data.filter(p=>p.mgrId===mg);
+  if(cat) data=data.filter(p=>p.category===cat);
+  if(st)  data=data.filter(p=>p.status===st);
+  if(from)data=data.filter(p=>p.date>=from||p.submittedAt?.slice(0,10)>=from);
+  if(to)  data=data.filter(p=>p.date<=to||p.submittedAt?.slice(0,10)<=to);
+  return data;
+}
+
+function dlProbRepPDF(){
+  const data=getProbRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Category','Status','Problem','Admin Solution','Date'];
+  const rows=data.map(p=>[
+    p.mgrName||'—',p.deptName||'—',p.category||'—',
+    p.status==='solved'?'Solved':'Open',
+    (p.description||'').substring(0,80),
+    (p.solution||'').substring(0,80),
+    dlFmtD(p.submittedAt?.slice(0,10)||p.date||'')
+  ]);
+  makePDF('Problem/Solution Report',headers,rows,'FormTrack_ProblemReport_'+tod()+'.pdf');
+}
+
+function dlProbRepExcel(){
+  const data=getProbRepData();
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Category','Status','Problem Description','Admin Solution','Submitted At'];
+  const rows=data.map(p=>[
+    p.mgrName||'—',p.mgrId||'—',p.deptName||'—',p.category||'—',
+    p.status==='solved'?'Solved':'Open',
+    p.description||'',p.solution||'',
+    p.submittedAt?new Date(p.submittedAt).toLocaleString('en-IN'):''
+  ]);
+  makeExcel('Problem/Solution Report',headers,rows,'FormTrack_ProblemReport_'+tod()+'.xlsx');
+}
+
+/* ── Rating: PDF + Excel ── */
+function dlRtngRepPDF(){
+  const data=[...db.ratings||[]].sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Month','Stars','Note','Rated At'];
+  const rows=data.map(r=>{
+    const m=db.managers.find(x=>x.id===r.mgrId)||{};
+    return[
+      m.name||r.mgrId||'—',dn(m.deptId)||'—',
+      r.month||'—','★'.repeat(r.stars||0)+' ('+r.stars+')',
+      (r.note||'').substring(0,80),
+      r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''
+    ];
+  });
+  makePDF('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.pdf');
+}
+
+function dlRtngRepExcel(){
+  const data=[...db.ratings||[]].sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Month','Stars (1-5)','Note','Rated At'];
+  const rows=data.map(r=>{
+    const m=db.managers.find(x=>x.id===r.mgrId)||{};
+    return[
+      m.name||r.mgrId||'—',r.mgrId||'—',dn(m.deptId)||'—',
+      r.month||'—',r.stars||0,r.note||'',
+      r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''
+    ];
+  });
+  makeExcel('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.xlsx');
+}
 </script>
