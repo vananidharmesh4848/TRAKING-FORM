@@ -213,6 +213,19 @@ textarea{resize:vertical;min-height:56px}
     <button class="btn bg2 bsm" onclick="doLogout()">Logout</button>
   </div>
   <div class="wrap">
+    
+    <!-- TOP TABS (Admin jevi) -->
+    <div class="atabs" id="mtabs">
+      <button class="atab on" id="mn-sub" onclick="mTab('sub',this)">📤 Submit</button>
+      <button class="atab" id="mn-rep" onclick="mTab('rep',this)">📋 Reports</button>
+      <button class="atab" id="mn-lv" onclick="mTab('lv',this)">🏖️ Leave</button>
+      <button class="atab" id="mn-mist" onclick="mTab('mist',this)">⚠️ Mistakes <span class="nbadge" id="mist-mgr-badge" style="display:none;position:static;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" id="mn-late" onclick="mTab('late',this)">⏰ Late</button>
+      <button class="atab" id="mn-prob" onclick="mTab('prob',this)">🔧 Problems <span class="nbadge" id="prob-mgr-badge" style="display:none;position:static;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" id="mn-rtng" onclick="mTab('rtng',this)">⭐ Rating</button>
+    </div>
+
+    <!-- SUBMIT FORMS -->
     <div class="sec on" id="ms-sub">
       <div class="stog">
         <button class="so on day" id="sh-d" onclick="psh('day')">☀️ Day 8am–8pm</button>
@@ -230,7 +243,11 @@ textarea{resize:vertical;min-height:56px}
       </div>
       <div class="ok" id="sub-msg"></div>
     </div>
+
+    <!-- MY REPORTS -->
     <div class="sec" id="ms-rep"><div id="my-reps"></div></div>
+
+    <!-- LEAVE -->
     <div class="sec" id="ms-lv">
       <div class="card"><div class="ct">My Leave Balance</div><div class="bal-grid" id="mgr-bal"></div></div>
       <div class="card">
@@ -247,18 +264,142 @@ textarea{resize:vertical;min-height:56px}
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Leave History</div>
       <div id="my-lv-list"></div>
     </div>
-  </div>
+
+    <!-- MISTAKES -->
     <div class="sec" id="ms-mist">
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Mistake Reports</div>
       <div id="mgr-mist-list"></div>
     </div>
+
+    <!-- LATE ENTRY -->
+    <div class="sec" id="ms-late">
+      <div class="card">
+        <div class="ct">⏰ Late Entry Report Karo</div>
+        <div class="fg"><label>Date</label><input type="date" id="le-date"></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Shift</label>
+            <select id="le-shift">
+              <option value="day">☀️ Day Shift (8am–8pm)</option>
+              <option value="night">🌙 Night Shift (8pm–8am)</option>
+            </select>
+          </div>
+          <div class="fg" style="margin:0"><label>Late by (minutes)</label>
+            <input type="number" id="le-mins" min="1" max="480" placeholder="30">
+          </div>
+        </div>
+        <div class="fg"><label>Actual Arrival Time</label><input type="time" id="le-time"></div>
+        <div class="fg"><label>Reason</label><textarea id="le-reason" placeholder="Late aavana no reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="submitLateEntry()">📨 Submit Late Entry</button>
+        <div class="ok" id="le-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Late Entry History</div>
+      <div id="mgr-late-list"></div>
+    </div>
+
+    <!-- PROBLEMS -->
+    <div class="sec" id="ms-prob">
+      <div class="card">
+        <div class="ct">🔧 Admin ne Problem / Complaint Moklo</div>
+        <div class="fg"><label>Category</label>
+          <select id="mgr-pr-cat">
+            <option value="Work Issue">Work Issue</option>
+            <option value="Behavior Issue">Behavior Issue</option>
+            <option value="Process Issue">Process Issue</option>
+            <option value="Communication Issue">Communication Issue</option>
+            <option value="Quality Issue">Quality Issue</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Problem / Complaint (shu problem che te lakhao)</label>
+          <textarea id="mgr-pr-desc" placeholder="Tamari problem ya complaint detail ma lakhao..."></textarea>
+        </div>
+        <button class="btn ba bsm" onclick="mgrSubmitProblem()">📨 Submit Problem</button>
+        <div class="ok" id="mgr-pr-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Mara Problem Reports / Admin Solutions</div>
+      <div id="mgr-prob-list"></div>
+    </div>
+
+    <!-- RATING -->
+    <div class="sec" id="ms-rtng">
+      <div class="card" id="mgr-my-rating-card">
+        <div class="ct">⭐ Maru Rating</div>
+        <div id="mgr-my-rating"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏬 Mara Department na Managers</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="dept-rtng-tbl">
+          <thead><tr><th>#</th><th>Manager</th><th>Avg Rating</th><th>Perf Score</th></tr></thead>
+          <tbody id="dept-rtng-body"></tbody>
+        </table></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">🏆 Office Leaderboard</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="office-rtng-tbl">
+          <thead><tr><th>#</th><th>Manager</th><th>Dept</th><th>Avg Rating</th><th>Perf Score</th></tr></thead>
+          <tbody id="office-rtng-body"></tbody>
+        </table></div>
+      </div>
+    </div>
+
   </div>
+</div>
+    <!-- Manager: My Problems section -->
+    <div class="sec" id="ms-prob">
+      <div class="card">
+        <div class="ct">🔧 Admin ne Problem / Complaint Moklo</div>
+        <div class="fg"><label>Category</label>
+          <select id="mgr-pr-cat">
+            <option value="Work Issue">Work Issue</option>
+            <option value="Behavior Issue">Behavior Issue</option>
+            <option value="Process Issue">Process Issue</option>
+            <option value="Communication Issue">Communication Issue</option>
+            <option value="Quality Issue">Quality Issue</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Problem / Complaint (shu problem che te lakhao)</label>
+          <textarea id="mgr-pr-desc" placeholder="Tamari problem ya complaint detail ma lakhao..."></textarea>
+        </div>
+        <button class="btn ba bsm" onclick="mgrSubmitProblem()">📨 Submit Problem</button>
+        <div class="ok" id="mgr-pr-msg"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Mara Problem Reports / Admin Solutions</div>
+      <div id="mgr-prob-list"></div>
+    </div>
+
+    <!-- Manager: Rating section -->
+    <div class="sec" id="ms-rtng">
+      <!-- My Rating Card -->
+      <div class="card" id="mgr-my-rating-card">
+        <div class="ct">⭐ Maru Rating</div>
+        <div id="mgr-my-rating"></div>
+      </div>
+      <!-- Department Leaderboard -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏬 Mara Department na Managers</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="dept-rtng-tbl">
+          <thead><tr><th>#</th><th>Manager</th><th>Avg Rating</th><th>Perf Score</th></tr></thead>
+          <tbody id="dept-rtng-body"></tbody>
+        </table></div>
+      </div>
+      <!-- Office Leaderboard -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">🏆 Office Leaderboard</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="office-rtng-tbl">
+          <thead><tr><th>#</th><th>Manager</th><th>Dept</th><th>Avg Rating</th><th>Perf Score</th></tr></thead>
+          <tbody id="office-rtng-body"></tbody>
+        </table></div>
+      </div>
+    </div>
   <div class="bnav" id="mgr-bnav">
     <button class="nb on" id="mn-sub" onclick="mTab('sub',this)"><span class="ni">📤</span><span class="nl">Submit</span></button>
     <button class="nb" id="mn-rep" onclick="mTab('rep',this)"><span class="ni">📋</span><span class="nl">Reports</span></button>
     <button class="nb" id="mn-lv" onclick="mTab('lv',this)"><span class="ni">🏖️</span><span class="nl">Leave</span></button>
     <button class="nb" id="mn-mist" onclick="mTab('mist',this)" style="position:relative"><span class="ni">⚠️</span><span class="nl">Mistakes</span><span class="nbadge" id="mist-mgr-badge" style="display:none">0</span></button>
     <button class="nb" id="mn-late" onclick="mTab('late',this)"><span class="ni">⏰</span><span class="nl">Late</span><span class="nbadge" id="late-mgr-badge" style="display:none">!</span></button>
+    <button class="nb" id="mn-prob" onclick="mTab('prob',this)" style="position:relative"><span class="ni">🔧</span><span class="nl">Problems</span><span class="nbadge" id="prob-mgr-badge" style="display:none">0</span></button>
+    <button class="nb" id="mn-rtng" onclick="mTab('rtng',this)"><span class="ni">⭐</span><span class="nl">Rating</span></button>
   </div>
 </div>
 
@@ -303,6 +444,8 @@ textarea{resize:vertical;min-height:56px}
       <button class="atab" onclick="aTab('ct',this)">🏷️ Categories</button>
       <button class="atab" onclick="aTab('bk',this)">☁️ Backup</button>
       <button class="atab" onclick="aTab('late',this)">⏰ Late Entry <span id="late-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" onclick="aTab('prob',this)">🔧 Problem/Solution <span id="prob-badge" style="display:none;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
+      <button class="atab" onclick="aTab('rtng',this)">⭐ Rating</button>
       <button class="atab" onclick="aTab('st',this)">⚙️ Settings</button>
     </div>
 
@@ -595,6 +738,62 @@ textarea{resize:vertical;min-height:56px}
       <!-- Full List -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Late Entries</div>
       <div id="late-list"></div>
+    </div>
+
+    <!-- PROBLEM / SOLUTION -->
+    <div class="sec" id="as-prob">
+      <!-- Stats -->
+      <div class="sg3" id="prob-stats"></div>
+      <!-- Filter -->
+      <div class="fwrap">
+        <div class="fgrid">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="prf-mg"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Category</label><select id="prf-cat"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Status</label><select id="prf-st"><option value="">All</option><option value="open">🔴 Open</option><option value="solved">✅ Solved</option></select></div>
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="prf-from"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="prf-to"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn ba bsm" onclick="renderProblems()">Apply</button>
+          <button class="btn bg2 bsm" onclick="clrProbF()">Reset</button>
+        </div>
+      </div>
+      <!-- Problem List (Admin sees all, can reply) -->
+      <div id="prob-list"></div>
+    </div>
+
+    <!-- RATING -->
+    <div class="sec" id="as-rtng">
+      <div class="card">
+        <div class="ct">⭐ Manager Rating Add Karo</div>
+        <div class="g3r">
+          <div class="fg" style="margin:0"><label>Manager</label><select id="rt-mg"><option value="">— Select Manager —</option></select></div>
+          <div class="fg" style="margin:0"><label>Month</label><input type="month" id="rt-month"></div>
+          <div class="fg" style="margin:0"><label>Rating (1–5 Star)</label>
+            <select id="rt-star">
+              <option value="5">⭐⭐⭐⭐⭐ Excellent (5)</option>
+              <option value="4">⭐⭐⭐⭐ Good (4)</option>
+              <option value="3">⭐⭐⭐ Average (3)</option>
+              <option value="2">⭐⭐ Poor (2)</option>
+              <option value="1">⭐ Very Poor (1)</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label>Rating Note / Feedback</label><textarea id="rt-note" placeholder="Rating mate reason lakhao..."></textarea></div>
+        <button class="btn ba bsm" onclick="addRating()">⭐ Save Rating</button>
+        <div class="ok" id="rt-msg"></div>
+      </div>
+      <!-- Office Leaderboard -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏆 Office Leaderboard (All Departments)</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="rtng-tbl">
+          <thead><tr><th>#</th><th>Manager</th><th>Dept</th><th>Avg Rating</th><th>Submissions</th><th>Leave Days</th><th>Late Count</th><th>Performance Score</th></tr></thead>
+          <tbody id="rtng-body"></tbody>
+        </table></div>
+      </div>
+      <!-- Rating History -->
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">Rating History</div>
+      <div id="rtng-list"></div>
     </div>
 
     <div class="sec" id="as-st">
@@ -2048,4 +2247,326 @@ function dlLateRepExcel(){
   makeExcel('Late Entry Report',headers,rows,'FormTrack_LateReport_'+tod()+'.xlsx');
 }
 
+</script>
+<!-- ═══════════ PROBLEM / SOLUTION + RATING SYSTEM ═══════════ -->
+<style>
+.prob-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
+.prob-open{border-left:3px solid var(--re)}.prob-solved{border-left:3px solid var(--gr)}
+.star-fill{color:#FBBF24;font-size:18px;letter-spacing:1px}
+.rtng-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:8px}
+.rank-1{color:#FFD700;font-weight:700}.rank-2{color:#C0C0C0;font-weight:700}.rank-3{color:#CD7F32;font-weight:700}
+</style>
+<script>
+/* ═══════════════════ PROBLEM / SOLUTION SYSTEM ═══════════════════ */
+if(!db.problems) db.problems = JSON.parse(localStorage.getItem('ft8_prob')||'[]');
+function persistProb(){ localStorage.setItem('ft8_prob', JSON.stringify(db.problems)); }
+const PROB_CATS=['Work Issue','Behavior Issue','Process Issue','Communication Issue','Quality Issue','Other'];
+
+/* ── Manager submits a problem ── */
+function mgrSubmitProblem(){
+  if(!curUser)return;
+  const cat=document.getElementById('mgr-pr-cat').value;
+  const desc=document.getElementById('mgr-pr-desc').value.trim();
+  if(!desc){sm('mgr-pr-msg','Problem lakhao',true);return;}
+  db.problems.unshift({
+    id:Date.now(), mgrId:curUser.id, mgrName:curUser.name,
+    deptId:curUser.deptId, deptName:dn(curUser.deptId),
+    date:tod(), category:cat, description:desc,
+    solution:'', status:'open',
+    addedAt:new Date().toISOString(), addedBy:'manager',
+    seenByAdmin:false, seenByMgr:true
+  });
+  persistProb();
+  sm('mgr-pr-msg','✅ Problem submit thayi! Admin solution aapshhe.');
+  document.getElementById('mgr-pr-desc').value='';
+  renderMgrProb(); updateProbBadge();
+}
+
+/* ── Admin: reply/solve a problem ── */
+function solveProblem(id){
+  const p=db.problems.find(x=>x.id===id);if(!p)return;
+  const sol=prompt('Admin Solution / Reply lakhao:');if(sol===null)return;
+  p.solution=sol||'Resolved by admin';
+  p.status='solved';
+  p.solvedAt=new Date().toISOString();
+  p.seenByMgr=false; // manager ne notification
+  persistProb(); renderProblems(); updateProbBadge();
+}
+
+/* ── Admin: delete ── */
+function delProb(id){
+  if(!confirm('Delete?'))return;
+  db.problems=db.problems.filter(p=>p.id!==id);
+  persistProb(); renderProblems(); updateProbBadge();
+}
+
+/* ── Admin: render all problems ── */
+function renderProblems(){
+  const prfmg=document.getElementById('prf-mg');
+  if(prfmg&&prfmg.options.length<=1)db.managers.forEach(m=>prfmg.add(new Option(m.name,m.id)));
+  const prfcat=document.getElementById('prf-cat');
+  if(prfcat&&prfcat.options.length<=1)PROB_CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;prfcat.appendChild(o);});
+  // mark all as seen by admin
+  db.problems.forEach(p=>{if(!p.seenByAdmin)p.seenByAdmin=true;});
+  persistProb(); updateProbBadge();
+  const total=db.problems.length;
+  const open=db.problems.filter(p=>p.status==='open').length;
+  const solved=db.problems.filter(p=>p.status==='solved').length;
+  const statsEl=document.getElementById('prob-stats');
+  if(statsEl)statsEl.innerHTML=`
+    <div class="sc"><div class="sn" style="color:var(--ac)">${total}</div><div class="sl">Total</div></div>
+    <div class="sc"><div class="sn" style="color:var(--re)">${open}</div><div class="sl">🔴 Open</div></div>
+    <div class="sc"><div class="sn" style="color:var(--gr)">${solved}</div><div class="sl">✅ Solved</div></div>
+  `;
+  let data=[...db.problems].sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
+  const fmg=document.getElementById('prf-mg')?.value;const fcat=document.getElementById('prf-cat')?.value;
+  const fst=document.getElementById('prf-st')?.value;const ffrom=document.getElementById('prf-from')?.value;const fto=document.getElementById('prf-to')?.value;
+  if(fmg)data=data.filter(p=>p.mgrId===fmg);if(fcat)data=data.filter(p=>p.category===fcat);
+  if(fst)data=data.filter(p=>p.status===fst);if(ffrom)data=data.filter(p=>p.date>=ffrom);if(fto)data=data.filter(p=>p.date<=fto);
+  document.getElementById('prob-list').innerHTML=data.length?data.map(p=>probCard(p,true)).join(''):'<div class="empty"><div class="ee">✅</div><p>Koi problems nathi</p></div>';
+}
+
+/* ── Problem card — used by both admin and manager ── */
+function probCard(p,isAdmin){
+  const timeAgo=p.addedAt?fmtDT(p.addedAt):'—';
+  return `<div class="prob-row ${p.status==='open'?'prob-open':'prob-solved'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px">
+      <div>
+        ${isAdmin?`<div style="font-weight:600;font-size:14px">${p.mgrName}</div><div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${p.mgrId} · ${p.deptName}</div>`:''}
+        <div style="font-size:11px;color:var(--t2);margin-top:${isAdmin?'2px':'0'}">📅 ${fmtD(p.date)} · 🕐 ${timeAgo}</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+        <span class="badge ${p.status==='open'?'b-re':'b-gr'}">${p.status==='open'?'🔴 Open':'✅ Solved'}</span>
+        <span class="badge b-te" style="font-size:10px">${p.category}</span>
+        ${isAdmin&&p.status==='open'?`<button class="btn bgr bxs" onclick="solveProblem(${p.id})">✅ Reply</button>`:''}
+        ${isAdmin?`<button class="btn bre bxs" onclick="delProb(${p.id})">🗑️</button>`:''}
+      </div>
+    </div>
+    <div style="font-size:13px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);margin-bottom:6px">
+      <div style="font-size:10px;font-weight:600;color:var(--re);margin-bottom:3px">🔧 ${isAdmin?'MANAGER PROBLEM':'MARO PROBLEM'}</div>
+      ${p.description}
+    </div>
+    ${p.solution
+      ?`<div style="font-size:13px;padding:8px 10px;background:var(--gr2);border-radius:var(--rs);border-left:2px solid var(--gr)">
+          <div style="font-size:10px;font-weight:600;color:var(--gr);margin-bottom:3px">✅ ADMIN SOLUTION / REPLY</div>
+          ${p.solution}
+        </div>`
+      :'<div style="font-size:11px;color:var(--t3);font-style:italic;padding:4px 0">⏳ Admin solution pending...</div>'
+    }
+  </div>`;
+}
+
+function clrProbF(){
+  ['prf-mg','prf-cat','prf-st','prf-from','prf-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderProblems();
+}
+
+function updateProbBadge(){
+  // Admin badge = unseen (new) problems from managers
+  const newProbs=db.problems.filter(p=>!p.seenByAdmin).length;
+  const ab=document.getElementById('prob-badge');
+  if(ab){ab.textContent=newProbs;ab.style.display=newProbs?'inline':'none';}
+  // Manager badge = solved problems they haven't seen (new reply from admin)
+  if(curUser){
+    const newReplies=db.problems.filter(p=>p.mgrId===curUser.id&&p.status==='solved'&&!p.seenByMgr).length;
+    const mb=document.getElementById('prob-mgr-badge');
+    if(mb){mb.textContent=newReplies;mb.style.display=newReplies?'inline':'none';}
+  }
+}
+
+/* ── Manager: view own problems ── */
+function renderMgrProb(){
+  if(!curUser)return;
+  const myP=db.problems.filter(p=>p.mgrId===curUser.id).sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
+  // mark solved ones as seen by manager
+  myP.forEach(p=>{if(p.status==='solved'&&!p.seenByMgr)p.seenByMgr=true;});
+  persistProb(); updateProbBadge();
+  const el=document.getElementById('mgr-prob-list');
+  if(el)el.innerHTML=myP.length?myP.map(p=>probCard(p,false)).join(''):'<div class="empty"><div class="ee">📨</div><p>Koi problem submit nathi karyu</p></div>';
+}
+
+/* ═══════════════════ RATING SYSTEM ═══════════════════ */
+if(!db.ratings)db.ratings=JSON.parse(localStorage.getItem('ft8_rtng')||'[]');
+function persistRatings(){localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));}
+
+function starHTML(n){n=Math.round(n);return '<span style="color:#FBBF24;font-size:16px">'+'⭐'.repeat(n)+'</span>';}
+
+function calcPerfScore(mgrId){
+  const subs=db.submissions.filter(s=>s.mgrId===mgrId).length;
+  const leaveDays=db.leaves.filter(l=>l.mgrId===mgrId&&l.status==='approved').reduce((a,l)=>a+l.days,0);
+  const lateCount=db.lateEntries.filter(l=>l.mgrId===mgrId).length;
+  const mistakePenalty=db.mistakes.filter(m=>m.mgrId===mgrId).reduce((a,m)=>a+(SV_CONFIG[m.severity]?.weight||1),0);
+  const score=Math.max(0,subs*2-leaveDays*2-lateCount*3-mistakePenalty*4);
+  return{score,subs,leaveDays,lateCount};
+}
+
+function getAvgRating(mgrId){
+  const myR=db.ratings.filter(r=>r.mgrId===mgrId);
+  if(!myR.length)return null;
+  return myR.reduce((a,r)=>a+r.stars,0)/myR.length;
+}
+
+function addRating(){
+  const mgrId=document.getElementById('rt-mg').value;
+  const month=document.getElementById('rt-month').value;
+  const stars=parseInt(document.getElementById('rt-star').value);
+  const note=document.getElementById('rt-note').value.trim();
+  if(!mgrId){sm('rt-msg','Manager select karo',true);return;}
+  if(!month){sm('rt-msg','Month select karo',true);return;}
+  db.ratings=db.ratings.filter(r=>!(r.mgrId===mgrId&&r.month===month));
+  const mgr=db.managers.find(m=>m.id===mgrId);
+  db.ratings.unshift({id:Date.now(),mgrId,mgrName:mgr.name,deptId:mgr.deptId,deptName:dn(mgr.deptId),month,stars,note,addedAt:new Date().toISOString()});
+  persistRatings();
+  sm('rt-msg','✅ Rating saved — '+mgr.name+' → '+stars+' Star');
+  document.getElementById('rt-mg').value='';document.getElementById('rt-note').value='';
+  renderAdminRating();
+}
+
+function renderAdminRating(){
+  const rtmg=document.getElementById('rt-mg');
+  if(rtmg&&rtmg.options.length<=1)db.managers.forEach(m=>rtmg.add(new Option(m.name+' ('+m.id+')',m.id)));
+  const ranked=db.managers.map(m=>{
+    const avg=getAvgRating(m.id);const{score,subs,leaveDays,lateCount}=calcPerfScore(m.id);
+    return{m,avg,score,subs,leaveDays,lateCount};
+  }).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
+  document.getElementById('rtng-body').innerHTML=ranked.map((x,i)=>{
+    const rankCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const avg=x.avg!==null?x.avg.toFixed(1):'—';
+    const stars=x.avg!==null?starHTML(Math.round(x.avg))+' <span style="font-size:11px;color:var(--t2)">('+avg+')</span>':'<span style="color:var(--t3)">No rating</span>';
+    const perfColor=x.score>=20?'var(--gr)':x.score>=10?'var(--am)':'var(--re)';
+    return `<tr>
+      <td style="font-weight:700;font-size:15px" class="${rankCls}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(x.m.name)}</div>${x.m.name}</div></td>
+      <td><span class="badge b-te" style="font-size:10px">${dn(x.m.deptId)}</span></td>
+      <td>${stars}</td><td style="text-align:center;color:var(--ac)">${x.subs}</td>
+      <td style="text-align:center;color:${x.leaveDays?'var(--am)':'var(--gr)'}">${x.leaveDays}</td>
+      <td style="text-align:center;color:${x.lateCount?'var(--re)':'var(--gr)'}">${x.lateCount}</td>
+      <td style="font-weight:600;color:${perfColor}">${x.score} pts</td>
+    </tr>`;
+  }).join('');
+  const sorted=[...db.ratings].sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
+  document.getElementById('rtng-list').innerHTML=sorted.length?sorted.map(r=>`
+    <div class="rtng-row">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div><div style="font-weight:600">${r.mgrName} <span style="font-size:10px;color:var(--t3);font-family:'DM Mono'">${r.mgrId}</span></div>
+        <div style="font-size:11px;color:var(--t2)">🏬 ${r.deptName} · 📅 ${r.month}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">${starHTML(r.stars)}
+        <button class="btn bre bxs" onclick="delRating(${r.id})">🗑️</button></div>
+      </div>
+      ${r.note?`<div style="font-size:12px;color:var(--t2);margin-top:6px;padding:6px 8px;background:var(--s2);border-radius:var(--rs)">📝 ${r.note}</div>`:''}
+    </div>`).join(''):'<div class="empty"><div class="ee">⭐</div><p>Koi rating nathi</p></div>';
+}
+
+function delRating(id){
+  if(!confirm('Delete?'))return;
+  db.ratings=db.ratings.filter(r=>r.id!==id);persistRatings();renderAdminRating();
+}
+
+function renderMgrRating(){
+  if(!curUser)return;
+  const myAvg=getAvgRating(curUser.id);
+  const{score,subs,leaveDays,lateCount}=calcPerfScore(curUser.id);
+  const myRatings=db.ratings.filter(r=>r.mgrId===curUser.id).sort((a,b)=>b.month.localeCompare(a.month));
+  document.getElementById('mgr-my-rating').innerHTML=`
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:28px;margin-bottom:4px">${myAvg!==null?starHTML(Math.round(myAvg)):'<span style="color:var(--t3);font-size:14px">Admin e haji rating nathi apyu</span>'}</div>
+      <div style="font-size:22px;font-weight:700;color:var(--am)">${myAvg!==null?myAvg.toFixed(1)+' / 5.0':'—'}</div>
+      <div style="font-size:11px;color:var(--t2);margin-top:4px">Admin by rated</div>
+    </div>
+    <div class="sg3" style="margin-top:12px">
+      <div class="sc"><div class="sn" style="color:var(--ac)">${subs}</div><div class="sl">Submissions</div></div>
+      <div class="sc"><div class="sn" style="color:${leaveDays?'var(--am)':'var(--gr)'}">${leaveDays}</div><div class="sl">Leave Days</div></div>
+      <div class="sc"><div class="sn" style="color:${score>=20?'var(--gr)':score>=10?'var(--am)':'var(--re)'}">${score}</div><div class="sl">Perf Score</div></div>
+    </div>
+    ${myRatings.length?'<div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px">'+myRatings.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="font-size:12px;color:var(--t2)">📅 ${r.month}</span>${starHTML(r.stars)}${r.note?`<span style="font-size:11px;color:var(--t2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 ${r.note}</span>`:''}</div>`).join('')+'</div>':''}
+  `;
+  const deptMgrs=db.managers.filter(m=>m.deptId===curUser.deptId);
+  const deptRanked=deptMgrs.map(m=>{const avg=getAvgRating(m.id);const{score}=calcPerfScore(m.id);return{m,avg,score};}).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
+  document.getElementById('dept-rtng-body').innerHTML=deptRanked.map((x,i)=>{
+    const isMe=x.m.id===curUser.id;const avg=x.avg!==null?x.avg.toFixed(1):'—';
+    return `<tr style="${isMe?'background:var(--ac2)':''}">
+      <td style="font-weight:700">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px;${isMe?'background:var(--ac)':''}">${ini(x.m.name)}</div>${x.m.name}${isMe?' <span style="font-size:10px;color:var(--ac)">👈 You</span>':''}</div></td>
+      <td>${x.avg!==null?starHTML(Math.round(x.avg))+' <span style="font-size:11px;color:var(--t2)">('+avg+')</span>':'<span style="color:var(--t3)">—</span>'}</td>
+      <td style="font-weight:600;color:${x.score>=20?'var(--gr)':x.score>=10?'var(--am)':'var(--re)'}">${x.score} pts</td>
+    </tr>`;
+  }).join('');
+  const allRanked=db.managers.map(m=>{const avg=getAvgRating(m.id);const{score}=calcPerfScore(m.id);return{m,avg,score};}).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
+  document.getElementById('office-rtng-body').innerHTML=allRanked.map((x,i)=>{
+    const isMe=x.m.id===curUser.id;const avg=x.avg!==null?x.avg.toFixed(1):'—';
+    return `<tr style="${isMe?'background:var(--ac2)':''}">
+      <td style="font-weight:700">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px;${isMe?'background:var(--ac)':''}">${ini(x.m.name)}</div>${x.m.name}${isMe?' <span style="font-size:10px;color:var(--ac)">👈 You</span>':''}</div></td>
+      <td><span class="badge b-te" style="font-size:10px">${dn(x.m.deptId)}</span></td>
+      <td>${x.avg!==null?starHTML(Math.round(x.avg))+' <span style="font-size:11px;color:var(--t2)">('+avg+')</span>':'<span style="color:var(--t3)">—</span>'}</td>
+      <td style="font-weight:600;color:${x.score>=20?'var(--gr)':x.score>=10?'var(--am)':'var(--re)'}">${x.score} pts</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Patch aTab FINAL ── */
+const _origATabFinal=aTab;
+aTab=function(t,el){
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  const sec=document.getElementById('as-'+t);if(sec)sec.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='ov')renderOv();if(t==='rp'){popF();renderReps();}
+  if(t==='lv')renderAdminLv();if(t==='mist')renderMistReport();if(t==='late')renderLateReport();
+  if(t==='prob')renderProblems();if(t==='rtng')renderAdminRating();
+  if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}if(t==='dp')renderDpTbl();
+  if(t==='ct'){popD('cd');renderCtList();}if(t==='bk')initBkTab();
+  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
+};
+
+/* ── Patch mTab FINAL ── */
+const _origMTabFinal=mTab;
+mTab=function(t,el){
+  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const sec=document.getElementById('ms-'+t);if(sec)sec.classList.add('on');
+  window.scrollTo(0,0);
+  if(t==='rep')renderMyRep();if(t==='lv')renderMgrLv();if(t==='mist')renderMgrMist();
+  if(t==='late'){document.getElementById('le-date').value=tod();const h=new Date().getHours();const sh=document.getElementById('le-shift');if(sh)sh.value=h>=8&&h<20?'day':'night';renderMgrLate();}
+  if(t==='prob')renderMgrProb();if(t==='rtng')renderMgrRating();
+};
+
+/* ── Patch initAdmin + initMgr ── */
+const _origInitAdminFinal=initAdmin;
+initAdmin=function(){_origInitAdminFinal();updateProbBadge();};
+const _origInitMgrFinal=initMgr;
+initMgr=function(){_origInitMgrFinal();setTimeout(()=>{updateProbBadge();const rm=document.getElementById('rt-month');if(rm&&!rm.value)rm.value=new Date().toISOString().slice(0,7);},200);};
+
+/* ── Patch persist ── */
+const _origPersistFinal=persist;
+persist=function(){_origPersistFinal();persistProb();persistRatings();};
+
+/* ── Patch export/import ── */
+const _origExpFinal=expJSON;
+expJSON=function(){
+  const data=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,mistakes:db.mistakes,lateEntries:db.lateEntries,problems:db.problems,ratings:db.ratings,exportedAt:new Date().toISOString()});
+  const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(data);a.download='FormTrack_'+tod()+'.json';a.click();sm('mn-msg','✅ Backup JSON downloaded!');
+};
+const _origImpFinal=impJSON;
+impJSON=function(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{
+    try{const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
+    if(!confirm('Restore? This replaces all data!'))return;
+    if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
+    if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
+    if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
+    if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
+    if(d.problems)db.problems=d.problems;if(d.ratings)db.ratings=d.ratings;
+    _origPersistFinal();persistLate();persistProb();persistRatings();
+    sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
+    }catch(e){sm('mn-msg','Invalid JSON',true);}
+  };r.readAsText(f);inp.value='';
+};
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const rm=document.getElementById('rt-month');if(rm)rm.value=new Date().toISOString().slice(0,7);
+});
 </script>
