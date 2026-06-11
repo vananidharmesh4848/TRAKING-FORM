@@ -275,7 +275,7 @@ textarea{resize:vertical;min-height:56px}
         <div class="rc" id="rc-a" onclick="selR('a')"><div class="ri">🛡️</div><div class="rl">Admin</div><div class="rd">Full access</div></div>
       </div>
       <div id="mb" style="display:none">
-        <div class="fg"><label>Manager ID</label><input type="text" id="l-id" placeholder="MGR-01" autocapitalize="characters"></div>
+        <div class="fg"><label>Manager ID</label><input type="text" id="l-id" placeholder="MGR-01" autocapitalize="characters" onkeydown="if(event.key==='Enter')document.getElementById('l-pw').focus()"></div>
         <div class="fg"><label>Password</label><div class="pww"><input type="password" id="l-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-pw',this)">👁</button></div></div>
       </div>
       <div id="ab" style="display:none">
