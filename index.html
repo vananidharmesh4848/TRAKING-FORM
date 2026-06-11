@@ -100,7 +100,7 @@ textarea{resize:vertical;min-height:56px}
 
 /* ═══ TOPBAR (Mobile mgr) ═══ */
 .topbar{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh)}
-.tbl{display:flex;align-items:center;gap:10px}
+.tbl-logo{display:flex;align-items:center;gap:10px}
 .tlo{width:32px;height:32px;background:linear-gradient(135deg,#3D5AF1,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .tnm{font-size:14px;font-weight:700;color:var(--t)}.tsb{font-size:11px;color:var(--t2)}
 .wrap{max-width:760px;margin:0 auto;padding:1.25rem 1rem 6.5rem}
@@ -255,6 +255,9 @@ textarea{resize:vertical;min-height:56px}
 </head>
 <body>
 
+<!-- ═══ DRIVE BOOT GATE (mandatory — app starts here) ═══ -->
+
+
 <!-- LOGIN -->
 <div id="pg-login" class="pg on">
   <div class="lwrap">
@@ -286,8 +289,9 @@ textarea{resize:vertical;min-height:56px}
 <!-- MANAGER PAGE -->
 <div id="pg-mgr" class="pg">
   <div class="topbar">
-    <div class="tbl"><div class="tlo">📋</div><div><div class="tnm" id="m-nm">—</div><div class="tsb" id="m-dp">—</div></div></div>
+    <div class="tbl-logo"><div class="tlo">📋</div><div><div class="tnm" id="m-nm">—</div><div class="tsb" id="m-dp">—</div></div></div>
     <button class="btn bg2 bsm" onclick="doLogout()">Logout</button>
+    <div id="gd-mgr-sync" style="display:none;font-size:11px;color:var(--gr);background:var(--gr2);padding:3px 8px;border-radius:100px;border:1px solid var(--gr3)">☁️</div>
   </div>
   <div class="wrap">
     
@@ -453,34 +457,55 @@ textarea{resize:vertical;min-height:56px}
     <div class="sec" id="ms-hrs">
       <div class="card">
         <div class="ct">⏱️ Aaj na Kaam na Kalako</div>
-        <div class="g2">
-          <div class="fg" style="margin:0"><label>Date</label><input type="date" id="hrs-date"></div>
-          <div class="fg" style="margin:0"><label>Shift</label>
-            <select id="hrs-shift">
-              <option value="day">☀️ Day (8am–8pm)</option>
-              <option value="night">🌙 Night (8pm–8am)</option>
+
+        <!-- Step 1: Date + Shift -->
+        <div class="g2" style="margin-bottom:12px">
+          <div class="fg" style="margin:0"><label>📅 Date</label><input type="date" id="hrs-date"></div>
+          <div class="fg" style="margin:0"><label>🔄 Shift Select Karo</label>
+            <select id="hrs-shift" onchange="chkOT()">
+              <option value="day">☀️ Day Shift (8am–8pm)</option>
+              <option value="night">🌙 Night Shift (8pm–8am)</option>
             </select>
           </div>
         </div>
-        <div class="g2" style="margin-top:10px">
-          <div class="fg" style="margin:0"><label>Kaam na Kalako (Hours Worked)</label>
-            <input type="number" id="hrs-worked" min="0.5" max="24" step="0.5" placeholder="e.g. 9" oninput="chkOT()">
+
+        <!-- Step 2: Regular + OT Hours -->
+        <div class="g2" style="margin-bottom:4px">
+          <div class="fg" style="margin:0">
+            <label>🕐 Regular Kalako <span style="font-size:10px;color:var(--t3)">(standard 11.25h)</span></label>
+            <input type="number" id="hrs-regular" min="0" max="11.25" step="0.25" placeholder="max 11.25" oninput="chkOT()">
           </div>
-          <div class="fg" style="margin:0"><label>OT Kalako (Auto-calculated)</label>
-            <input type="number" id="hrs-ot" readonly style="background:var(--s3);color:var(--am);font-weight:600" placeholder="0">
+          <div class="fg" style="margin:0">
+            <label>⏱️ OT Kalako <span style="font-size:10px;color:var(--t3)">(11.25 uprant)</span></label>
+            <input type="number" id="hrs-ot-manual" min="0" max="16" step="0.5" placeholder="0" oninput="chkOT()">
           </div>
         </div>
-        <div id="hrs-ot-wrap" style="display:none;margin-top:6px">
-          <div class="fg"><label>OT Remark <span style="color:var(--re);font-size:11px">⚠️ OT hoy to FARAJIYAT</span></label>
-            <textarea id="hrs-remark" placeholder="OT kema aapyu te lakhao (mandatory if OT > 0)..."></textarea>
+
+        <!-- Live preview -->
+        <div id="hrs-preview" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 14px;margin-bottom:10px;font-size:13px">
+          <!-- filled by chkOT() -->
+        </div>
+
+        <!-- OT Remark — shows only when OT > 0 -->
+        <div id="hrs-ot-wrap" style="display:none;margin-bottom:10px">
+          <div style="background:var(--am2);border:1px solid var(--am3);border-radius:var(--rs);padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--am);font-weight:600">
+            ⚠️ OT Kalako bharya — Remark FARAJIYAT che
+          </div>
+          <div class="fg" style="margin:0"><label>OT Remark — Kema OT aapu? <span style="color:var(--re);font-size:11px">★ FARAJIYAT</span></label>
+            <textarea id="hrs-remark" placeholder="OT kema aapyu te lakhao... (e.g. Production urgent hatu, Manager request)" style="min-height:60px"></textarea>
           </div>
         </div>
-        <div class="fg" style="margin-top:6px"><label>Extra Note (optional)</label>
+
+        <!-- Extra Note -->
+        <div class="fg"><label>📝 Extra Note (optional)</label>
           <textarea id="hrs-note" placeholder="Aaj koi khaas kaam karyu..." style="min-height:44px"></textarea>
         </div>
-        <button class="btn ba bsm" onclick="submitHours()">✅ Hours Submit Karo</button>
+
+        <button class="btn ba bsm bfu" onclick="submitHours()">✅ Hours Submit Karo</button>
         <div class="ok" id="hrs-msg"></div>
       </div>
+
+      <!-- Month filter + stats -->
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Month:</div>
         <input type="month" id="hrs-month" style="flex:1;max-width:180px" oninput="renderMgrHrs()">
@@ -540,11 +565,12 @@ textarea{resize:vertical;min-height:56px}
           <div class="tb-sub">FormTrack — Office Management System</div>
         </div>
         <div class="tb-right">
+          <div id="gd-topbar-dot" style="display:none;font-size:11px;color:var(--gr);background:var(--gr2);padding:3px 10px;border-radius:100px;border:1px solid var(--gr3);cursor:pointer" onclick="aTab('bk',document.getElementById('sbi-bk'))" title="Google Drive Live Sync ON — Click for settings">☁️ Live Sync</div>
           <div class="tb-user"><div class="tb-dot"></div><span style="font-size:12px;font-weight:600;color:var(--t)">Admin</span></div>
         </div>
       </div>
       <div class="main-content">
-        <div class="atabs" id="atabs" style="display:none"></div>
+        <div class="atabs" id="atabs"></div>
     <div class="sec on" id="as-ov">
       <div class="pg-header">
         <div class="pg-title">📊 Manager Summary</div>
@@ -560,8 +586,24 @@ textarea{resize:vertical;min-height:56px}
           <div id="a-sum-pending"><div class="panel-empty">કોઈ pending leave નથી</div></div>
         </div>
       </div>
-      <div style="margin-top:16px;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">All Managers</div>
-      <div id="a-sum"></div>
+      <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">👥 All Managers (<span id="a-sum-cnt">0</span>)</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn bgr bsm" onclick="expOvExcel()">📊 Excel</button>
+          <button class="btn ba bsm" onclick="expOvPDF()">📄 PDF</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto"><table class="rep-tbl" id="a-sum-tbl" style="width:100%">
+        <thead><tr>
+          <th>ID</th><th>Manager</th><th>Department</th>
+          <th style="text-align:center">Submissions</th>
+          <th style="text-align:center">OT Hours</th>
+          <th style="text-align:center">Late Entries</th>
+          <th style="text-align:center">Leave Pending</th>
+          <th style="text-align:center">Last Active</th>
+        </tr></thead>
+        <tbody id="a-sum"></tbody>
+      </table></div>
     </div>
 
     <!-- FORM REPORTS -->
@@ -689,17 +731,19 @@ textarea{resize:vertical;min-height:56px}
     <div class="sec" id="as-bk">
       <!-- Google Drive -->
       <div class="card">
-        <div class="ct">☁️ Google Drive Backup</div>
+        <div class="ct">☁️ Google Drive — Live Sync</div>
         <div class="drive-status" id="gd-st"><span class="dot no"></span><span id="gd-st-txt">Not signed in</span></div>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Sign in karo → <b>dareek change auto Drive ma sync thashe</b>. Bijo user app open kare etle Drive thi latest data auto-load thashe.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
           <button class="btn ba bsm" onclick="gdSignIn()">🔗 Sign in with Google</button>
-          <button class="btn bgr bsm" id="gd-bk-btn" onclick="gdBackup()" style="display:none">⬆️ Backup Now</button>
-          <button class="btn bg bsm" id="gd-rs-btn" onclick="gdRestore()" style="display:none">⬇️ Restore</button>
-          <button class="btn bd2 bsm" id="gd-out-btn" onclick="gdSignOut()" style="display:none">Sign Out</button>
+          <button class="btn bgr bsm" id="gd-bk-btn" onclick="gdBackup()" style="display:none">⬆️ Sync Now</button>
+          <button class="btn bg2 bsm" id="gd-rs-btn" onclick="gdRestore()" style="display:none">⬇️ Force Restore</button>
+          <button class="btn bre bsm" id="gd-out-btn" onclick="gdSignOut()" style="display:none">Sign Out</button>
         </div>
+        <div id="last-bk-txt" style="font-size:11px;color:var(--t2);margin-bottom:6px"></div>
         <div class="suc" id="gd-msg"></div>
         <div style="font-size:12px;color:var(--t2);padding:10px;background:var(--s2);border-radius:var(--rs)">
-          📧 <strong>dharmesh4848@gmail.com</strong> account thi sign in karo → backup automatic Google Drive ma save thashe
+          📧 <strong>vanani.dharmesh4848@gmail.com</strong> account thi sign in karo → Drive ma <b>FormTrack_LiveData.json</b> file ma live data raheshe. Dareek computer/mobile par sign in karo etle same data milshe.
         </div>
       </div>
       <!-- Manual -->
@@ -725,6 +769,26 @@ textarea{resize:vertical;min-height:56px}
         </div>
         <button class="btn ba bsm" onclick="saveAuto()">Save Auto Backup</button>
         <div class="suc" id="ab-msg"></div>
+      </div>
+      <!-- PC Folder Backup -->
+      <div class="card">
+        <div class="ct">📁 PC Folder Auto-Backup</div>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Folder select karo — dareek change par <b>same date ni file overwrite</b> thase. Page refresh par <b>auto restore</b> thase.</p>
+        <!-- Path input row -->
+        <div class="fg" style="margin-bottom:10px">
+          <label>Backup Folder Path</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="bkf-path-box" readonly placeholder="Folder select nathi thayo…"
+              style="flex:1;cursor:pointer;background:var(--s2);border:1.5px solid var(--bd);border-radius:var(--rs);padding:8px 12px;font-size:13px;color:var(--t1)"
+              onclick="setBackupFolder()" title="Click to browse folder">
+            <button class="btn ba bsm" id="bkf-set-btn" onclick="setBackupFolder()" style="white-space:nowrap">📂 Browse…</button>
+            <button class="btn bre bsm" id="bkf-clr-btn" onclick="clearBackupFolder()" style="display:none;white-space:nowrap">✕</button>
+          </div>
+        </div>
+        <div id="bkf-status" style="font-size:12px;color:var(--t3);min-height:16px"></div>
+        <div style="margin-top:8px;font-size:11px;color:var(--t3);background:var(--s2);border-radius:var(--rs);padding:8px 10px">
+          ⚠️ Chrome / Edge browser ma j kaam karse. Firefox support nathi kartu. Browser security karane sirf folder name dikhay — full path nahi.
+        </div>
       </div>
     </div>
 
@@ -927,6 +991,14 @@ textarea{resize:vertical;min-height:56px}
         <div class="ok" id="pw-msg"></div>
       </div>
       <div class="card">
+        <div class="ct">☁️ Google API Configuration</div>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Google Drive live sync chalava mate Client ID ane API Key set karo.</p>
+        <div class="fg"><label>Google Client ID</label><input type="text" id="g-cid" placeholder="xxxxxxxx.apps.googleusercontent.com"></div>
+        <div class="fg"><label>Google API Key</label><div class="pww"><input type="password" id="g-api-key" placeholder="API Key"><button class="eye" onclick="tpw('g-api-key',this)">👁</button></div></div>
+        <button class="btn ba bsm" onclick="saveGoogleCreds()">Save Credentials</button>
+        <div class="ok" id="g-msg"></div>
+      </div>
+      <div class="card">
         <div class="ct">🗑️ Danger Zone</div>
         <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Date range ma submissions delete karo</p>
         <div class="fgrid" style="margin-bottom:10px">
@@ -962,12 +1034,17 @@ textarea{resize:vertical;min-height:56px}
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Hours Summary</div>
       <div class="card" style="padding:0;overflow:hidden">
         <div style="overflow-x:auto"><table class="tbl">
-          <thead><tr><th>Manager</th><th>Dept</th><th>Days</th><th>Total Hrs</th><th>OT Hrs</th><th>Avg/Day</th></tr></thead>
+          <thead><tr><th>Manager</th><th>Dept</th><th>Days</th><th>Total Hrs</th><th>Regular Hrs</th><th>OT Hrs</th><th>Avg/Day</th></tr></thead>
           <tbody id="hrs-sum-body"></tbody>
         </table></div>
       </div>
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Hours Entries</div>
-      <div id="hrs-list"></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto"><table class="tbl" id="hrs-list-tbl">
+          <thead><tr><th>Manager</th><th>ID</th><th>Dept</th><th>Date</th><th>Shift</th><th style="text-align:center">Regular Hrs</th><th style="text-align:center">OT Hrs</th><th style="text-align:center">Total Hrs</th><th>OT Remark</th><th>Note</th><th>Submitted At</th></tr></thead>
+          <tbody id="hrs-list"></tbody>
+        </table></div>
+      </div>
     </div>
 
       </div><!-- end main-content -->
@@ -1009,9 +1086,6 @@ textarea{resize:vertical;min-height:56px}
 ============================================================ */
 const LEAVE_TYPES=['Casual Leave','Sick Leave','Earned Leave','Emergency Leave'];
 const DEF_BAL={'Casual Leave':12,'Sick Leave':10,'Earned Leave':15,'Emergency Leave':3};
-const GD_EMAIL='vanani.dharmesh4848@gmail.com';
-const GD_CLIENT_ID='87896498461-qmcsm4helca8p5on0du5kjfspa556vgv.apps.googleusercontent.com';
-const GD_SCOPES='https://www.googleapis.com/auth/drive.file';
 
 let db={
   managers:    JSON.parse(ls('ft6_mg')||'null'),
@@ -1020,8 +1094,7 @@ let db={
   submissions: JSON.parse(ls('ft6_sb')||'[]'),
   leaves:      JSON.parse(ls('ft6_lv')||'[]'),
   leavebal:    JSON.parse(ls('ft6_lb')||'{}'),
-  adminPw:     ls('ft6_apw')||'admin123',
-  backup:      JSON.parse(ls('ft6_bk')||'{}')
+  adminPw:     ls('ft6_apw')||'admin123'
 };
 function ls(k){return localStorage.getItem(k);}
 
@@ -1035,7 +1108,7 @@ if(!db.managers){
   for(let i=1;i<=10;i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'),name:'Manager '+i,deptId:'d1',pw:'pass'+String(i).padStart(2,'0')});
 }
 
-let catFiles={}, curUser=null, editId=null, curRole=null, gdToken=null;
+let catFiles={}, curUser=null, editId=null, curRole=null;
 
 function persist(){
   try{
@@ -1046,7 +1119,6 @@ function persist(){
     localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
     localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
     localStorage.setItem('ft6_apw',db.adminPw);
-    localStorage.setItem('ft6_bk',JSON.stringify(db.backup));
   }catch(e){alert('Storage full! Admin > Settings > Delete old submissions');}
 }
 
@@ -1074,11 +1146,11 @@ function restoreSession(){
   try{
     const s=JSON.parse(ls(SES)||'null');
     if(!s)return false;
-    if(s.r==='a'){showPg('pg-admin');initAdmin();return true;}
+    if(s.r==='a'){curRole='a';showPg('pg-admin');initAdmin();return true;}
     if(s.r==='m'){
       const m=db.managers.find(x=>x.id===s.uid);
       if(!m){clearSession();return false;}
-      curUser=m;showPg('pg-mgr');initMgr();return true;
+      curRole='m';curUser=m;showPg('pg-mgr');initMgr();return true;
     }
   }catch(e){clearSession();}
   return false;
@@ -1109,7 +1181,10 @@ function doLogin(){
     saveSession('a','admin');showPg('pg-admin');initAdmin();
   }
 }
-function doLogout(){curUser=null;catFiles={};curRole=null;clearSession();showPg('pg-login');}
+function doLogout(){
+  curUser=null;catFiles={};curRole=null;clearSession();
+  showPg('pg-login');
+}
 
 /* ============================================================
    MANAGER PAGE
@@ -1151,8 +1226,8 @@ function renderCats(){
   document.getElementById('cat-area').innerHTML=mc.map(c=>`
     <div class="ci" id="ci-${c.id}">
       <div class="chdr"><div class="cnm">📄 ${c.name}</div><span class="ccnt" id="cnt-${c.id}"></span></div>
-      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">⬆️ <span>Tap to upload photo / PDF</span>
-        <input type="file" id="fu-${c.id}" multiple accept="image/*,.pdf" data-cid="${c.id}" onchange="onFile(this)">
+      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">⬆️ <span>Tap to upload file / photo / Excel</span>
+        <input type="file" id="fu-${c.id}" multiple data-cid="${c.id}" onchange="onFile(this)">
       </div>
       <div class="chips" id="ch-${c.id}"></div>
     </div>`).join('');
@@ -1183,7 +1258,7 @@ function subForms(){
   db.categories.filter(c=>c.deptId===curUser.deptId).forEach(c=>{if(catFiles[c.id]?.length)cats[c.id]={name:c.name,files:[...catFiles[c.id]]};});
   const now=new Date().toISOString();
   db.submissions.unshift({id:Date.now(),mgrId:curUser.id,mgrName:curUser.name,deptId:curUser.deptId,deptName:dn(curUser.deptId),date,shift:gsh(),note:document.getElementById('sub-n').value,categories:cats,submittedAt:now});
-  persist();sm('sub-msg','✅ '+tf+' forms submitted! — '+fmtDT(now));renderCats();document.getElementById('sub-n').value='';
+  persist(curUser.id);sm('sub-msg','✅ '+tf+' forms submitted! — '+fmtDT(now));renderCats();document.getElementById('sub-n').value='';
 }
 function clrSub(){renderCats();document.getElementById('sub-n').value='';}
 function renderMyRep(){
@@ -1215,7 +1290,7 @@ function applyLv(){
   const bal=getLvBal(curUser.id);
   if((bal[type]??DEF_BAL[type])<days){sm('lv-msg','Balance nathi! '+type+': '+(bal[type]??DEF_BAL[type])+' days baki',true);return;}
   db.leaves.unshift({id:Date.now(),mgrId:curUser.id,mgrName:curUser.name,deptId:curUser.deptId,deptName:dn(curUser.deptId),type,from,to,days,reason:rsn,status:'pending',appliedAt:Date.now(),approvedAt:null,remark:''});
-  persist();
+  persist(curUser.id);
   sm('lv-msg','✅ Leave submit thayi! Admin approve karshhe.');
   document.getElementById('lv-from').value='';document.getElementById('lv-to').value='';document.getElementById('lv-rsn').value='';
   renderMgrLv();updateLvBadge();
@@ -1239,14 +1314,22 @@ function repCard(s,isA){
     ${cats.map(c=>`<div class="cfg"><div class="cft">🏷️ ${c.name} (${c.files.length})</div>
       <div class="tr">${c.files.map(f=>f.type?.startsWith('image')
         ?`<img class="th" src="${f.data}" onclick="openLB('${f.data}')" title="${f.name}">`
-        :`<div class="tp"><span style="font-size:18px">📄</span>${f.name.split('.').pop().toUpperCase()}</div>`
+        :`<a class="tp" href="${f.data}" download="${f.name}" style="text-decoration:none;color:inherit;cursor:pointer" title="Click to download ${f.name}"><span style="font-size:18px">📄</span>${f.name.split('.').pop().toUpperCase()}</a>`
       ).join('')}</div></div>`).join('')}
     ${s.note?`<div class="notebox">${s.note}</div>`:''}
   </div>`;
 }
 function openLB(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');}
 function closeLB(){document.getElementById('lb').classList.remove('open');}
-function delSub(id){if(!confirm('Delete?'))return;db.submissions=db.submissions.filter(s=>s.id!==id);persist();renderReps();renderOv();}
+function delSub(id){
+  if(!confirm('Delete?'))return;
+  const s=db.submissions.find(x=>x.id===id);
+  const mid=s?s.mgrId:null;
+  db.submissions=db.submissions.filter(s=>s.id!==id);
+  persist(mid);
+  renderReps();
+  renderOv();
+}
 
 /* ============================================================
    LEAVE ROW
@@ -1279,15 +1362,22 @@ function approveLv(id){
   const bal=getLvBal(l.mgrId);
   bal[l.type]=Math.max(0,(bal[l.type]??DEF_BAL[l.type])-l.days);
   db.leavebal[l.mgrId]=bal;
-  persist();sm('lv-admin-msg','✅ Leave approved for '+l.mgrName);renderAdminLv();
+  persist(l.mgrId);sm('lv-admin-msg','✅ Leave approved for '+l.mgrName);renderAdminLv();
 }
 function rejectLv(id){
   const l=db.leaves.find(x=>x.id===id);if(!l)return;
   const rem=prompt('Rejection reason:')||'Not approved';
   l.status='rejected';l.approvedAt=Date.now();l.remark=rem;
-  persist();sm('lv-admin-msg','Leave rejected for '+l.mgrName);renderAdminLv();
+  persist(l.mgrId);sm('lv-admin-msg','Leave rejected for '+l.mgrName);renderAdminLv();
 }
-function delLv(id){if(!confirm('Delete?'))return;db.leaves=db.leaves.filter(l=>l.id!==id);persist();renderAdminLv();}
+function delLv(id){
+  if(!confirm('Delete?'))return;
+  const l=db.leaves.find(x=>x.id===id);
+  const mid=l?l.mgrId:null;
+  db.leaves=db.leaves.filter(l=>l.id!==id);
+  persist(mid);
+  renderAdminLv();
+}
 function updateLvBadge(){
   const p=db.leaves.filter(l=>l.status==='pending').length;
   const b=document.getElementById('lv-badge');if(b){b.textContent=p;b.style.display=p?'inline':'none';}
@@ -1301,6 +1391,26 @@ function initAdmin(){
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
   document.getElementById('sbi-ov').classList.add('on');
   document.getElementById('as-ov').classList.add('on');
+  // Populate top atabs for admin (horizontal nav bar)
+  const atabs=document.getElementById('atabs');
+  if(atabs && !atabs.dataset.built){
+    atabs.dataset.built='1';
+    atabs.innerHTML=`
+      <button class="atab on" id="atb-ov"  onclick="aTab('ov', document.getElementById('sbi-ov'))">📊 Summary</button>
+      <button class="atab"    id="atb-rp"  onclick="aTab('rp', document.getElementById('sbi-rp'))">📁 Reports</button>
+      <button class="atab"    id="atb-lv"  onclick="aTab('lv', document.getElementById('sbi-lv'))">🏖️ Leave</button>
+      <button class="atab"    id="atb-hrs" onclick="aTab('hrs',document.getElementById('sbi-hrs'))">⏱️ Hours</button>
+      <button class="atab"    id="atb-late"onclick="aTab('late',document.getElementById('sbi-late'))">⏰ Late</button>
+      <button class="atab"    id="atb-mist"onclick="aTab('mist',document.getElementById('sbi-mist'))">⚠️ Mistakes</button>
+      <button class="atab"    id="atb-rtng"onclick="aTab('rtng',document.getElementById('sbi-rtng'))">⭐ Rating</button>
+      <button class="atab"    id="atb-prob"onclick="aTab('prob',document.getElementById('sbi-prob'))">🔧 Problems</button>
+      <button class="atab"    id="atb-mg"  onclick="aTab('mg', document.getElementById('sbi-mg'))">👥 Managers</button>
+      <button class="atab"    id="atb-dp"  onclick="aTab('dp', document.getElementById('sbi-dp'))">🏬 Depts</button>
+      <button class="atab"    id="atb-ct"  onclick="aTab('ct', document.getElementById('sbi-ct'))">🏷️ Categories</button>
+      <button class="atab"    id="atb-bk"  onclick="aTab('bk', document.getElementById('sbi-bk'))">☁️ Backup</button>
+      <button class="atab"    id="atb-st"  onclick="aTab('st', document.getElementById('sbi-st'))">⚙️ Settings</button>
+    `;
+  }
   renderOv();updateLvBadge();
 }
 
@@ -1310,7 +1420,9 @@ const _tabTitles={ov:'📊 Manager Summary',rp:'📁 Form Reports',lv:'🏖️ L
 function aTab(t,el){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');document.getElementById('as-'+t).classList.add('on');window.scrollTo(0,0);
+  const atb=document.getElementById('atb-'+t);if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
   const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=_tabTitles[t]||'FormTrack';
   if(t==='ov')renderOv();
   if(t==='rp'){popF();renderReps();}
@@ -1364,22 +1476,33 @@ function renderOv(){
       </div>
       <span class="badge b-am" style="font-size:10px">⏳ Pending</span>
     </div>`).join(''):'<div class="panel-empty">કોઈ pending leave નથી</div>';}
-  /* All managers */
-  document.getElementById('a-sum').innerHTML=db.managers.length?db.managers.map(m=>{
-    const ms=s.filter(x=>x.mgrId===m.id),last=ms[0];
-    const days=[...new Set(ms.map(x=>x.date))].length;
-    const pending=db.leaves.filter(l=>l.mgrId===m.id&&l.status==='pending').length;
-    return `<div class="mr">
-      <div class="av">${ini(m.name)}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--t)">${m.name} <span style="font-size:10px;color:var(--t3);font-family:'DM Mono'">${m.id}</span></div>
-        <div style="font-size:11px;color:var(--t2)">🏬 ${dn(m.deptId)} · ${ms.length} submissions · ${days} days ${pending?`· <span style="color:var(--am)">⏳ ${pending} leave pending</span>`:''}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        ${ms.length?`<span class="badge b-gr">${ms.length} ✓</span><div style="font-size:10px;color:var(--t3);margin-top:3px">${last.date}</div>`:`<span class="badge b-re">No subs</span>`}
-      </div>
-    </div>`;
-  }).join(''):'<div class="empty"><div class="ee">👥</div><p>No managers yet</p></div>';
+  /* All managers table */
+  const sumEl=document.getElementById('a-sum');
+  const cntEl=document.getElementById('a-sum-cnt');
+  if(cntEl) cntEl.textContent=db.managers.length;
+  if(sumEl){
+    if(!db.managers.length){
+      sumEl.innerHTML='<tr><td colspan="8" class="empty" style="text-align:center;padding:2rem">No managers yet</td></tr>';
+    } else {
+      sumEl.innerHTML=db.managers.map(m=>{
+        const ms=s.filter(x=>x.mgrId===m.id);
+        const last=ms[0];
+        const pending=(db.leaves||[]).filter(l=>l.mgrId===m.id&&l.status==='pending').length;
+        const otH=((db.workHours||[]).filter(h=>h.mgrId===m.id).reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
+        const lateCount=(db.lateEntries||[]).filter(l=>l.mgrId===m.id).length;
+        return `<tr>
+          <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--t3)">${m.id}</td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${ini(m.name)}</div><span style="font-size:13px;font-weight:600">${m.name}</span></div></td>
+          <td><span class="badge b-te" style="font-size:10px">${dn(m.deptId)}</span></td>
+          <td style="text-align:center"><span class="badge ${ms.length?'b-gr':'b-re'}">${ms.length}</span></td>
+          <td style="text-align:center;font-weight:600;color:${parseFloat(otH)>0?'var(--gr)':'var(--t3)'}">${otH}h</td>
+          <td style="text-align:center"><span class="badge ${lateCount?'b-am':'b-gr'}">${lateCount}</span></td>
+          <td style="text-align:center">${pending?`<span class="badge b-am">⏳ ${pending}</span>`:'<span style="color:var(--t3)">—</span>'}</td>
+          <td style="text-align:center;font-size:11px;color:var(--t3)">${last?last.date:'—'}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
 }
 
 /* FORM REPORTS */
@@ -1486,7 +1609,7 @@ function setBalance(){
   const val=parseInt(document.getElementById('sb-val').value);
   if(!mid||!tp){sm('sb-msg','Manager ane type select karo',true);return;}
   if(isNaN(val)||val<0){sm('sb-msg','Valid number nakho',true);return;}
-  const bal=getLvBal(mid);bal[tp]=val;db.leavebal[mid]=bal;persist();
+  const bal=getLvBal(mid);bal[tp]=val;db.leavebal[mid]=bal;persist(mid);
   sm('sb-msg','✅ Balance set: '+val+' days for '+tp);renderAdminLv();
 }
 
@@ -1607,117 +1730,11 @@ function clrRange(){
 }
 
 /* ============================================================
-   GOOGLE DRIVE
-============================================================ */
-let tclient=null;
-function gdUI(){
-  const ok=!!gdToken;
-  ['gd-bk-btn','gd-rs-btn','gd-out-btn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=ok?'inline-flex':'none';});
-  const stEl=document.getElementById('gd-st-txt');if(stEl)stEl.textContent=ok?'✅ Connected — Ready to backup':'Not signed in';
-  const stDiv=document.getElementById('gd-st');
-  if(stDiv){const dot=stDiv.querySelector('.dot');if(dot){dot.className='dot '+(ok?'on':'no');}}
-}
-function gdSignIn(){
-  sm('gd-msg','Connecting...');
-  const go=()=>{
-    try{
-      tclient=google.accounts.oauth2.initTokenClient({
-        client_id:GD_CLIENT_ID,
-        scope:GD_SCOPES,
-        hint:GD_EMAIL,
-        callback:(r)=>{
-          if(r.error){sm('gd-msg','Sign-in failed: '+r.error,true);return;}
-          gdToken=r.access_token;
-          gdUI();
-          sm('gd-msg','✅ Connected!');
-        }
-      });
-      tclient.requestAccessToken({prompt:''});
-    }catch(err){sm('gd-msg','Error: '+err.message,true);}
-  };
-  if(typeof google!=='undefined'&&google.accounts){
-    go();
-  }else{
-    const s=document.createElement('script');
-    s.src='https://accounts.google.com/gsi/client';
-    s.onload=()=>{setTimeout(go,300);};
-    s.onerror=()=>sm('gd-msg','Google library load failed — check internet',true);
-    document.head.appendChild(s);
-  }
-}
-function gdSignOut(){if(gdToken)google.accounts.oauth2.revoke(gdToken,()=>{});gdToken=null;gdUI();sm('gd-msg','Signed out');}
-async function gdBackup(){
-  if(!gdToken){sm('gd-msg','Sign in first',true);return;}
-  const stEl2=document.getElementById('gd-st-txt');if(stEl2)stEl2.textContent='Uploading...';
-  try{
-    const q=encodeURIComponent(`name='FormTrack_Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
-    const fr=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`,{headers:{'Authorization':'Bearer '+gdToken}});
-    const fd=await fr.json();
-    let fid=fd.files?.[0]?.id;
-    if(!fid){const cr=await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Authorization':'Bearer '+gdToken,'Content-Type':'application/json'},body:JSON.stringify({name:'FormTrack_Backups',mimeType:'application/vnd.google-apps.folder'})});const cd=await cr.json();fid=cd.id;}
-    const payload=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,mistakes:db.mistakes,lateEntries:db.lateEntries,backupAt:new Date().toISOString()});
-    const fname='FormTrack_'+tod()+'.json';
-    const form=new FormData();form.append('metadata',new Blob([JSON.stringify({name:fname,mimeType:'application/json',parents:[fid]})],{type:'application/json'}));form.append('file',new Blob([payload],{type:'application/json'}));
-    const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+gdToken},body:form});
-    const d=await res.json();
-    if(d.id){sm('gd-msg','✅ Backup saved: '+fname);gdUI();}else throw new Error(d.error?.message||'Failed');
-  }catch(e){sm('gd-msg','Error: '+e.message,true);gdUI();}
-}
-async function gdRestore(){
-  if(!gdToken){sm('gd-msg','Sign in first',true);return;}
-  try{
-    const q=encodeURIComponent(`name contains 'FormTrack_' and trashed=false`);
-    const res=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&orderBy=createdTime+desc&fields=files(id,name)`,{headers:{'Authorization':'Bearer '+gdToken}});
-    const d=await res.json();
-    if(!d.files?.length){sm('gd-msg','No backup found',true);return;}
-    if(!confirm('Restore from: '+d.files[0].name+'?'))return;
-    const fr=await fetch(`https://www.googleapis.com/drive/v3/files/${d.files[0].id}?alt=media`,{headers:{'Authorization':'Bearer '+gdToken}});
-    const bk=await fr.json();
-    if(bk.managers)db.managers=bk.managers;if(bk.departments)db.departments=bk.departments;
-    if(bk.categories)db.categories=bk.categories;if(bk.submissions)db.submissions=bk.submissions;
-    if(bk.leaves)db.leaves=bk.leaves;if(bk.leavebal)db.leavebal=bk.leavebal;
-    if(bk.mistakes)db.mistakes=bk.mistakes;if(bk.lateEntries)db.lateEntries=bk.lateEntries;
-    persist();persistLate();sm('gd-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
-  }catch(e){sm('gd-msg','Error: '+e.message,true);}
-}
-function initBkTab(){
-  gdUI();
-  const lastbk=localStorage.getItem('ft7_lastbk');
-  const el=document.getElementById('last-bk-txt');
-  if(el)el.textContent=lastbk?'Last backup: '+new Date(lastbk).toLocaleString()+' ✅':'Last backup: Never';
-}
-function saveAuto(){
-  const f=document.getElementById('ab-f');
-  const d=document.getElementById('ab-d');
-  if(!f||!d)return;
-  db.backup=db.backup||{};
-  db.backup.autoF=f.value;
-  db.backup.autoD=d.value;
-  persist();sm('ab-msg','✅ Auto backup settings saved!');
-}
-/* expJSON defined below (final version includes all data fields) */
-function expJSON(){ /* overridden below */ }
-function impJSON(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();r.onload=e=>{
-    try{const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
-    if(!confirm('Restore? This replaces all data!'))return;
-    if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
-    if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
-    if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
-    if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
-    persist();persistLate();sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
-    }catch(e){sm('mn-msg','Invalid JSON',true);}
-  };r.readAsText(f);inp.value='';
-}
-
-/* ============================================================
-   INIT — restore session on load
+   APP INIT
 ============================================================ */
 window.addEventListener('DOMContentLoaded',()=>{
-  if(!restoreSession()) showPg('pg-login');
-  // Set rating month default
   const rm=document.getElementById('rt-month');if(rm)rm.value=new Date().toISOString().slice(0,7);
+  if(!restoreSession()) showPg('pg-login');
 });
 </script>
 </body>
@@ -1771,7 +1788,7 @@ function renderMgrMist(){
     : '<div class="empty"><div class="ee">✅</div><p>Koi mistake report nathi</p></div>';
   // mark as seen
   myM.forEach(m=>{if(!m.seenByMgr){m.seenByMgr=true;}});
-  persistMist();
+  persistMist(curUser.id);
 }
 
 /* ---- ADMIN: add new mistake ---- */
@@ -1795,7 +1812,7 @@ function addMistake(){
     addedBy:'admin', addedAt:new Date().toISOString(),
     seenByMgr:false
   });
-  persistMist();
+  persistMist(mgrId);
   sm('mr-msg','✅ Mistake report add thayi — '+mgr.name+' ne notification thashe');
   ['mr-desc','mr-action'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('mr-mg').value='';
@@ -1909,8 +1926,10 @@ function mistCard(m, isAdmin){
 
 function delMist(id){
   if(!confirm('Delete?'))return;
+  const m=db.mistakes.find(x=>x.id===id);
+  const mid=m?m.mgrId:null;
   db.mistakes=db.mistakes.filter(m=>m.id!==id);
-  persistMist();renderMistReport();updateMistBadge();
+  persistMist(mid);renderMistReport();updateMistBadge();
 }
 
 function updateMistBadge(){
@@ -1925,9 +1944,11 @@ aTab=function(t,el){
   if(t==='mist'){
     document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+    document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
     el.classList.add('on');
     document.getElementById('as-mist').classList.add('on');
     window.scrollTo(0,0);
+    const atb=document.getElementById('atb-mist');if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
     const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=_tabTitles['mist']||'FormTrack';
     renderMistReport();
     return;
@@ -2018,7 +2039,7 @@ function submitLateEntry(){
     status:'pending', remark:'', addedBy:'manager',
     submittedAt:new Date().toISOString()
   });
-  persistLate();
+  persistLate(curUser.id);
   sm('le-msg','✅ Late entry submit thayi! Admin review karshhe.');
   document.getElementById('le-date').value='';
   document.getElementById('le-mins').value='';
@@ -2057,7 +2078,7 @@ function adminAddLate(){
     status:'pending', remark, addedBy:'admin',
     submittedAt:new Date().toISOString()
   });
-  persistLate();
+  persistLate(mgrId);
   sm('al-msg','✅ Late entry add thayi — '+mgr.name);
   ['al-mg','al-date','al-mins','al-time','al-reason','al-remark'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
@@ -2071,18 +2092,20 @@ function excuseLate(id){
   const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
   const rem=prompt('Excuse remark (optional):')||'Excused by admin';
   l.status='approved';l.remark=rem;
-  persistLate();renderLateReport();
+  persistLate(l.mgrId);renderLateReport();
 }
 function unexcuseLate(id){
   const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
   const rem=prompt('Reason for unexcused:')||'Not acceptable';
   l.status='unexcused';l.remark=rem;
-  persistLate();renderLateReport();
+  persistLate(l.mgrId);renderLateReport();
 }
 function delLate(id){
   if(!confirm('Delete?'))return;
+  const l=db.lateEntries.find(x=>x.id===id);
+  const mid=l?l.mgrId:null;
   db.lateEntries=db.lateEntries.filter(l=>l.id!==id);
-  persistLate();renderLateReport();updateLateBadges();
+  persistLate(mid);renderLateReport();updateLateBadges();
 }
 
 // ── Late Card ──
@@ -2217,10 +2240,12 @@ const _origATab3=aTab;
 aTab=function(t,el){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
   const sec=document.getElementById('as-'+t);
   if(sec)sec.classList.add('on');
   window.scrollTo(0,0);
+  const atb=document.getElementById('atb-'+t);if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
   const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=_tabTitles[t]||'FormTrack';
   if(t==='ov')renderOv();
   if(t==='rp'){popF();renderReps();}
@@ -2326,6 +2351,27 @@ function makeExcel(title,headers,rows,filename){
 
 // ── Formatted date helper ──
 const dlFmtD=d=>{if(!d)return'—';try{const x=new Date(d);return x.toLocaleDateString('en-IN');}catch(e){return d;}};
+
+/* ==== ALL MANAGERS — SUMMARY EXPORT ==== */
+function _getOvRows(){
+  const s=db.submissions||[];
+  return db.managers.map(m=>{
+    const ms=s.filter(x=>x.mgrId===m.id);
+    const last=ms[0];
+    const pending=(db.leaves||[]).filter(l=>l.mgrId===m.id&&l.status==='pending').length;
+    const otH=((db.workHours||[]).filter(h=>h.mgrId===m.id).reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
+    const lateCount=(db.lateEntries||[]).filter(l=>l.mgrId===m.id).length;
+    return [m.id, m.name, dn(m.deptId), ms.length, otH+'h', lateCount, pending, last?last.date:'—'];
+  });
+}
+function expOvPDF(){
+  const headers=['ID','Manager','Department','Submissions','OT Hours','Late Entries','Leave Pending','Last Active'];
+  makePDF('All Managers Summary',headers,_getOvRows(),'FormTrack_AllManagers_'+tod()+'.pdf');
+}
+function expOvExcel(){
+  const headers=['ID','Manager','Department','Submissions','OT Hours','Late Entries','Leave Pending','Last Active'];
+  makeExcel('All Managers Summary',headers,_getOvRows(),'FormTrack_AllManagers_'+tod()+'.xlsx');
+}
 
 /* ==== FORM REPORTS ==== */
 function getFormRepData(){
@@ -2480,8 +2526,10 @@ function solveProblem(id){
 /* ── Admin: delete ── */
 function delProb(id){
   if(!confirm('Delete?'))return;
+  const p=db.problems.find(x=>x.id===id);
+  const mid=p?p.mgrId:null;
   db.problems=db.problems.filter(p=>p.id!==id);
-  persistProb(); renderProblems(); updateProbBadge();
+  persistProb(mid); renderProblems(); updateProbBadge();
 }
 
 /* ── Admin: render all problems ── */
@@ -2637,7 +2685,7 @@ function addRating(){
   const mgr=db.managers.find(m=>m.id===mgrId);
   const autoNote=`Auto: ${subs} forms, ${mistakeCount} mistakes, ${lateCount} late, ${leaveDays} leave days`+(note?' | '+note:'');
   db.ratings.unshift({id:Date.now(),mgrId,mgrName:mgr.name,deptId:mgr.deptId,deptName:dn(mgr.deptId),month,stars,note:autoNote,addedAt:new Date().toISOString()});
-  persistRatings();
+  persistRatings(mgrId);
   sm('rt-msg','✅ Auto Rating saved — '+mgr.name+' → '+'⭐'.repeat(stars)+' ('+stars+'/5)');
   document.getElementById('rt-mg').value='';document.getElementById('rt-month').value='';document.getElementById('rt-note').value='';
   const prev=document.getElementById('rt-preview');if(prev)prev.innerHTML='<span style="color:var(--t3)">Manager & Month select karo…</span>';
@@ -2682,7 +2730,9 @@ function renderAdminRating(){
 
 function delRating(id){
   if(!confirm('Delete?'))return;
-  db.ratings=db.ratings.filter(r=>r.id!==id);persistRatings();renderAdminRating();
+  const r=db.ratings.find(x=>x.id===id);
+  const mid=r?r.mgrId:null;
+  db.ratings=db.ratings.filter(r=>r.id!==id);persistRatings(mid);renderAdminRating();
 }
 
 function renderMgrRating(){
@@ -2732,9 +2782,11 @@ const _origATabFinal=aTab;
 aTab=function(t,el){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
   const sec=document.getElementById('as-'+t);if(sec)sec.classList.add('on');
   window.scrollTo(0,0);
+  const atb=document.getElementById('atb-'+t);if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
   const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=(_tabTitles&&_tabTitles[t])||'FormTrack';
   if(t==='ov')renderOv();if(t==='rp'){popF();renderReps();}
   if(t==='lv')renderAdminLv();if(t==='mist')renderMistReport();if(t==='late')renderLateReport();
@@ -2742,7 +2794,13 @@ aTab=function(t,el){
   if(t==='hrs')renderHrsReport();
   if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}if(t==='dp')renderDpTbl();
   if(t==='ct'){popD('cd');renderCtList();}if(t==='bk')initBkTab();
-  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
+  if(t==='st'){
+    ['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
+    const gcid = document.getElementById('g-cid');
+    const gkey = document.getElementById('g-api-key');
+    if(gcid) gcid.value = localStorage.getItem('ft_g_cid') || '';
+    if(gkey) gkey.value = localStorage.getItem('ft_g_api_key') || '';
+  }
 };
 
 /* ── Patch mTab FINAL ── */
@@ -2876,7 +2934,8 @@ impJSON=function(inp){
     if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
     if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
     if(d.problems)db.problems=d.problems;if(d.ratings)db.ratings=d.ratings;
-    _origPersistFinal();persistLate();persistProb();persistRatings();
+    if(d.workHours)db.workHours=d.workHours;
+    _origPersistFinal();persistLate();persistProb();persistRatings();persistHrs();
     sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
     }catch(e){sm('mn-msg','Invalid JSON',true);}
   };r.readAsText(f);inp.value='';
@@ -2898,14 +2957,41 @@ function persistHrs(){
   try{ localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); }catch(e){}
 }
 
-/* ── OT Auto-calculation (>8h = OT) ── */
+/* ── OT Check & Live Preview ── */
 function chkOT(){
-  const w = parseFloat(document.getElementById('hrs-worked')?.value)||0;
-  const ot = w > 8 ? Math.round((w - 8)*2)/2 : 0;
-  const otEl = document.getElementById('hrs-ot');
+  const reg = parseFloat(document.getElementById('hrs-regular')?.value)||0;
+  const ot  = parseFloat(document.getElementById('hrs-ot-manual')?.value)||0;
+  const total = reg + ot;
+
+  /* OT remark wrap */
   const otWrap = document.getElementById('hrs-ot-wrap');
-  if(otEl) otEl.value = ot > 0 ? ot : '';
   if(otWrap) otWrap.style.display = ot > 0 ? 'block' : 'none';
+
+  /* Live preview box */
+  const prev = document.getElementById('hrs-preview');
+  if(prev){
+    if(total > 0){
+      prev.style.display = 'block';
+      prev.innerHTML = `
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+          <div style="text-align:center">
+            <div style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ac)">${total.toFixed(1)}h</div>
+            <div style="font-size:10px;color:var(--t3)">Total</div>
+          </div>
+          <div style="flex:1;display:flex;flex-wrap:wrap;gap:8px">
+            <span style="background:var(--gr2);color:var(--gr);border:1px solid var(--gr3);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600">✅ Regular: ${reg.toFixed(1)}h</span>
+            <span style="background:${ot>0?'var(--am2)':'var(--s2)'};color:${ot>0?'var(--am)':'var(--t3)'};border:1px solid ${ot>0?'var(--am3)':'var(--bd)'};border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600">⏱️ OT: ${ot.toFixed(1)}h</span>
+            ${ot>0?'<span style="background:var(--re2);color:var(--re);border-radius:20px;padding:3px 10px;font-size:11px">⚠️ Remark farajiyat</span>':''}
+          </div>
+        </div>`;
+    } else {
+      prev.style.display = 'none';
+    }
+  }
+
+  /* keep old hrs-ot field in sync for backward compat */
+  const otEl = document.getElementById('hrs-ot');
+  if(otEl) otEl.value = ot > 0 ? ot : '';
 }
 
 /* ── Manager: Submit Hours ── */
@@ -2913,16 +2999,19 @@ function submitHours(){
   if(!curUser){ sm('hrs-msg','Login required',true); return; }
   const date    = document.getElementById('hrs-date')?.value;
   const shift   = document.getElementById('hrs-shift')?.value;
-  const worked  = parseFloat(document.getElementById('hrs-worked')?.value);
-  const ot      = parseFloat(document.getElementById('hrs-ot')?.value)||0;
+  const reg     = parseFloat(document.getElementById('hrs-regular')?.value)||0;
+  const ot      = parseFloat(document.getElementById('hrs-ot-manual')?.value)||0;
+  const worked  = reg + ot;
   const remark  = document.getElementById('hrs-remark')?.value.trim();
   const note    = document.getElementById('hrs-note')?.value.trim();
 
-  if(!date)        { sm('hrs-msg','Date nakho',true); return; }
-  if(!worked||worked<0.5) { sm('hrs-msg','Hours nakho (min 0.5)',true); return; }
-  if(ot > 0 && !remark)  { sm('hrs-msg','OT hoy to remark farajiyat che!',true); return; }
+  if(!date)          { sm('hrs-msg','Date nakho',true); return; }
+  if(!shift)         { sm('hrs-msg','Shift select karo',true); return; }
+  if(reg <= 0)       { sm('hrs-msg','Regular kalako bharvo (min 0.5)',true); return; }
+  if(reg > 11.25)      { sm('hrs-msg','Regular kalako max 11.25 hoy — OT alag bharvo',true); return; }
+  if(ot > 0 && !remark) { sm('hrs-msg','OT hoy to remark FARAJIYAT che!',true); return; }
 
-  /* prevent duplicate date+shift for same manager */
+  /* prevent duplicate date+shift */
   const dup = db.workHours.find(h=>h.mgrId===curUser.id&&h.date===date&&h.shift===shift);
   if(dup){ sm('hrs-msg','Aa date+shift mate already entry che!',true); return; }
 
@@ -2930,19 +3019,26 @@ function submitHours(){
     id: Date.now(),
     mgrId: curUser.id, mgrName: curUser.name,
     deptId: curUser.deptId, deptName: dn(curUser.deptId),
-    date, shift, workedHours: worked, otHours: ot,
+    date, shift,
+    regularHours: reg,
+    otHours: ot,
+    workedHours: worked,   /* total — kept for backward compat */
     remarkOT: remark, note,
     submittedAt: new Date().toISOString()
   });
   persistHrs();
-  sm('hrs-msg','✅ Hours save thaya!');
+  sm('hrs-msg', ot>0
+    ? `✅ Save thaya! Regular: ${reg}h + OT: ${ot}h = Total: ${worked}h`
+    : `✅ Save thaya! Regular: ${reg}h`
+  );
 
   /* clear form */
-  document.getElementById('hrs-worked').value='';
-  document.getElementById('hrs-ot').value='';
+  document.getElementById('hrs-regular').value='';
+  document.getElementById('hrs-ot-manual').value='';
   document.getElementById('hrs-note').value='';
   const rem=document.getElementById('hrs-remark'); if(rem) rem.value='';
   const ow=document.getElementById('hrs-ot-wrap'); if(ow) ow.style.display='none';
+  const pv=document.getElementById('hrs-preview'); if(pv) pv.style.display='none';
   renderMgrHrs();
 }
 
@@ -2956,14 +3052,15 @@ function renderMgrHrs(){
 
   /* stats */
   const totH  = data.reduce((a,h)=>a+h.workedHours,0);
-  const totOT = data.reduce((a,h)=>a+(h.otHours||0),0);
-  const days  = [...new Set(data.map(h=>h.date))].length;
+  const totOT  = data.reduce((a,h)=>a+(h.otHours||0),0);
+  const totReg = data.reduce((a,h)=>a+(h.regularHours||Math.max(0,h.workedHours-(h.otHours||0))),0);
+  const days   = [...new Set(data.map(h=>h.date))].length;
   const statsEl = document.getElementById('hrs-my-stats');
   if(statsEl) statsEl.innerHTML=`
-    <div class="sc"><div class="sn" style="color:var(--ac)">${data.length}</div><div class="sl">Entries</div></div>
-    <div class="sc"><div class="sn" style="color:var(--gr)">${totH.toFixed(1)}</div><div class="sl">Total Hrs</div></div>
-    <div class="sc"><div class="sn" style="color:${totOT>0?'var(--am)':'var(--gr)'}">${totOT.toFixed(1)}</div><div class="sl">OT Hrs</div></div>
-    <div class="sc"><div class="sn" style="color:var(--pu)">${days}</div><div class="sl">Days</div></div>
+    <div class="sc sc-blue"><div class="sn">${data.length}</div><div class="sl">Entries</div></div>
+    <div class="sc sc-green"><div class="sn">${totReg.toFixed(1)}h</div><div class="sl">Regular Hrs</div></div>
+    <div class="sc sc-amber"><div class="sn">${totOT.toFixed(1)}h</div><div class="sl">OT Hrs</div></div>
+    <div class="sc sc-purple"><div class="sn">${days}</div><div class="sl">Days</div></div>
   `;
 
   const listEl = document.getElementById('mgr-hrs-list');
@@ -2972,29 +3069,34 @@ function renderMgrHrs(){
     listEl.innerHTML='<div class="empty"><div class="ee">⏱️</div><p>Haji koi hours submit nathi karya'+(month?' (aa month ma)':'')+'</p></div>';
     return;
   }
-  listEl.innerHTML = data.map(h=>`
-    <div class="lv-row" style="border-left:3px solid ${h.otHours>0?'var(--am)':'var(--ac)'}">
+  listEl.innerHTML = data.map(h=>{
+    const reg = h.regularHours ?? Math.max(0, h.workedHours - (h.otHours||0));
+    const ot  = h.otHours||0;
+    const tot = h.workedHours;
+    return `
+    <div class="lv-row" style="border-left:3px solid ${ot>0?'var(--am)':'var(--ac)'}">
       <div class="lv-top">
         <div>
-          <div class="lv-name">
-            ${fmtD(h.date)}
-            ${h.otHours>0?`<span class="badge b-am" style="font-size:10px;margin-left:6px">OT: ${h.otHours}h</span>`:''}
-          </div>
+          <div class="lv-name">${fmtD(h.date)}</div>
           <div class="lv-meta">
-            <span>${h.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+            <span>${h.shift==='day'?'☀️ Day Shift':'🌙 Night Shift'}</span>
             <span>🕐 ${fmtDT(h.submittedAt)}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px">
+            <span class="badge b-gr" style="font-size:10px">✅ Regular: ${reg.toFixed(1)}h</span>
+            <span class="badge ${ot>0?'b-am':'b-gr'}" style="font-size:10px">⏱️ OT: ${ot.toFixed(1)}h</span>
+            <span class="badge b-te" style="font-size:10px">Total: ${tot.toFixed(1)}h</span>
           </div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ac)">${h.workedHours}h</div>
-          <div style="font-size:10px;color:var(--t3)">worked</div>
+          <div style="font-size:26px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ac)">${tot.toFixed(1)}h</div>
+          <div style="font-size:10px;color:var(--t3)">total</div>
         </div>
       </div>
-      ${h.remarkOT?`<div class="notebox" style="border-left-color:var(--am)">⏱️ OT Remark: ${h.remarkOT}</div>`:''}
-      ${h.note?`<div class="notebox">${h.note}</div>`:''}
+      ${ot>0&&h.remarkOT?`<div class="notebox" style="border-left-color:var(--am)">⚠️ OT Remark: ${h.remarkOT}</div>`:''}
+      ${h.note?`<div class="notebox">📝 ${h.note}</div>`:''}
       <button class="btn bre bxs" style="margin-top:8px" onclick="delHrs(${h.id})">🗑️ Delete</button>
-    </div>
-  `).join('');
+    </div>`}).join('');
 }
 
 /* ── Manager: delete own entry ── */
@@ -3043,44 +3145,41 @@ function renderHrsReport(){
     if(!mH.length) return `<tr><td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td><td><span class="badge b-te">${dn(m.deptId)}</span></td><td colspan="4" style="color:var(--t3)">No entries</td></tr>`;
     const tH  = mH.reduce((a,h)=>a+h.workedHours,0);
     const tOT = mH.reduce((a,h)=>a+(h.otHours||0),0);
+    const tReg = tH - tOT;
     const days = [...new Set(mH.map(h=>h.date))].length;
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
       <td><span class="badge b-te">${dn(m.deptId)}</span></td>
       <td style="text-align:center;font-weight:600">${days}</td>
       <td style="text-align:center;font-weight:600;color:var(--ac)">${tH.toFixed(1)}</td>
+      <td style="text-align:center;font-weight:600;color:var(--gr)">${tReg.toFixed(1)}</td>
       <td style="text-align:center;font-weight:600;color:${tOT>0?'var(--am)':'var(--gr)'}">${tOT.toFixed(1)}</td>
       <td style="text-align:center;color:var(--t2)">${(tH/Math.max(days,1)).toFixed(1)}</td>
     </tr>`;
   }).join('');
 
-  /* full list */
+  /* full list — table rows */
   const listEl = document.getElementById('hrs-list');
   if(!listEl) return;
   listEl.innerHTML = data.length
-    ? data.map(h=>`
-      <div class="lv-row" style="border-left:3px solid ${h.otHours>0?'var(--am)':'var(--ac)'}">
-        <div class="lv-top">
-          <div>
-            <div class="lv-name">${h.mgrName}
-              <span style="font-size:11px;color:var(--t2);font-family:'DM Mono',monospace;margin-left:6px">${h.mgrId}</span>
-              ${h.otHours>0?`<span class="badge b-am" style="font-size:10px;margin-left:4px">OT: ${h.otHours}h</span>`:''}
-            </div>
-            <div class="lv-meta">
-              <span><span class="badge b-te" style="font-size:10px">${h.deptName}</span></span>
-              <span>${h.shift==='day'?'☀️ Day':'🌙 Night'}</span>
-              <span>📅 ${fmtD(h.date)}</span>
-            </div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ac)">${h.workedHours}h</div>
-            <div style="font-size:10px;color:var(--t3)">${fmtDT(h.submittedAt)}</div>
-          </div>
-        </div>
-        ${h.remarkOT?`<div class="notebox" style="border-left-color:var(--am)">⏱️ OT Remark: ${h.remarkOT}</div>`:''}
-        ${h.note?`<div class="notebox">${h.note}</div>`:''}
-      </div>`).join('')
-    : '<div class="empty"><div class="ee">⏱️</div><p>No hours entries found</p></div>';
+    ? data.map(h=>{
+        const reg = h.regularHours ?? Math.max(0, h.workedHours-(h.otHours||0));
+        const ot  = h.otHours||0;
+        return `<tr>
+          <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(h.mgrName)}</div>${h.mgrName}</div></td>
+          <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${h.mgrId}</td>
+          <td><span class="badge b-te" style="font-size:10px">${h.deptName||'—'}</span></td>
+          <td style="white-space:nowrap">${fmtD(h.date)}</td>
+          <td>${h.shift==='day'?'☀️ Day':'🌙 Night'}</td>
+          <td style="text-align:center;font-weight:600;color:var(--gr)">${reg.toFixed(1)}h</td>
+          <td style="text-align:center;font-weight:600;color:${ot>0?'var(--am)':'var(--t3)'}">${ot.toFixed(1)}h</td>
+          <td style="text-align:center;font-weight:700;color:var(--ac)">${h.workedHours}h</td>
+          <td style="font-size:11px;color:var(--t2);max-width:120px">${h.remarkOT||'—'}</td>
+          <td style="font-size:11px;color:var(--t2);max-width:120px">${h.note||'—'}</td>
+          <td style="font-size:11px;color:var(--t3);white-space:nowrap">${fmtDT(h.submittedAt)}</td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--t3)">⏱️ No hours entries found</td></tr>';
 }
 
 function clrHrsF(){
@@ -3095,9 +3194,10 @@ const _origMTabHrs = mTab;
 mTab = function(t, el){
   _origMTabHrs(t, el);
   if(t==='hrs'){
-    /* auto-fill date + shift */
+    /* auto-fill date */
     const hd=document.getElementById('hrs-date');
     if(hd&&!hd.value) hd.value=tod();
+    /* auto-select shift by current time */
     const hs=document.getElementById('hrs-shift');
     if(hs){const h=new Date().getHours();hs.value=(h>=8&&h<20)?'day':'night';}
     /* default month filter to current month */
@@ -3236,3 +3336,866 @@ function dlRtngRepExcel(){
   makeExcel('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.xlsx');
 }
 </script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   PC FOLDER AUTO-BACKUP — FormTrack97
+   • User sets folder once → stored in IndexedDB (survives refresh)
+   • Every persist() → overwrites FormTrack_YYYY-MM-DD.json in folder
+   • Page load → auto-restore from latest dated file in that folder
+   • Requires Chrome / Edge (File System Access API)
+═══════════════════════════════════════════════════════════════ */
+
+const _FSA_IDB   = 'ft7_fsa_v1';
+const _FSA_STORE = 'handles';
+const _FSA_KEY   = 'backupDir';
+
+function _openFsaDB(){
+  return new Promise((res,rej)=>{
+    const req = indexedDB.open(_FSA_IDB, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(_FSA_STORE);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function _saveDirHandle(handle){
+  const idb = await _openFsaDB();
+  return new Promise((res,rej)=>{
+    const tx = idb.transaction(_FSA_STORE,'readwrite');
+    tx.objectStore(_FSA_STORE).put(handle, _FSA_KEY);
+    tx.oncomplete = ()=>res();
+    tx.onerror    = e=>rej(e.target.error);
+  });
+}
+
+async function _getDirHandle(){
+  try{
+    const idb = await _openFsaDB();
+    return new Promise((res,rej)=>{
+      const tx  = idb.transaction(_FSA_STORE,'readonly');
+      const req = tx.objectStore(_FSA_STORE).get(_FSA_KEY);
+      req.onsuccess = e => res(e.target.result || null);
+      req.onerror   = e => rej(e.target.error);
+    });
+  }catch(e){ return null; }
+}
+
+async function _clearDirHandle(){
+  const idb = await _openFsaDB();
+  return new Promise((res,rej)=>{
+    const tx = idb.transaction(_FSA_STORE,'readwrite');
+    tx.objectStore(_FSA_STORE).delete(_FSA_KEY);
+    tx.oncomplete = ()=>res();
+    tx.onerror    = e=>rej(e.target.error);
+  });
+}
+
+function _bkFileName(){ return 'FormTrack_'+tod()+'.json'; }
+
+function _buildSnapshot(){
+  return JSON.stringify({
+    managers:db.managers||[], departments:db.departments||[],
+    categories:db.categories||[], submissions:db.submissions||[],
+    leaves:db.leaves||[], leavebal:db.leavebal||{},
+    mistakes:db.mistakes||[], lateEntries:db.lateEntries||[],
+    problems:db.problems||[], ratings:db.ratings||[],
+    workHours:db.workHours||[],
+    exportedAt:new Date().toISOString()
+  });
+}
+
+async function _fsaWriteFile(parentHandle, fileName, contentObj) {
+  const fh = await parentHandle.getFileHandle(fileName, {create:true});
+  const writable = await fh.createWritable();
+  await writable.write(JSON.stringify(contentObj));
+  await writable.close();
+}
+
+async function _fsaReadFile(parentHandle, fileName) {
+  try {
+    const fh = await parentHandle.getFileHandle(fileName);
+    const file = await fh.getFile();
+    const text = await file.text();
+    return JSON.parse(text);
+  } catch (e) {
+    return null;
+  }
+}
+
+async function _writeBackupFile(dirHandle, specificMgrId = null){
+  if(!dirHandle) return;
+  try{
+    const perm = await dirHandle.requestPermission({mode:'readwrite'});
+    if(perm !== 'granted'){ _updateFsaStatus('⚠️ Folder permission denied'); return; }
+    
+    // 1. Save global file (metadata)
+    await _fsaWriteFile(dirHandle, 'FormTrack_Global.json', getGlobalSnapshot());
+    
+    // 2. Save manager files
+    if (curRole === 'm' && curUser) {
+      const subDir = await dirHandle.getDirectoryHandle(curUser.id, {create: true});
+      await _fsaWriteFile(subDir, `FormTrack_${curUser.id}.json`, getManagerSnapshot(curUser.id));
+    } else if (curRole === 'a') {
+      if (specificMgrId) {
+        const subDir = await dirHandle.getDirectoryHandle(specificMgrId, {create: true});
+        await _fsaWriteFile(subDir, `FormTrack_${specificMgrId}.json`, getManagerSnapshot(specificMgrId));
+      } else {
+        const mgrIds = new Set(db.managers.map(m => m.id));
+        db.submissions.forEach(s => mgrIds.add(s.mgrId));
+        db.leaves.forEach(l => mgrIds.add(l.mgrId));
+        
+        for (const mid of mgrIds) {
+          if (!mid) continue;
+          const subDir = await dirHandle.getDirectoryHandle(mid, {create: true});
+          await _fsaWriteFile(subDir, `FormTrack_${mid}.json`, getManagerSnapshot(mid));
+        }
+      }
+    }
+    
+    const now  = new Date().toISOString();
+    localStorage.setItem('ft7_lastbk', now);
+    const lbEl = document.getElementById('last-bk-txt');
+    if(lbEl) lbEl.textContent = 'Last backup: '+new Date(now).toLocaleString()+' ✅';
+    _updateFsaStatus('✅ Saved manager-wise folders ('+new Date(now).toLocaleTimeString()+')');
+  }catch(e){
+    console.warn('[FSA] Write failed:', e);
+    _updateFsaStatus('❌ Backup failed: '+e.message);
+  }
+}
+
+function _updateFsaStatus(msg){
+  const el = document.getElementById('bkf-status');
+  if(el) el.textContent = msg;
+}
+
+function _refreshFsaUI(folderName){
+  const clrBtn  = document.getElementById('bkf-clr-btn');
+  const setBtn  = document.getElementById('bkf-set-btn');
+  const pathBox = document.getElementById('bkf-path-box');
+  if(folderName){
+    if(clrBtn)  clrBtn.style.display = '';
+    if(setBtn)  setBtn.textContent   = '📂 Change';
+    if(pathBox){ pathBox.value = folderName; pathBox.style.color='var(--t1)'; pathBox.style.borderColor='var(--gr)'; }
+    _updateFsaStatus('✅ Folder set — dareek save par auto-backup thase');
+  } else {
+    if(clrBtn)  clrBtn.style.display = 'none';
+    if(setBtn)  setBtn.textContent   = '📂 Browse…';
+    if(pathBox){ pathBox.value = ''; pathBox.placeholder = 'Folder select nathi thayo…'; pathBox.style.borderColor=''; pathBox.style.color=''; }
+    _updateFsaStatus('');
+  }
+}
+
+async function setBackupFolder(){
+  if(!window.showDirectoryPicker){
+    sm('mn-msg','⚠️ PC folder backup sirf Chrome / Edge ma kaam kare che', true);
+    return;
+  }
+  try{
+    const handle = await window.showDirectoryPicker({mode:'readwrite', startIn:'documents'});
+    await _saveDirHandle(handle);
+    localStorage.setItem('ft7_bkdir_name', handle.name);
+    _refreshFsaUI(handle.name);
+    await _writeBackupFile(handle);
+    sm('mn-msg','✅ Folder set! Dareek change par auto-save thase.');
+  }catch(e){
+    if(e.name !== 'AbortError')
+      sm('mn-msg','❌ Folder set nai thayo: '+e.message, true);
+  }
+}
+
+async function clearBackupFolder(){
+  if(!confirm('Backup folder remove karvu che?')) return;
+  await _clearDirHandle();
+  localStorage.removeItem('ft7_bkdir_name');
+  _refreshFsaUI(null);
+  _updateFsaStatus('Folder removed. Manual backup vaapravo.');
+}
+
+async function _autoRestoreFromFolder(){
+  const savedName = localStorage.getItem('ft7_bkdir_name');
+  if(!savedName) return;
+
+  const dirHandle = await _getDirHandle();
+  if(!dirHandle) return;
+
+  try{
+    /* Page-load time: only QUERY permission — never REQUEST (needs user gesture).
+       If already granted (browser remembered it) we proceed.
+       If not granted, show a clickable banner so user can grant with a tap. */
+    const perm = await dirHandle.queryPermission({mode:'read'});
+
+    if(perm !== 'granted'){
+      // Permission not yet granted — show a restore banner the user can click
+      console.info('[FSA] Permission not granted yet — showing restore prompt');
+      setTimeout(()=>{
+        _refreshFsaUI(dirHandle.name);
+        _updateFsaStatus('🔔 Folder ready — "Restore from Folder" dabo to data load thashe');
+        _showFsaRestoreBanner(dirHandle);
+      }, 600);
+      return;
+    }
+
+    await _doFsaRestore(dirHandle);
+
+  }catch(e){
+    console.warn('[FSA] Auto-restore check failed:', e);
+    setTimeout(()=>_refreshFsaUI(dirHandle.name), 600);
+  }
+}
+
+/* Called from banner button (user gesture) — can safely requestPermission */
+async function _requestAndRestore(){
+  const dirHandle = await _getDirHandle();
+  if(!dirHandle){ _updateFsaStatus('Folder handle lost — please re-select folder', true); return; }
+  try{
+    const perm = await dirHandle.requestPermission({mode:'read'});
+    if(perm !== 'granted'){ _updateFsaStatus('Permission denied — cannot restore', true); return; }
+    await _doFsaRestore(dirHandle);
+  }catch(e){
+    _updateFsaStatus('⚠️ Restore failed: '+e.message, true);
+  }
+}
+
+/* Show a small sticky banner so user can tap to grant folder permission */
+function _showFsaRestoreBanner(dirHandle){
+  if(document.getElementById('fsa-banner')) return; // already shown
+  const banner = document.createElement('div');
+  banner.id = 'fsa-banner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;background:#1E2A5A;color:#fff;border-radius:12px;padding:12px 18px;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;max-width:360px;width:90%';
+  banner.innerHTML = `
+    <span style="font-size:20px">📁</span>
+    <div style="flex:1">
+      <div style="font-weight:600;margin-bottom:2px">PC Folder Backup Ready</div>
+      <div style="font-size:11px;opacity:.8">${dirHandle.name} — Tap to load latest data</div>
+    </div>
+    <button onclick="_requestAndRestore();document.getElementById('fsa-banner')?.remove()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:Inter,sans-serif;white-space:nowrap">Load ↗</button>
+    <button onclick="document.getElementById('fsa-banner')?.remove()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:18px;padding:0 0 0 4px">×</button>`;
+  document.body.appendChild(banner);
+  // Auto-dismiss after 30s
+  setTimeout(()=>banner.remove(), 30000);
+}
+
+/* Core restore logic — call only when permission already granted */
+async function _doFsaRestore(dirHandle){
+  try {
+    const perm = await dirHandle.requestPermission({mode:'read'});
+    if(perm !== 'granted'){ _updateFsaStatus('⚠️ Folder permission denied'); return; }
+    
+    // 1. Fetch Global config
+    const globalData = await _fsaReadFile(dirHandle, 'FormTrack_Global.json');
+    if (globalData) {
+      applyGlobalSnapshot(globalData);
+    }
+    
+    // 2. Fetch Manager-wise data
+    if (curRole === 'm' && curUser) {
+      try {
+        const subDir = await dirHandle.getDirectoryHandle(curUser.id);
+        const mgrData = await _fsaReadFile(subDir, `FormTrack_${curUser.id}.json`);
+        if (mgrData) {
+          applyManagerSnapshot(mgrData);
+        }
+      } catch (e) {
+        console.warn('[FSA] Manager folder or file not found for:', curUser.id);
+      }
+      _origPersistFSA(); // Save to local storage
+      initMgr(); // Refresh Mgr UI
+    } else if (curRole === 'a') {
+      // Reset Admin combined database before merge
+      db.submissions = [];
+      db.leaves = [];
+      db.leavebal = {};
+      db.mistakes = [];
+      db.lateEntries = [];
+      db.problems = [];
+      db.ratings = [];
+      db.workHours = [];
+      
+      const mgrIds = new Set(db.managers.map(m => m.id));
+      for (const mid of mgrIds) {
+        try {
+          const subDir = await dirHandle.getDirectoryHandle(mid);
+          const mgrData = await _fsaReadFile(subDir, `FormTrack_${mid}.json`);
+          if (mgrData) {
+            applyManagerSnapshot(mgrData);
+          }
+        } catch (e) {
+          // Folder or file does not exist for this manager yet, which is fine
+        }
+      }
+      _origPersistFSA(); // Save combined locally
+      initAdmin(); // Refresh Admin UI
+    }
+    
+    const now = new Date().toISOString();
+    localStorage.setItem('ft7_lastbk', now);
+    const lbEl = document.getElementById('last-bk-txt');
+    if (lbEl) lbEl.textContent = 'Last backup: ' + new Date(now).toLocaleString() + ' ✅';
+    _updateFsaStatus('✅ Restored and merged manager-wise data');
+  } catch (err) {
+    console.error('[FSA] Restore failed:', err);
+    _updateFsaStatus('❌ Restore failed: ' + err.message);
+  }
+}
+
+/* ── Debounced backup trigger — avoids multiple writes when
+   persist() + persistLate() fire together ── */
+let _fsaTimer = null;
+let _fsaPendingMgrs = new Set();
+
+function _triggerFsaBackup(mgrId){
+  if (mgrId) _fsaPendingMgrs.add(mgrId);
+  clearTimeout(_fsaTimer);
+  _fsaTimer = setTimeout(()=>{
+    _getDirHandle().then(async (h)=>{
+      if(h) {
+        if (curRole === 'a' && _fsaPendingMgrs.size > 0) {
+          for (const mid of _fsaPendingMgrs) {
+            await _writeBackupFile(h, mid);
+          }
+          _fsaPendingMgrs.clear();
+        } else {
+          await _writeBackupFile(h);
+        }
+      }
+    }).catch(()=>{});
+  }, 1000);
+}
+
+/* Hook ALL persist functions so EVERY user's changes backup to folder */
+const _origPersistFSA = persist;
+persist = function(mgrId){ _origPersistFSA(mgrId); _triggerFsaBackup(mgrId); };
+
+const _origPersistLateFSA = persistLate;
+persistLate = function(mgrId){ _origPersistLateFSA(mgrId); _triggerFsaBackup(mgrId); };
+
+const _origPersistProbFSA = persistProb;
+persistProb = function(mgrId){ _origPersistProbFSA(mgrId); _triggerFsaBackup(mgrId); };
+
+const _origPersistRtngFSA = persistRatings;
+persistRatings = function(mgrId){ _origPersistRtngFSA(mgrId); _triggerFsaBackup(mgrId); };
+
+const _origPersistHrsFSA = persistHrs;
+persistHrs = function(mgrId){ _origPersistHrsFSA(mgrId); _triggerFsaBackup(mgrId || (curUser ? curUser.id : null)); };
+
+const _origPersistMistFSA = persistMist;
+persistMist = function(mgrId){ _origPersistMistFSA(mgrId); _triggerFsaBackup(mgrId); };
+
+/* Run auto-restore immediately (before DOMContentLoaded fires rendering) */
+(async function _fsaBootstrap(){
+  await _autoRestoreFromFolder();
+  const name = localStorage.getItem('ft7_bkdir_name');
+  if(name) setTimeout(()=>_refreshFsaUI(name), 400);
+})();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   GOOGLE DRIVE LIVE SYNC (Manager-wise Sync) — FormTrack
+   • Managers save to FormTrack_MGR-[ID].json
+   • Admin merges all FormTrack_MGR-[ID].json files
+   • Global settings are stored in FormTrack_Global.json
+═══════════════════════════════════════════════════════════════ */
+
+let tokenClient = null;
+let gdriveAccessToken = null;
+
+// Save credentials from Settings tab
+function saveGoogleCreds(){
+  const cid = document.getElementById('g-cid').value.trim();
+  const api = document.getElementById('g-api-key').value.trim();
+  localStorage.setItem('ft_g_cid', cid);
+  localStorage.setItem('ft_g_api_key', api);
+  sm('g-msg', '✅ Credentials saved successfully!');
+  gdSignOut();
+}
+
+// Load GAPI & GIS libraries and initialize Gdrive client
+function initGapiClient(callback) {
+  const cid = localStorage.getItem('ft_g_cid') || '';
+  const api = localStorage.getItem('ft_g_api_key') || '';
+  if (!cid || !api) {
+    callback(new Error('Please set Client ID and API Key in Settings tab first!'));
+    return;
+  }
+  
+  loadScript('https://apis.google.com/js/api.js', () => {
+    gapi.load('client', async () => {
+      try {
+        await gapi.client.init({
+          apiKey: api,
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+        });
+        loadScript('https://accounts.google.com/gsi/client', () => {
+          tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: cid,
+            scope: 'https://www.googleapis.com/auth/drive.file',
+            callback: '', // assigned during gdSignIn
+          });
+          callback(null);
+        });
+      } catch (err) {
+        callback(err);
+      }
+    });
+  });
+}
+
+function updateDriveUI(signedIn) {
+  const dot = document.getElementById('gd-topbar-dot');
+  const mgrSync = document.getElementById('gd-mgr-sync');
+  const st = document.getElementById('gd-st');
+  const stTxt = document.getElementById('gd-st-txt');
+  const bkBtn = document.getElementById('gd-bk-btn');
+  const rsBtn = document.getElementById('gd-rs-btn');
+  const outBtn = document.getElementById('gd-out-btn');
+
+  if (signedIn) {
+    if (dot) dot.style.display = 'inline-flex';
+    if (mgrSync) mgrSync.style.display = 'inline-flex';
+    if (st) {
+      st.className = 'drive-status on';
+    }
+    if (stTxt) stTxt.textContent = 'Signed in (Google Drive Sync active)';
+    if (bkBtn) bkBtn.style.display = 'inline-block';
+    if (rsBtn) rsBtn.style.display = 'inline-block';
+    if (outBtn) outBtn.style.display = 'inline-block';
+  } else {
+    if (dot) dot.style.display = 'none';
+    if (mgrSync) mgrSync.style.display = 'none';
+    if (st) {
+      st.className = 'drive-status';
+    }
+    if (stTxt) stTxt.textContent = 'Not signed in';
+    if (bkBtn) bkBtn.style.display = 'none';
+    if (rsBtn) rsBtn.style.display = 'none';
+    if (outBtn) outBtn.style.display = 'none';
+  }
+}
+
+function gdSignIn() {
+  const msgEl = document.getElementById('gd-msg');
+  if (msgEl) {
+    msgEl.textContent = 'Connecting to Google Drive...';
+    msgEl.style.color = 'var(--am)';
+  }
+  
+  initGapiClient((err) => {
+    if (err) {
+      if (msgEl) {
+        msgEl.textContent = '❌ Connection failed: ' + err.message;
+        msgEl.style.color = 'var(--re)';
+      }
+      return;
+    }
+    
+    tokenClient.callback = async (resp) => {
+      if (resp.error !== undefined) {
+        if (msgEl) {
+          msgEl.textContent = '❌ Authentication failed: ' + resp.error;
+          msgEl.style.color = 'var(--re)';
+        }
+        return;
+      }
+      gdriveAccessToken = resp.access_token;
+      localStorage.setItem('ft_gd_token', gdriveAccessToken);
+      localStorage.setItem('ft_gd_token_expiry', Date.now() + resp.expires_in * 1000);
+      updateDriveUI(true);
+      if (msgEl) {
+        msgEl.textContent = '✅ Google Drive connected successfully!';
+        msgEl.style.color = 'var(--gr)';
+      }
+      gdRestore();
+    };
+    
+    // Check for cached token
+    const savedToken = localStorage.getItem('ft_gd_token');
+    const expiry = parseInt(localStorage.getItem('ft_gd_token_expiry') || '0');
+    if (savedToken && expiry > Date.now()) {
+      gdriveAccessToken = savedToken;
+      gapi.client.setToken({ access_token: gdriveAccessToken });
+      updateDriveUI(true);
+      if (msgEl) {
+        msgEl.textContent = '✅ Session restored!';
+        msgEl.style.color = 'var(--gr)';
+      }
+      gdRestore();
+    } else {
+      tokenClient.requestAccessToken({ prompt: 'consent' });
+    }
+  });
+}
+
+function gdSignOut() {
+  localStorage.removeItem('ft_gd_token');
+  localStorage.removeItem('ft_gd_token_expiry');
+  gdriveAccessToken = null;
+  updateDriveUI(false);
+  const msgEl = document.getElementById('gd-msg');
+  if (msgEl) {
+    msgEl.textContent = 'Signed out from Google Drive.';
+    msgEl.style.color = 'var(--t2)';
+  }
+}
+
+// Drive Operations
+async function getOrCreateFile(name) {
+  try {
+    const query = `name = '${name}' and trashed = false`;
+    const resp = await gapi.client.drive.files.list({
+      q: query,
+      fields: 'files(id, name)',
+      spaces: 'drive'
+    });
+    const files = resp.result.files;
+    if (files && files.length > 0) {
+      return files[0].id;
+    } else {
+      const createResp = await gapi.client.drive.files.create({
+        resource: {
+          name: name,
+          mimeType: 'application/json'
+        },
+        fields: 'id'
+      });
+      return createResp.result.id;
+    }
+  } catch (err) {
+    console.error('getOrCreateFile error:', err);
+    throw err;
+  }
+}
+
+async function updateFileContent(fileId, contentObj) {
+  try {
+    await gapi.client.request({
+      path: '/upload/drive/v3/files/' + fileId,
+      method: 'PATCH',
+      params: { uploadType: 'media' },
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contentObj)
+    });
+  } catch (err) {
+    console.error('updateFileContent error:', err);
+    throw err;
+  }
+}
+
+async function getFileContent(fileId) {
+  try {
+    const resp = await gapi.client.drive.files.get({
+      fileId: fileId,
+      alt: 'media'
+    });
+    return resp.result || resp.body;
+  } catch (err) {
+    console.error('getFileContent error:', err);
+    throw err;
+  }
+}
+
+function safeParseJson(data) {
+  if (!data) return null;
+  if (typeof data === 'object') return data;
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    console.warn('JSON parse error:', e);
+    return null;
+  }
+}
+
+// Data Serialization
+function getManagerSnapshot(mgrId) {
+  const filterByMgr = (arr) => (arr || []).filter(item => item.mgrId === mgrId);
+  return {
+    mgrId: mgrId,
+    submissions: filterByMgr(db.submissions),
+    leaves: filterByMgr(db.leaves),
+    leavebal: db.leavebal[mgrId] || {...DEF_BAL},
+    mistakes: filterByMgr(db.mistakes),
+    lateEntries: filterByMgr(db.lateEntries),
+    problems: filterByMgr(db.problems),
+    ratings: filterByMgr(db.ratings),
+    workHours: filterByMgr(db.workHours),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function applyManagerSnapshot(snapshot) {
+  if (!snapshot || !snapshot.mgrId) return;
+  const mgrId = snapshot.mgrId;
+  const filterOutMgr = (arr) => (arr || []).filter(item => item.mgrId !== mgrId);
+  
+  db.submissions = filterOutMgr(db.submissions).concat(snapshot.submissions || []);
+  db.leaves = filterOutMgr(db.leaves).concat(snapshot.leaves || []);
+  db.leavebal[mgrId] = snapshot.leavebal || {...DEF_BAL};
+  db.mistakes = filterOutMgr(db.mistakes).concat(snapshot.mistakes || []);
+  db.lateEntries = filterOutMgr(db.lateEntries).concat(snapshot.lateEntries || []);
+  db.problems = filterOutMgr(db.problems).concat(snapshot.problems || []);
+  db.ratings = filterOutMgr(db.ratings).concat(snapshot.ratings || []);
+  db.workHours = filterOutMgr(db.workHours).concat(snapshot.workHours || []);
+}
+
+function getGlobalSnapshot() {
+  return {
+    managers: db.managers || [],
+    departments: db.departments || [],
+    categories: db.categories || [],
+    adminPw: db.adminPw || 'admin123',
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function applyGlobalSnapshot(snapshot) {
+  if (!snapshot) return;
+  if (snapshot.managers) db.managers = snapshot.managers;
+  if (snapshot.departments) db.departments = snapshot.departments;
+  if (snapshot.categories) db.categories = snapshot.categories;
+  if (snapshot.adminPw) db.adminPw = snapshot.adminPw;
+}
+
+// Sync Triggers
+async function gdBackup(specificMgrId = null) {
+  if (!gdriveAccessToken) return;
+  const msgEl = document.getElementById('gd-msg');
+  if (msgEl) {
+    msgEl.textContent = '⬆️ Uploading to Google Drive...';
+    msgEl.style.color = 'var(--am)';
+  }
+  
+  try {
+    // 1. Save global file (metadata)
+    const globalId = await getOrCreateFile('FormTrack_Global.json');
+    await updateFileContent(globalId, getGlobalSnapshot());
+    
+    // 2. Save manager files
+    if (curRole === 'm' && curUser) {
+      const mgrFileName = `FormTrack_${curUser.id}.json`;
+      const mgrFileId = await getOrCreateFile(mgrFileName);
+      await updateFileContent(mgrFileId, getManagerSnapshot(curUser.id));
+    } else if (curRole === 'a') {
+      if (specificMgrId) {
+        const mgrFileName = `FormTrack_${specificMgrId}.json`;
+        const mgrFileId = await getOrCreateFile(mgrFileName);
+        await updateFileContent(mgrFileId, getManagerSnapshot(specificMgrId));
+      } else {
+        const mgrIds = new Set(db.managers.map(m => m.id));
+        db.submissions.forEach(s => mgrIds.add(s.mgrId));
+        db.leaves.forEach(l => mgrIds.add(l.mgrId));
+        
+        for (const mid of mgrIds) {
+          if (!mid) continue;
+          const mgrFileName = `FormTrack_${mid}.json`;
+          const mgrFileId = await getOrCreateFile(mgrFileName);
+          await updateFileContent(mgrFileId, getManagerSnapshot(mid));
+        }
+      }
+    }
+    
+    const now = new Date().toISOString();
+    localStorage.setItem('ft7_lastbk', now);
+    const lbEl = document.getElementById('last-bk-txt');
+    if (lbEl) lbEl.textContent = 'Last sync: ' + new Date(now).toLocaleString() + ' ✅';
+    if (msgEl) {
+      msgEl.textContent = '✅ Sync finished successfully!';
+      msgEl.style.color = 'var(--gr)';
+    }
+  } catch (err) {
+    console.error('gdBackup failed:', err);
+    if (msgEl) {
+      msgEl.textContent = '❌ Sync failed: ' + err.message;
+      msgEl.style.color = 'var(--re)';
+    }
+  }
+}
+
+async function gdRestore() {
+  if (!gdriveAccessToken) return;
+  const msgEl = document.getElementById('gd-msg');
+  if (msgEl) {
+    msgEl.textContent = '📥 Fetching latest from Google Drive...';
+    msgEl.style.color = 'var(--am)';
+  }
+  
+  try {
+    // 1. Fetch Global config
+    const globalId = await getOrCreateFile('FormTrack_Global.json');
+    const globalDataRaw = await getFileContent(globalId);
+    const globalData = safeParseJson(globalDataRaw);
+    if (globalData) {
+      applyGlobalSnapshot(globalData);
+    }
+    
+    // 2. Fetch Manager-wise data
+    if (curRole === 'm' && curUser) {
+      const mgrFileName = `FormTrack_${curUser.id}.json`;
+      const mgrFileId = await getOrCreateFile(mgrFileName);
+      const mgrDataRaw = await getFileContent(mgrFileId);
+      const mgrData = safeParseJson(mgrDataRaw);
+      if (mgrData) {
+        applyManagerSnapshot(mgrData);
+      }
+      _origPersistFSA(); // Save to local storage
+      initMgr(); // Refresh Mgr UI
+    } else if (curRole === 'a') {
+      const resp = await gapi.client.drive.files.list({
+        q: "name contains 'FormTrack_MGR-' and name contains '.json' and trashed = false",
+        fields: 'files(id, name)',
+        spaces: 'drive'
+      });
+      const files = resp.result.files || [];
+      
+      // Reset Admin combined database before merge
+      db.submissions = [];
+      db.leaves = [];
+      db.leavebal = {};
+      db.mistakes = [];
+      db.lateEntries = [];
+      db.problems = [];
+      db.ratings = [];
+      db.workHours = [];
+      
+      for (const file of files) {
+        const dataRaw = await getFileContent(file.id);
+        const data = safeParseJson(dataRaw);
+        if (data) {
+          applyManagerSnapshot(data);
+        }
+      }
+      _origPersistFSA(); // Save combined locally
+      initAdmin(); // Refresh Admin UI
+    }
+    
+    const now = new Date().toISOString();
+    localStorage.setItem('ft7_lastbk', now);
+    const lbEl = document.getElementById('last-bk-txt');
+    if (lbEl) lbEl.textContent = 'Last sync: ' + new Date(now).toLocaleString() + ' ✅';
+    if (msgEl) {
+      msgEl.textContent = '✅ Restored data successfully!';
+      msgEl.style.color = 'var(--gr)';
+    }
+  } catch (err) {
+    console.error('gdRestore failed:', err);
+    if (msgEl) {
+      msgEl.textContent = '❌ Restore failed: ' + err.message;
+      msgEl.style.color = 'var(--re)';
+    }
+  }
+}
+
+// Debounced Auto-Sync Logic
+let _gdTimer = null;
+let _gdPendingMgrs = new Set();
+let _gdSyncGlobal = false;
+
+function _triggerGDriveBackup(mgrId, isGlobal = false) {
+  if (mgrId) _gdPendingMgrs.add(mgrId);
+  if (isGlobal) _gdSyncGlobal = true;
+  
+  clearTimeout(_gdTimer);
+  _gdTimer = setTimeout(async () => {
+    if (!gdriveAccessToken) return;
+    try {
+      if (_gdSyncGlobal) {
+        const globalId = await getOrCreateFile('FormTrack_Global.json');
+        await updateFileContent(globalId, getGlobalSnapshot());
+        _gdSyncGlobal = false;
+      }
+      
+      if (curRole === 'm' && curUser) {
+        const mgrFileName = `FormTrack_${curUser.id}.json`;
+        const mgrFileId = await getOrCreateFile(mgrFileName);
+        await updateFileContent(mgrFileId, getManagerSnapshot(curUser.id));
+      } else if (curRole === 'a') {
+        if (_gdPendingMgrs.size > 0) {
+          for (const mid of _gdPendingMgrs) {
+            const mgrFileName = `FormTrack_${mid}.json`;
+            const mgrFileId = await getOrCreateFile(mgrFileName);
+            await updateFileContent(mgrFileId, getManagerSnapshot(mid));
+          }
+          _gdPendingMgrs.clear();
+        } else {
+          await gdBackup();
+        }
+      }
+      const now = new Date().toISOString();
+      localStorage.setItem('ft7_lastbk', now);
+      const lbEl = document.getElementById('last-bk-txt');
+      if (lbEl) lbEl.textContent = 'Last sync: ' + new Date(now).toLocaleString() + ' ✅';
+    } catch (e) {
+      console.error('Auto GDrive backup failed:', e);
+    }
+  }, 1000);
+}
+
+// Backup tab UI init
+function initBkTab() {
+  const token = localStorage.getItem('ft_gd_token');
+  const expiry = parseInt(localStorage.getItem('ft_gd_token_expiry') || '0');
+  const hasToken = token && expiry > Date.now();
+  updateDriveUI(hasToken);
+  
+  const cid = localStorage.getItem('ft_g_cid') || '';
+  const api = localStorage.getItem('ft_g_api_key') || '';
+  const msgEl = document.getElementById('gd-msg');
+  if (msgEl) {
+    if (!cid || !api) {
+      msgEl.textContent = '⚠️ Google Drive credentials are not configured in Settings tab!';
+      msgEl.style.color = 'var(--re)';
+    } else {
+      msgEl.textContent = hasToken ? '✅ Google Drive Sync is active.' : 'Click "Sign in with Google" to enable sync.';
+      msgEl.style.color = hasToken ? 'var(--gr)' : 'var(--t2)';
+    }
+  }
+}
+
+// Intercept Local Storage triggers to run Drive backup
+const _origPersistGD = persist;
+persist = function(mgrId) {
+  _origPersistGD();
+  _triggerGDriveBackup(mgrId, curRole === 'a');
+};
+
+const _origPersistLateGD = persistLate;
+persistLate = function(mgrId) {
+  _origPersistLateGD();
+  _triggerGDriveBackup(mgrId);
+};
+
+const _origPersistProbGD = persistProb;
+persistProb = function(mgrId) {
+  _origPersistProbGD();
+  _triggerGDriveBackup(mgrId);
+};
+
+const _origPersistRtngGD = persistRatings;
+persistRatings = function(mgrId) {
+  _origPersistRtngGD();
+  _triggerGDriveBackup(mgrId);
+};
+
+const _origPersistHrsGD = persistHrs;
+persistHrs = function(mgrId) {
+  _origPersistHrsGD();
+  _triggerGDriveBackup(mgrId || (curUser ? curUser.id : null));
+};
+
+const _origPersistMistGD = persistMist;
+persistMist = function(mgrId) {
+  _origPersistMistGD();
+  _triggerGDriveBackup(mgrId);
+};
+
+// Auto boot gate
+setTimeout(() => {
+  const token = localStorage.getItem('ft_gd_token');
+  const expiry = parseInt(localStorage.getItem('ft_gd_token_expiry') || '0');
+  if (token && expiry > Date.now()) {
+    gdSignIn();
+  }
+}, 1000);
+</script>
+</body>
+</html>
+
