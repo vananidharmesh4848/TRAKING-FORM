@@ -3422,6 +3422,62 @@ async function _fsaReadFile(parentHandle, fileName) {
   }
 }
 
+function _dataURLToBlob(dataURL) {
+  try {
+    const parts = dataURL.split(';base64,');
+    if (parts.length < 2) return null;
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uInt8Array], {type: contentType});
+  } catch (e) {
+    return null;
+  }
+}
+
+async function _fsaWriteBinaryFile(parentHandle, fileName, base64DataUrl) {
+  try {
+    const blob = _dataURLToBlob(base64DataUrl);
+    if (!blob) return;
+    const fh = await parentHandle.getFileHandle(fileName, {create:true});
+    const writable = await fh.createWritable();
+    await writable.write(blob);
+    await writable.close();
+  } catch(e) {
+    console.warn("[FSA] Binary write failed for " + fileName + ":", e);
+  }
+}
+
+function _sanitizeFileName(name) {
+  return name.replace(/[\\/:*?"<>|]/g, '_');
+}
+
+async function _saveManagerRawFiles(parentDirHandle, snapshot) {
+  try {
+    if (!snapshot || !snapshot.submissions || !snapshot.submissions.length) return;
+    const filesDir = await parentDirHandle.getDirectoryHandle('files', {create: true});
+    for (const sub of snapshot.submissions) {
+      const dateFolder = sub.date || 'unknown';
+      const dateDir = await filesDir.getDirectoryHandle(dateFolder, {create: true});
+      for (const cat of Object.values(sub.categories || {})) {
+        if (!cat.files || !Array.isArray(cat.files)) continue;
+        for (const file of cat.files) {
+          if (file.data && file.data.startsWith('data:')) {
+            const cleanName = _sanitizeFileName(file.name);
+            await _fsaWriteBinaryFile(dateDir, cleanName, file.data);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[FSA] Failed to save raw files directory:', e);
+  }
+}
+
 async function _writeBackupFile(dirHandle, specificMgrId = null){
   if(!dirHandle) return;
   try{
@@ -3434,11 +3490,15 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
     // 2. Save manager files
     if (curRole === 'm' && curUser) {
       const subDir = await dirHandle.getDirectoryHandle(curUser.id, {create: true});
-      await _fsaWriteFile(subDir, `FormTrack_${curUser.id}.json`, getManagerSnapshot(curUser.id));
+      const snapshot = getManagerSnapshot(curUser.id);
+      await _fsaWriteFile(subDir, `FormTrack_${curUser.id}.json`, snapshot);
+      await _saveManagerRawFiles(subDir, snapshot);
     } else if (curRole === 'a') {
       if (specificMgrId) {
         const subDir = await dirHandle.getDirectoryHandle(specificMgrId, {create: true});
-        await _fsaWriteFile(subDir, `FormTrack_${specificMgrId}.json`, getManagerSnapshot(specificMgrId));
+        const snapshot = getManagerSnapshot(specificMgrId);
+        await _fsaWriteFile(subDir, `FormTrack_${specificMgrId}.json`, snapshot);
+        await _saveManagerRawFiles(subDir, snapshot);
       } else {
         const mgrIds = new Set(db.managers.map(m => m.id));
         db.submissions.forEach(s => mgrIds.add(s.mgrId));
@@ -3447,7 +3507,9 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
         for (const mid of mgrIds) {
           if (!mid) continue;
           const subDir = await dirHandle.getDirectoryHandle(mid, {create: true});
-          await _fsaWriteFile(subDir, `FormTrack_${mid}.json`, getManagerSnapshot(mid));
+          const snapshot = getManagerSnapshot(mid);
+          await _fsaWriteFile(subDir, `FormTrack_${mid}.json`, snapshot);
+          await _saveManagerRawFiles(subDir, snapshot);
         }
       }
     }
