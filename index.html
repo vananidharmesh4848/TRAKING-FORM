@@ -252,6 +252,8 @@ textarea{resize:vertical;min-height:56px}
 .empty .ee{font-size:34px;margin-bottom:8px}
 .div{height:1px;background:var(--bd);margin:1rem 0}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -1176,9 +1178,11 @@ function doLogin(){
     if(!m){document.getElementById('lerr').textContent='Manager ID not found';return;}
     if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
     curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
+    if (typeof _restoreFromFirebase === 'function') _restoreFromFirebase();
   }else{
     if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
     saveSession('a','admin');showPg('pg-admin');initAdmin();
+    if (typeof _restoreFromFirebase === 'function') _restoreFromFirebase();
   }
 }
 function doLogout(){
@@ -3700,6 +3704,100 @@ async function _doFsaRestore(dirHandle){
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   FIREBASE REALTIME DATABASE SYNC
+═══════════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyAjn1T0sOYqoMHq_KiAzT8dsubRlO7BJtU",
+  authDomain: "formtrack-7cd54.firebaseapp.com",
+  databaseURL: "https://formtrack-7cd54-default-rtdb.firebaseio.com",
+  projectId: "formtrack-7cd54",
+  storageBucket: "formtrack-7cd54.firebasestorage.app",
+  messagingSenderId: "448539758535",
+  appId: "1:448539758535:web:dee14d6b4ca7dd576053e2",
+  measurementId: "G-3VVB9N1YHB"
+};
+
+let isFirebaseEnabled = false;
+try {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    isFirebaseEnabled = true;
+    console.info("[Firebase] Realtime Database initialized successfully");
+  } else {
+    console.warn("[Firebase] SDK script not loaded");
+  }
+} catch (e) {
+  console.error("[Firebase] Initialization failed:", e);
+}
+
+async function _syncToFirebase(mgrId) {
+  if (!isFirebaseEnabled) return;
+  try {
+    const dbRef = firebase.database().ref('formtrack');
+    
+    // 1. Sync global settings
+    await dbRef.child('global').set(getGlobalSnapshot());
+    
+    // 2. Sync manager specific data
+    if (mgrId) {
+      const snap = getManagerSnapshot(mgrId);
+      await dbRef.child('managers').child(mgrId).set(snap);
+    } else if (curUser && curRole === 'm') {
+      const snap = getManagerSnapshot(curUser.id);
+      await dbRef.child('managers').child(curUser.id).set(snap);
+    }
+  } catch (e) {
+    console.error("[Firebase] Sync write failed:", e);
+  }
+}
+
+async function _restoreFromFirebase() {
+  if (!isFirebaseEnabled) return;
+  try {
+    const dbRef = firebase.database().ref('formtrack');
+    
+    // 1. Restore global metadata
+    const globalSnap = await dbRef.child('global').once('value');
+    const globalData = globalSnap.val();
+    if (globalData) {
+      applyGlobalSnapshot(globalData);
+    }
+    
+    // 2. Restore manager data
+    if (curRole === 'm' && curUser) {
+      const mgrSnap = await dbRef.child('managers').child(curUser.id).once('value');
+      const mgrData = mgrSnap.val();
+      if (mgrData) {
+        applyManagerSnapshot(mgrData);
+      }
+      _origPersistFSA(); // Save locally
+      initMgr(); // Refresh UI
+    } else if (curRole === 'a') {
+      // Clear database arrays before merge
+      db.submissions = [];
+      db.leaves = [];
+      db.leavebal = {};
+      db.mistakes = [];
+      db.lateEntries = [];
+      db.problems = [];
+      db.ratings = [];
+      db.workHours = [];
+      
+      const managersSnap = await dbRef.child('managers').once('value');
+      const managersData = managersSnap.val() || {};
+      for (const mid of Object.keys(managersData)) {
+        applyManagerSnapshot(managersData[mid]);
+      }
+      _origPersistFSA(); // Save locally
+      initAdmin(); // Refresh UI
+    }
+    console.info("[Firebase] Sync load completed successfully");
+  } catch (e) {
+    console.error("[Firebase] Sync load failed:", e);
+  }
+}
+
 /* ── Debounced backup trigger — avoids multiple writes when
    persist() + persistLate() fire together ── */
 let _fsaTimer = null;
@@ -3721,6 +3819,19 @@ function _triggerFsaBackup(mgrId){
         }
       }
     }).catch(()=>{});
+    
+    // Firebase Cloud Sync
+    if (isFirebaseEnabled) {
+      if (curRole === 'a' && _fsaPendingMgrs.size > 0) {
+        for (const mid of _fsaPendingMgrs) {
+          _syncToFirebase(mid);
+        }
+      } else if (curUser) {
+        _syncToFirebase(curUser.id);
+      } else {
+        _syncToFirebase(null);
+      }
+    }
   }, 1000);
 }
 
@@ -3746,6 +3857,7 @@ persistMist = function(mgrId){ _origPersistMistFSA(mgrId); _triggerFsaBackup(mgr
 /* Run auto-restore immediately (before DOMContentLoaded fires rendering) */
 (async function _fsaBootstrap(){
   await _autoRestoreFromFolder();
+  await _restoreFromFirebase(); // Cloud sync from Firebase on boot
   const name = localStorage.getItem('ft7_bkdir_name');
   if(name) setTimeout(()=>_refreshFsaUI(name), 400);
 })();
