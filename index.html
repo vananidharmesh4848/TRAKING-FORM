@@ -1720,7 +1720,7 @@ function addMgr(){
   if(pw!==pw2){sm('mg-msg','Passwords do not match',true);return;}
   if(db.managers.find(m=>m.id===id)){sm('mg-msg','ID already exists',true);return;}
   if(db.managers.length>=50){sm('mg-msg','Max 50',true);return;}
-  db.managers.push({id,name:nm,deptId:dp,pw});persist();
+  db.managers.push({id,name:nm,deptId:dp,pw});persistGlobal();
   ['ni','nn','np','np2'].forEach(x=>document.getElementById(x).value='');document.getElementById('nd').value='';
   sm('mg-msg','✅ '+nm+' added!');renderMgTbl();
 }
@@ -1749,9 +1749,9 @@ function saveEdit(){
   if(!nm||!dp){sm('e-msg','Fill all fields',true);return;}
   if(pw&&pw!==pw2){sm('e-msg','Passwords do not match',true);return;}
   const m=db.managers.find(x=>x.id===editId);if(!m)return;
-  m.name=nm;m.deptId=dp;if(pw)m.pw=pw;persist();closeEdit();sm('mg-msg','✅ '+nm+' updated!');renderMgTbl();
+  m.name=nm;m.deptId=dp;if(pw)m.pw=pw;persistGlobal();closeEdit();sm('mg-msg','✅ '+nm+' updated!');renderMgTbl();
 }
-function delMgr(id){if(!confirm('Delete?'))return;db.managers=db.managers.filter(m=>m.id!==id);persist();renderMgTbl();renderOv();}
+function delMgr(id){if(!confirm('Delete?'))return;db.managers=db.managers.filter(m=>m.id!==id);persistGlobal();renderMgTbl();renderOv();}
 
 /* ============================================================
    DEPARTMENTS & CATEGORIES
@@ -1759,7 +1759,7 @@ function delMgr(id){if(!confirm('Delete?'))return;db.managers=db.managers.filter
 function addDept(){
   const nm=document.getElementById('dn').value.trim();if(!nm)return;
   if(db.departments.find(d=>d.name.toLowerCase()===nm.toLowerCase())){sm('dp-msg','Already exists',true);return;}
-  db.departments.push({id:'d'+Date.now(),name:nm});persist();
+  db.departments.push({id:'d'+Date.now(),name:nm});persistGlobal();
   document.getElementById('dn').value='';sm('dp-msg','✅ '+nm+' added!');renderDpTbl();popDs(['nd','e-dp']);popD('cd');
 }
 function renderDpTbl(){
@@ -1774,14 +1774,14 @@ function renderDpTbl(){
 }
 function delDept(id){
   if(db.categories.filter(c=>c.deptId===id).length||db.managers.filter(m=>m.deptId===id).length){alert('Remove managers & categories first');return;}
-  if(!confirm('Delete?'))return;db.departments=db.departments.filter(d=>d.id!==id);persist();renderDpTbl();
+  if(!confirm('Delete?'))return;db.departments=db.departments.filter(d=>d.id!==id);persistGlobal();renderDpTbl();
 }
 function popD(sid){const sel=document.getElementById(sid);if(!sel)return;const cur=sel.value;sel.innerHTML='<option value="">— Select —</option>';db.departments.forEach(d=>sel.add(new Option(d.name,d.id)));if(cur)sel.value=cur;}
 function addCat(){
   const nm=document.getElementById('cn').value.trim();const dp=document.getElementById('cd').value;
   if(!nm||!dp){sm('ct-msg','Fill name and select dept',true);return;}
   if(db.categories.find(c=>c.name.toLowerCase()===nm.toLowerCase()&&c.deptId===dp)){sm('ct-msg','Already exists',true);return;}
-  db.categories.push({id:'c'+Date.now(),name:nm,deptId:dp});persist();document.getElementById('cn').value='';sm('ct-msg','✅ '+nm+' added!');renderCtList();
+  db.categories.push({id:'c'+Date.now(),name:nm,deptId:dp});persistGlobal();document.getElementById('cn').value='';sm('ct-msg','✅ '+nm+' added!');renderCtList();
 }
 function renderCtList(){
   document.getElementById('ct-list').innerHTML=db.departments.map(d=>{
@@ -1791,7 +1791,7 @@ function renderCtList(){
     </div>`;
   }).join('')||'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
 }
-function delCat(id){if(!confirm('Delete?'))return;db.categories=db.categories.filter(c=>c.id!==id);persist();renderCtList();}
+function delCat(id){if(!confirm('Delete?'))return;db.categories=db.categories.filter(c=>c.id!==id);persistGlobal();renderCtList();}
 
 /* ============================================================
    SETTINGS
@@ -1801,7 +1801,7 @@ function chgPw(){
   if(c!==db.adminPw){sm('pw-msg','Wrong current password',true);return;}
   if(n.length<4){sm('pw-msg','Min 4 characters',true);return;}
   if(n!==r){sm('pw-msg','Passwords do not match',true);return;}
-  db.adminPw=n;persist();sm('pw-msg','✅ Password updated!');['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
+  db.adminPw=n;persistGlobal();sm('pw-msg','✅ Password updated!');['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
 }
 function clrAll(){if(!confirm('DELETE ALL? Cannot undo!'))return;db.submissions=[];persist();renderOv();alert('Done.');}
 function clrRange(){
@@ -3575,11 +3575,6 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
     const perm = await dirHandle.requestPermission({mode:'readwrite'});
     if(perm !== 'granted'){ _updateFsaStatus('⚠️ Folder permission denied'); return; }
     
-    // 1. Save global file (metadata) - ONLY if Admin
-    if (curRole === 'a') {
-      await _fsaWriteFile(dirHandle, 'FormTrack_Global.json', getGlobalSnapshot());
-    }
-    
     // 2. Save manager files
     if (curRole === 'm' && curUser) {
       const subDir = await dirHandle.getDirectoryHandle(curUser.id, {create: true});
@@ -3820,6 +3815,14 @@ try {
     firebase.initializeApp(firebaseConfig);
     isFirebaseEnabled = true;
     console.info("[Firebase] Realtime Database initialized successfully");
+    if (typeof initFirebaseListeners === 'function') {
+      initFirebaseListeners();
+    } else {
+      // Fallback if defined later in parsing
+      setTimeout(() => {
+        if (typeof initFirebaseListeners === 'function') initFirebaseListeners();
+      }, 500);
+    }
   } else {
     console.warn("[Firebase] SDK script not loaded");
   }
@@ -3831,11 +3834,6 @@ async function _syncToFirebase(mgrId) {
   if (!isFirebaseEnabled) return;
   try {
     const dbRef = firebase.database().ref('formtrack');
-    
-    // 1. Sync global settings - ONLY if Admin
-    if (curRole === 'a') {
-      await dbRef.child('global').set(getGlobalSnapshot());
-    }
     
     // 2. Sync manager specific data
     if (mgrId) {
@@ -4440,37 +4438,37 @@ function initBkTab() {
 // Intercept Local Storage triggers to run Drive backup
 const _origPersistGD = persist;
 persist = function(mgrId) {
-  _origPersistGD();
-  _triggerGDriveBackup(mgrId, curRole === 'a');
+  _origPersistGD(mgrId);
+  _triggerGDriveBackup(mgrId, false);
 };
 
 const _origPersistLateGD = persistLate;
 persistLate = function(mgrId) {
-  _origPersistLateGD();
+  _origPersistLateGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistProbGD = persistProb;
 persistProb = function(mgrId) {
-  _origPersistProbGD();
+  _origPersistProbGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistRtngGD = persistRatings;
 persistRatings = function(mgrId) {
-  _origPersistRtngGD();
+  _origPersistRtngGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistHrsGD = persistHrs;
 persistHrs = function(mgrId) {
-  _origPersistHrsGD();
+  _origPersistHrsGD(mgrId);
   _triggerGDriveBackup(mgrId || (curUser ? curUser.id : null));
 };
 
 const _origPersistMistGD = persistMist;
 persistMist = function(mgrId) {
-  _origPersistMistGD();
+  _origPersistMistGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
@@ -4482,6 +4480,113 @@ setTimeout(() => {
     gdSignIn();
   }
 }, 1000);
+
+/* ============================================================
+   REAL-TIME SYNC & GLOBAL WRITE DECOUPLING
+============================================================ */
+async function syncGlobalToFirebase() {
+  if (!isFirebaseEnabled) return;
+  try {
+    const dbRef = firebase.database().ref('formtrack');
+    await dbRef.child('global').set(getGlobalSnapshot());
+    updateSyncStatus('firebase', 'ok');
+  } catch(e) {
+    console.error("[Firebase] Global sync failed:", e);
+    updateSyncStatus('firebase', 'error', 'Firebase Global Sync Failed: ' + e.message);
+  }
+}
+
+function triggerGDriveGlobalBackup() {
+  if (!gdriveAccessToken) return;
+  _gdSyncGlobal = true;
+  clearTimeout(_gdTimer);
+  _gdTimer = setTimeout(async () => {
+    try {
+      const globalId = await getOrCreateFile('FormTrack_Global.json');
+      await updateFileContent(globalId, getGlobalSnapshot());
+      _gdSyncGlobal = false;
+      updateSyncStatus('gdrive', 'ok');
+    } catch(e) {
+      console.error("GDrive global backup failed:", e);
+      updateSyncStatus('gdrive', 'error', 'GDrive Global Backup Failed: ' + e.message);
+    }
+  }, 1000);
+}
+
+function persistGlobal() {
+  // 1. Save locally
+  if (typeof _origPersistFSA === 'function') {
+    _origPersistFSA();
+  } else if (typeof persist === 'function') {
+    persist();
+  }
+  
+  // 2. Firebase Cloud Sync
+  if (isFirebaseEnabled) {
+    syncGlobalToFirebase();
+  }
+  
+  // 3. GDrive Sync
+  if (gdriveAccessToken) {
+    triggerGDriveGlobalBackup();
+  }
+  
+  // 4. PC Folder (FSA) Sync
+  if (typeof _getDirHandle === 'function') {
+    _getDirHandle().then(async (h) => {
+      if (h) {
+        try {
+          const perm = await h.requestPermission({mode:'readwrite'});
+          if(perm === 'granted'){
+            await _fsaWriteFile(h, 'FormTrack_Global.json', getGlobalSnapshot());
+            _updateFsaStatus('✅ Saved global configuration');
+          }
+        } catch(e) {
+          console.warn("[FSA] Global write failed:", e);
+        }
+      }
+    }).catch(() => {});
+  }
+}
+
+function initFirebaseListeners() {
+  if (!isFirebaseEnabled) return;
+  try {
+    const dbRef = firebase.database().ref('formtrack');
+    
+    // Listen to global changes in real-time
+    dbRef.child('global').on('value', (snapshot) => {
+      const globalData = snapshot.val();
+      if (globalData) {
+        // Simple comparison to prevent redundant updates
+        if (JSON.stringify(globalData.managers) === JSON.stringify(db.managers) &&
+            JSON.stringify(globalData.departments) === JSON.stringify(db.departments) &&
+            JSON.stringify(globalData.categories) === JSON.stringify(db.categories) &&
+            globalData.adminPw === db.adminPw) {
+          return; // Identical, ignore
+        }
+        
+        console.log("[Firebase] Global sync update received in real-time");
+        applyGlobalSnapshot(globalData);
+        if (typeof _origPersistFSA === 'function') _origPersistFSA();
+        
+        // Refresh UI
+        if (curRole === 'a') {
+          const activeSec = document.querySelector('#pg-admin .sec.on');
+          if (activeSec) {
+            const tabId = activeSec.id.replace('as-', '');
+            if (tabId === 'mg') renderMgTbl();
+            if (tabId === 'dp') renderDpTbl();
+            if (tabId === 'ct') renderCtList();
+          }
+          renderOv();
+        }
+      }
+    });
+  } catch(e) {
+    console.error("[Firebase] Listener setup failed:", e);
+  }
+}
 </script>
 </body>
 </html>
