@@ -3550,6 +3550,10 @@ function _dataURLToBlob(dataURL) {
 
 async function _fsaWriteBinaryFile(parentHandle, fileName, base64DataUrl) {
   try {
+    try {
+      const existingFile = await parentHandle.getFileHandle(fileName, {create: false});
+      if (existingFile) return;
+    } catch(err) {}
     const blob = _dataURLToBlob(base64DataUrl);
     if (!blob) return;
     const fh = await parentHandle.getFileHandle(fileName, {create:true});
