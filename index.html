@@ -1106,14 +1106,6 @@ function updateSyncStatus(system, status, detail = '') {
 }
 
 function updateSyncAlertsUI() {
-  const gCid = localStorage.getItem('ft_g_cid') || '';
-  const gApiKey = localStorage.getItem('ft_g_api_key') || '';
-  if (gCid && gApiKey && !gdriveAccessToken && syncStatus.gdrive.status === 'ok') {
-    syncStatus.gdrive = { status: 'warning', detail: 'Google Drive offline. Please sign in.' };
-  } else if ((!gCid || !gApiKey) && syncStatus.gdrive.status === 'ok') {
-    syncStatus.gdrive = { status: 'warning', detail: 'Google Drive not configured.' };
-  }
-
   const bkDirName = localStorage.getItem('ft7_bkdir_name');
   if (bkDirName && syncStatus.fsa.status === 'ok') {
     _getDirHandle().then(handle => {
@@ -1135,20 +1127,6 @@ function updateSyncAlertsUI() {
         <span>☁️ <b>Google Drive Sync Error:</b> ${syncStatus.gdrive.detail}</span>
         <button class="btn bre bxs" onclick="gdSignIn()">🔗 Re-authenticate</button>
       </div>`;
-  } else if (syncStatus.gdrive.status === 'warning') {
-    if (!gCid || !gApiKey) {
-      alertHTML += `
-        <div class="sync-alert warning">
-          <span>☁️ <b>Google Drive Offline:</b> GDrive Sync not configured. Tamari credentials check karo settings ma.</span>
-          <button class="btn bam bxs" onclick="curRole === 'a' ? aTab('st', document.getElementById('sbi-st')) : mTab('dash')">⚙️ Configure</button>
-        </div>`;
-    } else {
-      alertHTML += `
-        <div class="sync-alert warning">
-          <span>☁️ <b>Google Drive Offline:</b> Google Drive log out thayi gayu che. Sign in karo data sync કરવા.</span>
-          <button class="btn ba bxs" onclick="gdSignIn()">🔗 Sign In</button>
-        </div>`;
-    }
   }
 
   if (syncStatus.fsa.status === 'error') {
@@ -4065,14 +4043,7 @@ function updateDriveUI(signedIn) {
     if (bkBtn) bkBtn.style.display = 'none';
     if (rsBtn) rsBtn.style.display = 'none';
     if (outBtn) outBtn.style.display = 'none';
-    
-    const gCid = localStorage.getItem('ft_g_cid') || '';
-    const gApiKey = localStorage.getItem('ft_g_api_key') || '';
-    if (gCid && gApiKey) {
-      updateSyncStatus('gdrive', 'warning', 'Google Drive offline. Please sign in.');
-    } else {
-      updateSyncStatus('gdrive', 'warning', 'Google Drive not configured.');
-    }
+    updateSyncStatus('gdrive', 'ok');
   }
 }
 
