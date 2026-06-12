@@ -1102,6 +1102,8 @@ function ls(k){return localStorage.getItem(k);}
 function hasBackup(){
   return (typeof isFirebaseEnabled !== 'undefined' && isFirebaseEnabled) || !!localStorage.getItem('ft7_bkdir_name') || !!localStorage.getItem('ft_gd_token');
 }
+let lastGlobalUpdatedAt = null;
+let lastManagerUpdatedAt = {};
 
 if(!db.departments) db.departments=[{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
 if(!db.categories)  db.categories=[
@@ -4202,6 +4204,8 @@ function safeParseJson(data) {
 // Data Serialization
 function getManagerSnapshot(mgrId) {
   const filterByMgr = (arr) => (arr || []).filter(item => item.mgrId === mgrId);
+  const now = new Date().toISOString();
+  lastManagerUpdatedAt[mgrId] = now;
   return {
     mgrId: mgrId,
     submissions: filterByMgr(db.submissions),
@@ -4212,13 +4216,20 @@ function getManagerSnapshot(mgrId) {
     problems: filterByMgr(db.problems),
     ratings: filterByMgr(db.ratings),
     workHours: filterByMgr(db.workHours),
-    updatedAt: new Date().toISOString()
+    updatedAt: now
   };
 }
 
 function applyManagerSnapshot(snapshot) {
   if (!snapshot || !snapshot.mgrId) return;
   const mgrId = snapshot.mgrId;
+  if (snapshot.updatedAt) {
+    if (lastManagerUpdatedAt[mgrId] && new Date(snapshot.updatedAt) < new Date(lastManagerUpdatedAt[mgrId])) {
+      console.info("[Sync] Skipped applying older manager snapshot for " + mgrId + ":", snapshot.updatedAt);
+      return;
+    }
+    lastManagerUpdatedAt[mgrId] = snapshot.updatedAt;
+  }
   const filterOutMgr = (arr) => (arr || []).filter(item => item.mgrId !== mgrId);
   
   db.submissions = filterOutMgr(db.submissions).concat(snapshot.submissions || []);
@@ -4232,17 +4243,26 @@ function applyManagerSnapshot(snapshot) {
 }
 
 function getGlobalSnapshot() {
+  const now = new Date().toISOString();
+  lastGlobalUpdatedAt = now;
   return {
     managers: db.managers || [],
     departments: db.departments || [],
     categories: db.categories || [],
     adminPw: db.adminPw || 'admin123',
-    updatedAt: new Date().toISOString()
+    updatedAt: now
   };
 }
 
 function applyGlobalSnapshot(snapshot) {
   if (!snapshot) return;
+  if (snapshot.updatedAt) {
+    if (lastGlobalUpdatedAt && new Date(snapshot.updatedAt) < new Date(lastGlobalUpdatedAt)) {
+      console.info("[Sync] Skipped applying older global snapshot:", snapshot.updatedAt);
+      return;
+    }
+    lastGlobalUpdatedAt = snapshot.updatedAt;
+  }
   if (snapshot.managers) db.managers = snapshot.managers;
   if (snapshot.departments) db.departments = snapshot.departments;
   if (snapshot.categories) db.categories = snapshot.categories;
