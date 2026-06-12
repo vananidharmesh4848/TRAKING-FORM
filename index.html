@@ -3575,8 +3575,10 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
     const perm = await dirHandle.requestPermission({mode:'readwrite'});
     if(perm !== 'granted'){ _updateFsaStatus('⚠️ Folder permission denied'); return; }
     
-    // 1. Save global file (metadata)
-    await _fsaWriteFile(dirHandle, 'FormTrack_Global.json', getGlobalSnapshot());
+    // 1. Save global file (metadata) - ONLY if Admin
+    if (curRole === 'a') {
+      await _fsaWriteFile(dirHandle, 'FormTrack_Global.json', getGlobalSnapshot());
+    }
     
     // 2. Save manager files
     if (curRole === 'm' && curUser) {
@@ -3830,8 +3832,10 @@ async function _syncToFirebase(mgrId) {
   try {
     const dbRef = firebase.database().ref('formtrack');
     
-    // 1. Sync global settings
-    await dbRef.child('global').set(getGlobalSnapshot());
+    // 1. Sync global settings - ONLY if Admin
+    if (curRole === 'a') {
+      await dbRef.child('global').set(getGlobalSnapshot());
+    }
     
     // 2. Sync manager specific data
     if (mgrId) {
@@ -4380,7 +4384,7 @@ function _triggerGDriveBackup(mgrId, isGlobal = false) {
   _gdTimer = setTimeout(async () => {
     if (!gdriveAccessToken) return;
     try {
-      if (_gdSyncGlobal) {
+      if (_gdSyncGlobal && curRole === 'a') {
         const globalId = await getOrCreateFile('FormTrack_Global.json');
         await updateFileContent(globalId, getGlobalSnapshot());
         _gdSyncGlobal = false;
