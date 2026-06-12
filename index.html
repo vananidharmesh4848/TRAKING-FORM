@@ -251,6 +251,10 @@ textarea{resize:vertical;min-height:56px}
 .empty{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
 .empty .ee{font-size:34px;margin-bottom:8px}
 .div{height:1px;background:var(--bd);margin:1rem 0}
+.sync-alert{background:var(--re2);border:1.5px solid var(--re3);color:var(--re);padding:10px 14px;border-radius:var(--rs);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
+.sync-alert.warning{background:var(--am2);border-color:var(--am3);color:var(--am)}
+.sync-alert.success{background:var(--gr2);border-color:var(--gr3);color:var(--gr)}
+.sync-alert button{flex-shrink:0}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -296,6 +300,7 @@ textarea{resize:vertical;min-height:56px}
     <div id="gd-mgr-sync" style="display:none;font-size:11px;color:var(--gr);background:var(--gr2);padding:3px 8px;border-radius:100px;border:1px solid var(--gr3)">☁️</div>
   </div>
   <div class="wrap">
+    <div id="mgr-sync-alerts"></div>
     
     <!-- TOP TABS (Admin jevi) -->
     <div class="atabs" id="mtabs">
@@ -572,6 +577,7 @@ textarea{resize:vertical;min-height:56px}
         </div>
       </div>
       <div class="main-content">
+        <div id="admin-sync-alerts"></div>
         <div class="atabs" id="atabs"></div>
     <div class="sec on" id="as-ov">
       <div class="pg-header">
@@ -1084,6 +1090,96 @@ textarea{resize:vertical;min-height:56px}
 
 <script>
 /* ============================================================
+   SYNC STATUS TRACKING
+============================================================ */
+let syncStatus = {
+  gdrive: { status: 'ok', detail: '' },
+  firebase: { status: 'ok', detail: '' },
+  fsa: { status: 'ok', detail: '' }
+};
+
+function updateSyncStatus(system, status, detail = '') {
+  syncStatus[system] = { status, detail };
+  if (typeof updateSyncAlertsUI === 'function') {
+    updateSyncAlertsUI();
+  }
+}
+
+function updateSyncAlertsUI() {
+  const gCid = localStorage.getItem('ft_g_cid') || '';
+  const gApiKey = localStorage.getItem('ft_g_api_key') || '';
+  if (gCid && gApiKey && !gdriveAccessToken && syncStatus.gdrive.status === 'ok') {
+    syncStatus.gdrive = { status: 'warning', detail: 'Google Drive offline. Please sign in.' };
+  } else if ((!gCid || !gApiKey) && syncStatus.gdrive.status === 'ok') {
+    syncStatus.gdrive = { status: 'warning', detail: 'Google Drive not configured.' };
+  }
+
+  const bkDirName = localStorage.getItem('ft7_bkdir_name');
+  if (bkDirName && syncStatus.fsa.status === 'ok') {
+    _getDirHandle().then(handle => {
+      if (handle) {
+        handle.queryPermission({mode: 'readwrite'}).then(perm => {
+          if (perm !== 'granted') {
+            updateSyncStatus('fsa', 'warning', `Folder "${handle.name}" is locked. Click to unlock.`);
+          }
+        }).catch(() => {});
+      }
+    }).catch(() => {});
+  }
+
+  let alertHTML = '';
+
+  if (syncStatus.gdrive.status === 'error') {
+    alertHTML += `
+      <div class="sync-alert">
+        <span>☁️ <b>Google Drive Sync Error:</b> ${syncStatus.gdrive.detail}</span>
+        <button class="btn bre bxs" onclick="gdSignIn()">🔗 Re-authenticate</button>
+      </div>`;
+  } else if (syncStatus.gdrive.status === 'warning') {
+    if (!gCid || !gApiKey) {
+      alertHTML += `
+        <div class="sync-alert warning">
+          <span>☁️ <b>Google Drive Offline:</b> GDrive Sync not configured. Tamari credentials check karo settings ma.</span>
+          <button class="btn bam bxs" onclick="curRole === 'a' ? aTab('st', document.getElementById('sbi-st')) : mTab('dash')">⚙️ Configure</button>
+        </div>`;
+    } else {
+      alertHTML += `
+        <div class="sync-alert warning">
+          <span>☁️ <b>Google Drive Offline:</b> Google Drive log out thayi gayu che. Sign in karo data sync કરવા.</span>
+          <button class="btn ba bxs" onclick="gdSignIn()">🔗 Sign In</button>
+        </div>`;
+    }
+  }
+
+  if (syncStatus.fsa.status === 'error') {
+    alertHTML += `
+      <div class="sync-alert">
+        <span>📁 <b>Local Folder Sync Error:</b> ${syncStatus.fsa.detail}</span>
+        <button class="btn bre bxs" onclick="setBackupFolder()">📂 Re-select Folder</button>
+      </div>`;
+  } else if (syncStatus.fsa.status === 'warning') {
+    alertHTML += `
+      <div class="sync-alert warning">
+        <span>📁 <b>Local Folder Locked:</b> Browser restrictions na lidhe directory locked che. data restore karo.</span>
+        <button class="btn bam bxs" onclick="_requestAndRestore()">🔓 Unlock & Restore</button>
+      </div>`;
+  }
+
+  if (syncStatus.firebase.status === 'error') {
+    alertHTML += `
+      <div class="sync-alert">
+        <span>🔥 <b>Firebase Sync Offline:</b> ${syncStatus.firebase.detail}</span>
+        <button class="btn bre bxs" onclick="_restoreFromFirebase()">🔄 Reconnect</button>
+      </div>`;
+  }
+
+  const adminAlerts = document.getElementById('admin-sync-alerts');
+  const mgrAlerts = document.getElementById('mgr-sync-alerts');
+  if (adminAlerts) adminAlerts.innerHTML = alertHTML;
+  if (mgrAlerts) mgrAlerts.innerHTML = alertHTML;
+}
+
+/* ============================================================
    DATA
 ============================================================ */
 const LEAVE_TYPES=['Casual Leave','Sick Leave','Earned Leave','Emergency Leave'];
@@ -1099,11 +1195,6 @@ let db={
   adminPw:     ls('ft6_apw')||'admin123'
 };
 function ls(k){return localStorage.getItem(k);}
-function hasBackup(){
-  return (typeof isFirebaseEnabled !== 'undefined' && isFirebaseEnabled) || !!localStorage.getItem('ft7_bkdir_name') || !!localStorage.getItem('ft_gd_token');
-}
-let lastGlobalUpdatedAt = null;
-let lastManagerUpdatedAt = {};
 
 if(!db.departments) db.departments=[{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
 if(!db.categories)  db.categories=[
@@ -1122,22 +1213,11 @@ function persist(){
     localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
     localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
     localStorage.setItem('ft6_ct',JSON.stringify(db.categories));
+    localStorage.setItem('ft6_sb',JSON.stringify(db.submissions));
+    localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
+    localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
     localStorage.setItem('ft6_apw',db.adminPw);
-    
-    if (!hasBackup()) {
-      localStorage.setItem('ft6_sb',JSON.stringify(db.submissions));
-      localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
-      localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
-    } else {
-      localStorage.removeItem('ft6_sb');
-      localStorage.removeItem('ft6_lv');
-      localStorage.removeItem('ft6_lb');
-    }
-  }catch(e){
-    if (!hasBackup()) {
-      alert('Storage full! Admin > Settings > Delete old submissions');
-    }
-  }
+  }catch(e){alert('Storage full! Admin > Settings > Delete old submissions');}
 }
 
 /* ============================================================
@@ -1184,6 +1264,17 @@ function selR(r){
   document.getElementById('mb').style.display=r==='m'?'block':'none';
   document.getElementById('ab').style.display=r==='a'?'block':'none';
 }
+async function triggerSyncRestore() {
+  if (typeof _restoreFromFirebase === 'function') {
+    try { await _restoreFromFirebase(); } catch(e) { console.warn("Firebase restore failed", e); }
+  }
+  if (typeof gdRestore === 'function' && gdriveAccessToken) {
+    try { await gdRestore(); } catch(e) { console.warn("GDrive restore failed", e); }
+  }
+  if (typeof _autoRestoreFromFolder === 'function') {
+    try { await _autoRestoreFromFolder(); } catch(e) { console.warn("FSA restore failed", e); }
+  }
+}
 function doLogin(){
   document.getElementById('lerr').textContent='';
   if(!curRole){document.getElementById('lerr').textContent='Select a role';return;}
@@ -1194,11 +1285,11 @@ function doLogin(){
     if(!m){document.getElementById('lerr').textContent='Manager ID not found';return;}
     if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
     curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
-    if (typeof _restoreFromFirebase === 'function') _restoreFromFirebase();
+    triggerSyncRestore();
   }else{
     if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
     saveSession('a','admin');showPg('pg-admin');initAdmin();
-    if (typeof _restoreFromFirebase === 'function') _restoreFromFirebase();
+    triggerSyncRestore();
   }
 }
 function doLogout(){
@@ -1226,6 +1317,7 @@ function initMgr(){
   document.getElementById('ms-dash').classList.add('on');
   document.getElementById('mn-dash').classList.add('on');
   renderMgrDash();
+  if (typeof updateSyncAlertsUI === 'function') updateSyncAlertsUI();
 }
 function psh(s){document.getElementById('sh-d').className='so day'+(s==='day'?' on':'');document.getElementById('sh-n').className='so night'+(s==='night'?' on':'');}
 const gsh=()=>document.getElementById('sh-d').classList.contains('on')?'day':'night';
@@ -1252,77 +1344,12 @@ function renderCats(){
       <div class="chips" id="ch-${c.id}"></div>
     </div>`).join('');
 }
-function compressImage(base64Str, mimeType, callback) {
-  if (!mimeType.startsWith('image/')) {
-    callback(base64Str);
-    return;
-  }
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    const MAX_WIDTH = 800;
-    const MAX_HEIGHT = 800;
-    let width = img.width;
-    let height = img.height;
-    
-    if (width > height) {
-      if (width > MAX_WIDTH) {
-        height *= MAX_WIDTH / width;
-        width = MAX_WIDTH;
-      }
-    } else {
-      if (height > MAX_HEIGHT) {
-        width *= MAX_HEIGHT / height;
-        height = MAX_HEIGHT;
-      }
-    }
-    
-    canvas.width = width;
-    canvas.height = height;
-    ctx.drawImage(img, 0, 0, width, height);
-    
-    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-    callback(compressedBase64);
-  };
-  img.onerror = () => {
-    callback(base64Str);
-  };
-  img.src = base64Str;
-}
 function onFile(inp){
   const cid=inp.dataset.cid;const fs=Array.from(inp.files);
   if(!catFiles[cid])catFiles[cid]=[];
   if(catFiles[cid].length+fs.length>10){alert('Max 10 files');inp.value='';return;}
   let done=0;
-  fs.forEach(f=>{
-    const r=new FileReader();
-    r.onload=e=>{
-      const base64Data = e.target.result;
-      if(f.type.startsWith('image/')){
-        compressImage(base64Data, f.type, (compressedData)=>{
-          let finalName = f.name;
-          if (!finalName.toLowerCase().endsWith('.jpg') && !finalName.toLowerCase().endsWith('.jpeg')) {
-            const lastDot = finalName.lastIndexOf('.');
-            if (lastDot !== -1) {
-              finalName = finalName.substring(0, lastDot) + '.jpg';
-            } else {
-              finalName = finalName + '.jpg';
-            }
-          }
-          catFiles[cid].push({name:finalName,type:'image/jpeg',data:compressedData});
-          done++;
-          if(done===fs.length)refCh(cid);
-        });
-      } else {
-        catFiles[cid].push({name:f.name,type:f.type,data:base64Data});
-        done++;
-        if(done===fs.length)refCh(cid);
-      }
-    };
-    r.readAsDataURL(f);
-  });
+  fs.forEach(f=>{const r=new FileReader();r.onload=e=>{catFiles[cid].push({name:f.name,type:f.type,data:e.target.result});done++;if(done===fs.length)refCh(cid);};r.readAsDataURL(f);});
   inp.value='';
 }
 function refCh(cid){
@@ -1497,6 +1524,7 @@ function initAdmin(){
     `;
   }
   renderOv();updateLvBadge();
+  if (typeof updateSyncAlertsUI === 'function') updateSyncAlertsUI();
 }
 
 /* Sidebar tab titles map */
@@ -1849,11 +1877,7 @@ const MISTAKE_CATS=['Form Error','Late Submission','Missing Data','Process Viola
 if(!db.mistakes) db.mistakes=JSON.parse(localStorage.getItem('ft6_mist')||'[]');
 
 function persistMist(){
-  if (!hasBackup()) {
-    localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
-  } else {
-    localStorage.removeItem('ft6_mist');
-  }
+  localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
 }
 
 // Severity config
@@ -2107,11 +2131,7 @@ restoreSession=function(){
 if(!db.lateEntries) db.lateEntries = JSON.parse(localStorage.getItem('ft7_late')||'[]');
 
 function persistLate(){
-  if (!hasBackup()) {
-    localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
-  } else {
-    localStorage.removeItem('ft7_late');
-  }
+  localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
 }
 
 // ── Manager: submit late entry ──
@@ -2582,13 +2602,7 @@ function dlLateRepExcel(){
 <script>
 /* ═══════════════════ PROBLEM / SOLUTION SYSTEM ═══════════════════ */
 if(!db.problems) db.problems = JSON.parse(localStorage.getItem('ft8_prob')||'[]');
-function persistProb(){ 
-  if (!hasBackup()) {
-    localStorage.setItem('ft8_prob', JSON.stringify(db.problems)); 
-  } else {
-    localStorage.removeItem('ft8_prob');
-  }
-}
+function persistProb(){ localStorage.setItem('ft8_prob', JSON.stringify(db.problems)); }
 const PROB_CATS=['Work Issue','Behavior Issue','Process Issue','Communication Issue','Quality Issue','Other'];
 
 /* ── Manager submits a problem ── */
@@ -2718,13 +2732,7 @@ function renderMgrProb(){
 
 /* ═══════════════════ RATING SYSTEM ═══════════════════ */
 if(!db.ratings)db.ratings=JSON.parse(localStorage.getItem('ft8_rtng')||'[]');
-function persistRatings(){
-  if (!hasBackup()) {
-    localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));
-  } else {
-    localStorage.removeItem('ft8_rtng');
-  }
-}
+function persistRatings(){localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));}
 
 function starHTML(n){n=Math.round(n);return '<span style="color:#FBBF24;font-size:16px">'+'⭐'.repeat(n)+'</span>';}
 
@@ -3059,13 +3067,7 @@ impJSON=function(inp){
 if(!db.workHours) db.workHours = JSON.parse(localStorage.getItem('ft7_hrs')||'[]');
 
 function persistHrs(){
-  try{ 
-    if (!hasBackup()) {
-      localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); 
-    } else {
-      localStorage.removeItem('ft7_hrs');
-    }
-  }catch(e){}
+  try{ localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); }catch(e){}
 }
 
 /* ── OT Check & Live Preview ── */
@@ -3552,10 +3554,6 @@ function _dataURLToBlob(dataURL) {
 
 async function _fsaWriteBinaryFile(parentHandle, fileName, base64DataUrl) {
   try {
-    try {
-      const existingFile = await parentHandle.getFileHandle(fileName, {create: false});
-      if (existingFile) return;
-    } catch(err) {}
     const blob = _dataURLToBlob(base64DataUrl);
     if (!blob) return;
     const fh = await parentHandle.getFileHandle(fileName, {create:true});
@@ -3643,6 +3641,13 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
 function _updateFsaStatus(msg){
   const el = document.getElementById('bkf-status');
   if(el) el.textContent = msg;
+  if (msg.includes('❌')) {
+    updateSyncStatus('fsa', 'error', msg);
+  } else if (msg.includes('⚠️') || msg.includes('🔔') || msg.includes('locked')) {
+    updateSyncStatus('fsa', 'warning', msg);
+  } else {
+    updateSyncStatus('fsa', 'ok', msg);
+  }
 }
 
 function _refreshFsaUI(folderName){
@@ -3857,20 +3862,11 @@ async function _syncToFirebase(mgrId) {
     } else if (curUser && curRole === 'm') {
       const snap = getManagerSnapshot(curUser.id);
       await dbRef.child('managers').child(curUser.id).set(snap);
-    } else if (curRole === 'a') {
-      // Sync all managers as fallback on admin action
-      const mgrIds = new Set(db.managers.map(m => m.id));
-      db.submissions.forEach(s => mgrIds.add(s.mgrId));
-      db.leaves.forEach(l => mgrIds.add(l.mgrId));
-      
-      for (const mid of mgrIds) {
-        if (!mid) continue;
-        const snap = getManagerSnapshot(mid);
-        await dbRef.child('managers').child(mid).set(snap);
-      }
     }
+    updateSyncStatus('firebase', 'ok');
   } catch (e) {
     console.error("[Firebase] Sync write failed:", e);
+    updateSyncStatus('firebase', 'error', 'Firebase Write Failed: ' + e.message);
   }
 }
 
@@ -3914,9 +3910,11 @@ async function _restoreFromFirebase() {
       _origPersistFSA(); // Save locally
       initAdmin(); // Refresh UI
     }
+    updateSyncStatus('firebase', 'ok');
     console.info("[Firebase] Sync load completed successfully");
   } catch (e) {
     console.error("[Firebase] Sync load failed:", e);
+    updateSyncStatus('firebase', 'error', 'Firebase Load Failed: ' + e.message);
   }
 }
 
@@ -4056,6 +4054,7 @@ function updateDriveUI(signedIn) {
     if (bkBtn) bkBtn.style.display = 'inline-block';
     if (rsBtn) rsBtn.style.display = 'inline-block';
     if (outBtn) outBtn.style.display = 'inline-block';
+    updateSyncStatus('gdrive', 'ok');
   } else {
     if (dot) dot.style.display = 'none';
     if (mgrSync) mgrSync.style.display = 'none';
@@ -4066,6 +4065,14 @@ function updateDriveUI(signedIn) {
     if (bkBtn) bkBtn.style.display = 'none';
     if (rsBtn) rsBtn.style.display = 'none';
     if (outBtn) outBtn.style.display = 'none';
+    
+    const gCid = localStorage.getItem('ft_g_cid') || '';
+    const gApiKey = localStorage.getItem('ft_g_api_key') || '';
+    if (gCid && gApiKey) {
+      updateSyncStatus('gdrive', 'warning', 'Google Drive offline. Please sign in.');
+    } else {
+      updateSyncStatus('gdrive', 'warning', 'Google Drive not configured.');
+    }
   }
 }
 
@@ -4204,8 +4211,6 @@ function safeParseJson(data) {
 // Data Serialization
 function getManagerSnapshot(mgrId) {
   const filterByMgr = (arr) => (arr || []).filter(item => item.mgrId === mgrId);
-  const now = new Date().toISOString();
-  lastManagerUpdatedAt[mgrId] = now;
   return {
     mgrId: mgrId,
     submissions: filterByMgr(db.submissions),
@@ -4216,20 +4221,13 @@ function getManagerSnapshot(mgrId) {
     problems: filterByMgr(db.problems),
     ratings: filterByMgr(db.ratings),
     workHours: filterByMgr(db.workHours),
-    updatedAt: now
+    updatedAt: new Date().toISOString()
   };
 }
 
 function applyManagerSnapshot(snapshot) {
   if (!snapshot || !snapshot.mgrId) return;
   const mgrId = snapshot.mgrId;
-  if (snapshot.updatedAt) {
-    if (lastManagerUpdatedAt[mgrId] && new Date(snapshot.updatedAt) < new Date(lastManagerUpdatedAt[mgrId])) {
-      console.info("[Sync] Skipped applying older manager snapshot for " + mgrId + ":", snapshot.updatedAt);
-      return;
-    }
-    lastManagerUpdatedAt[mgrId] = snapshot.updatedAt;
-  }
   const filterOutMgr = (arr) => (arr || []).filter(item => item.mgrId !== mgrId);
   
   db.submissions = filterOutMgr(db.submissions).concat(snapshot.submissions || []);
@@ -4243,30 +4241,26 @@ function applyManagerSnapshot(snapshot) {
 }
 
 function getGlobalSnapshot() {
-  const now = new Date().toISOString();
-  lastGlobalUpdatedAt = now;
   return {
     managers: db.managers || [],
     departments: db.departments || [],
     categories: db.categories || [],
     adminPw: db.adminPw || 'admin123',
-    updatedAt: now
+    updatedAt: new Date().toISOString()
   };
 }
 
 function applyGlobalSnapshot(snapshot) {
   if (!snapshot) return;
-  if (snapshot.updatedAt) {
-    if (lastGlobalUpdatedAt && new Date(snapshot.updatedAt) < new Date(lastGlobalUpdatedAt)) {
-      console.info("[Sync] Skipped applying older global snapshot:", snapshot.updatedAt);
-      return;
-    }
-    lastGlobalUpdatedAt = snapshot.updatedAt;
-  }
   if (snapshot.managers) db.managers = snapshot.managers;
   if (snapshot.departments) db.departments = snapshot.departments;
   if (snapshot.categories) db.categories = snapshot.categories;
   if (snapshot.adminPw) db.adminPw = snapshot.adminPw;
+  if (typeof _origPersistFSA === 'function') {
+    _origPersistFSA();
+  } else if (typeof persist === 'function') {
+    persist();
+  }
 }
 
 // Sync Triggers
@@ -4315,8 +4309,10 @@ async function gdBackup(specificMgrId = null) {
       msgEl.textContent = '✅ Sync finished successfully!';
       msgEl.style.color = 'var(--gr)';
     }
+    updateSyncStatus('gdrive', 'ok');
   } catch (err) {
     console.error('gdBackup failed:', err);
+    updateSyncStatus('gdrive', 'error', 'Upload failed: ' + err.message);
     if (msgEl) {
       msgEl.textContent = '❌ Sync failed: ' + err.message;
       msgEl.style.color = 'var(--re)';
@@ -4389,8 +4385,10 @@ async function gdRestore() {
       msgEl.textContent = '✅ Restored data successfully!';
       msgEl.style.color = 'var(--gr)';
     }
+    updateSyncStatus('gdrive', 'ok');
   } catch (err) {
     console.error('gdRestore failed:', err);
+    updateSyncStatus('gdrive', 'error', 'Download failed: ' + err.message);
     if (msgEl) {
       msgEl.textContent = '❌ Restore failed: ' + err.message;
       msgEl.style.color = 'var(--re)';
@@ -4467,37 +4465,37 @@ function initBkTab() {
 // Intercept Local Storage triggers to run Drive backup
 const _origPersistGD = persist;
 persist = function(mgrId) {
-  _origPersistGD(mgrId);
+  _origPersistGD();
   _triggerGDriveBackup(mgrId, curRole === 'a');
 };
 
 const _origPersistLateGD = persistLate;
 persistLate = function(mgrId) {
-  _origPersistLateGD(mgrId);
+  _origPersistLateGD();
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistProbGD = persistProb;
 persistProb = function(mgrId) {
-  _origPersistProbGD(mgrId);
+  _origPersistProbGD();
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistRtngGD = persistRatings;
 persistRatings = function(mgrId) {
-  _origPersistRtngGD(mgrId);
+  _origPersistRtngGD();
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistHrsGD = persistHrs;
 persistHrs = function(mgrId) {
-  _origPersistHrsGD(mgrId);
+  _origPersistHrsGD();
   _triggerGDriveBackup(mgrId || (curUser ? curUser.id : null));
 };
 
 const _origPersistMistGD = persistMist;
 persistMist = function(mgrId) {
-  _origPersistMistGD(mgrId);
+  _origPersistMistGD();
   _triggerGDriveBackup(mgrId);
 };
 
