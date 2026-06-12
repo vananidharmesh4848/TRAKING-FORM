@@ -1186,7 +1186,7 @@ if(!db.managers){
 
 let catFiles={}, curUser=null, editId=null, curRole=null;
 
-function persist(mgrId){
+function persistLocal() {
   try{
     localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
     localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
@@ -1201,6 +1201,11 @@ function persist(mgrId){
     if (db.ratings) localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));
     if (db.workHours) localStorage.setItem('ft7_hrs',JSON.stringify(db.workHours));
   }catch(e){console.warn('Storage write failed:',e);}
+}
+const _origPersistFSA = persistLocal;
+
+function persist(mgrId){
+  persistLocal();
   if (typeof _triggerFsaBackup === 'function') _triggerFsaBackup(mgrId);
   if (typeof _triggerGDriveBackup === 'function') _triggerGDriveBackup(mgrId, false);
 }
@@ -4020,6 +4025,19 @@ function getGlobalSnapshot() {
 
 function applyGlobalSnapshot(snapshot) {
   if (!snapshot) return;
+  
+  // Manager account deletion check to force logout and disconnect backup folder
+  if (curRole === 'm' && curUser) {
+    const stillExists = (snapshot.managers || []).some(m => m.id === curUser.id);
+    if (!stillExists) {
+      alert("તમારું એકાઉન્ટ એડમિન દ્વારા ડીલીટ કરવામાં આવ્યું છે. લોગ આઉટ થઈ રહ્યું છે...");
+      if (typeof _clearDirHandle === 'function') _clearDirHandle().catch(()=>{});
+      localStorage.removeItem('ft7_bkdir_name');
+      doLogout();
+      return;
+    }
+  }
+
   if (snapshot.managers) db.managers = snapshot.managers;
   if (snapshot.departments) db.departments = snapshot.departments;
   if (snapshot.categories) db.categories = snapshot.categories;
