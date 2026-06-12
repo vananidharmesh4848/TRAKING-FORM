@@ -1186,7 +1186,7 @@ if(!db.managers){
 
 let catFiles={}, curUser=null, editId=null, curRole=null;
 
-function persist(){
+function persist(mgrId){
   try{
     localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
     localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
@@ -1195,7 +1195,14 @@ function persist(){
     localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
     localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
     localStorage.setItem('ft6_apw',db.adminPw);
-  }catch(e){alert('Storage full! Admin > Settings > Delete old submissions');}
+    if (db.mistakes) localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
+    if (db.lateEntries) localStorage.setItem('ft7_late',JSON.stringify(db.lateEntries));
+    if (db.problems) localStorage.setItem('ft8_prob',JSON.stringify(db.problems));
+    if (db.ratings) localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));
+    if (db.workHours) localStorage.setItem('ft7_hrs',JSON.stringify(db.workHours));
+  }catch(e){console.warn('Storage write failed:',e);}
+  if (typeof _triggerFsaBackup === 'function') _triggerFsaBackup(mgrId);
+  if (typeof _triggerGDriveBackup === 'function') _triggerGDriveBackup(mgrId, false);
 }
 
 /* ============================================================
@@ -1222,11 +1229,23 @@ function restoreSession(){
   try{
     const s=JSON.parse(ls(SES)||'null');
     if(!s)return false;
-    if(s.r==='a'){curRole='a';showPg('pg-admin');initAdmin();return true;}
+    if(s.r==='a'){
+      curRole='a';showPg('pg-admin');initAdmin();
+      setTimeout(()=>{ if(typeof updateMistBadge === 'function') updateMistBadge(); }, 300);
+      return true;
+    }
     if(s.r==='m'){
       const m=db.managers.find(x=>x.id===s.uid);
       if(!m){clearSession();return false;}
-      curRole='m';curUser=m;showPg('pg-mgr');initMgr();return true;
+      curRole='m';curUser=m;showPg('pg-mgr');initMgr();
+      setTimeout(()=>{
+        if(curUser && db.mistakes){
+          const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
+          const b=document.getElementById('mist-mgr-badge');
+          if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
+        }
+      },300);
+      return true;
     }
   }catch(e){clearSession();}
   return false;
@@ -1294,7 +1313,17 @@ function initMgr(){
   document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
   document.getElementById('ms-dash').classList.add('on');
   document.getElementById('mn-dash').classList.add('on');
-  renderMgrDash();
+  if (typeof renderMgrDash === 'function') renderMgrDash();
+  if (typeof updateLateBadges === 'function') updateLateBadges();
+  if (typeof updateProbBadge === 'function') updateProbBadge();
+  setTimeout(()=>{
+    if(!curUser)return;
+    if (db.mistakes) {
+      const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
+      const b=document.getElementById('mist-mgr-badge');
+      if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
+    }
+  },200);
   if (typeof updateSyncAlertsUI === 'function') updateSyncAlertsUI();
 }
 function psh(s){document.getElementById('sh-d').className='so day'+(s==='day'?' on':'');document.getElementById('sh-n').className='so night'+(s==='night'?' on':'');}
@@ -1303,10 +1332,31 @@ function mTab(t,el){
   document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
   if(el)el.classList.add('on');
-  document.getElementById('ms-'+t)?.classList.add('on');
+  const sec = document.getElementById('ms-'+t);
+  if(sec) sec.classList.add('on');
   window.scrollTo(0,0);
+  if(t==='dash' && typeof renderMgrDash === 'function') renderMgrDash();
   if(t==='rep')renderMyRep();
   if(t==='lv')renderMgrLv();
+  if(t==='mist' && typeof renderMgrMist === 'function') renderMgrMist();
+  if(t==='prob' && typeof renderMgrProb === 'function') renderMgrProb();
+  if(t==='rtng' && typeof renderMgrRating === 'function') renderMgrRating();
+  if(t==='hrs' && typeof renderMgrHrs === 'function'){
+    const hd=document.getElementById('hrs-date');
+    if(hd&&!hd.value) hd.value=tod();
+    const hs=document.getElementById('hrs-shift');
+    if(hs){const h=new Date().getHours();hs.value=(h>=8&&h<20)?'day':'night';}
+    const hm=document.getElementById('hrs-month');
+    if(hm&&!hm.value) hm.value=new Date().toISOString().slice(0,7);
+    renderMgrHrs();
+  }
+  if(t==='late' && typeof renderMgrLate === 'function'){
+    document.getElementById('le-date').value=tod();
+    const h=new Date().getHours();
+    const sh=document.getElementById('le-shift');
+    if(sh)sh.value=h>=8&&h<20?'day':'night';
+    renderMgrLate();
+  }
 }
 function renderCats(){
   catFiles={};
@@ -1501,7 +1551,11 @@ function initAdmin(){
       <button class="atab"    id="atb-st"  onclick="aTab('st', document.getElementById('sbi-st'))">⚙️ Settings</button>
     `;
   }
-  renderOv();updateLvBadge();
+  renderOv();
+  updateLvBadge();
+  if (typeof updateMistBadge === 'function') updateMistBadge();
+  if (typeof updateLateBadges === 'function') updateLateBadges();
+  if (typeof updateProbBadge === 'function') updateProbBadge();
   if (typeof updateSyncAlertsUI === 'function') updateSyncAlertsUI();
 }
 
@@ -1512,16 +1566,31 @@ function aTab(t,el){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');document.getElementById('as-'+t).classList.add('on');window.scrollTo(0,0);
+  el.classList.add('on');
+  const sec = document.getElementById('as-'+t);
+  if(sec) sec.classList.add('on');
+  window.scrollTo(0,0);
   const atb=document.getElementById('atb-'+t);if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
   const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=_tabTitles[t]||'FormTrack';
   if(t==='ov')renderOv();
   if(t==='rp'){popF();renderReps();}
   if(t==='lv')renderAdminLv();
+  if(t==='mist' && typeof renderMistReport === 'function') renderMistReport();
+  if(t==='late' && typeof renderLateReport === 'function') renderLateReport();
+  if(t==='prob' && typeof renderProblems === 'function') renderProblems();
+  if(t==='rtng' && typeof renderAdminRating === 'function') renderAdminRating();
+  if(t==='hrs' && typeof renderHrsReport === 'function') renderHrsReport();
   if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}
   if(t==='dp')renderDpTbl();
   if(t==='ct'){popD('cd');renderCtList();}
-  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
+  if(t==='bk' && typeof initBkTab === 'function') initBkTab();
+  if(t==='st'){
+    ['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
+    const gcid = document.getElementById('g-cid');
+    const gkey = document.getElementById('g-api-key');
+    if(gcid) gcid.value = localStorage.getItem('ft_g_cid') || '';
+    if(gkey) gkey.value = localStorage.getItem('ft_g_api_key') || '';
+  }
 }
 
 /* OVERVIEW */
@@ -2029,74 +2098,7 @@ function updateMistBadge(){
   if(b){b.textContent=db.mistakes.length;b.style.display=db.mistakes.length?'inline':'none';}
 }
 
-/* ---- PATCH aTab for mist ---- */
-const _origATab2=aTab;
-aTab=function(t,el){
-  if(t==='mist'){
-    document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
-    document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
-    document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
-    el.classList.add('on');
-    document.getElementById('as-mist').classList.add('on');
-    window.scrollTo(0,0);
-    const atb=document.getElementById('atb-mist');if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
-    const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=_tabTitles['mist']||'FormTrack';
-    renderMistReport();
-    return;
-  }
-  _origATab2(t,el);
-};
-
-/* ---- PATCH mTab for mist ---- */
-const _origMTab2=mTab;
-mTab=function(t,el){
-  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
-  if(el)el.classList.add('on');
-  document.getElementById('ms-'+t)?.classList.add('on');
-  window.scrollTo(0,0);
-  if(t==='rep')renderMyRep();
-  if(t==='lv')renderMgrLv();
-  if(t==='mist')renderMgrMist();
-};
-
-/* ---- PATCH initMgr for mistake badge ---- */
-const _origInitMgr2=initMgr;
-initMgr=function(){
-  _origInitMgr2();
-  // show badge if unseen mistakes
-  setTimeout(()=>{
-    if(!curUser)return;
-    const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
-    const b=document.getElementById('mist-mgr-badge');
-    if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
-  },200);
-};
-
-/* ---- PATCH initAdmin for mistake badge ---- */
-const _origInitAdmin2=initAdmin;
-initAdmin=function(){
-  _origInitAdmin2();
-  updateMistBadge();
-};
-
-/* ---- PATCH restoreSession for mistake ---- */
-const _origRest2=restoreSession;
-restoreSession=function(){
-  const r=_origRest2();
-  if(r){
-    setTimeout(()=>{
-      if(curUser){
-        const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
-        const b=document.getElementById('mist-mgr-badge');
-        if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
-      } else {
-        updateMistBadge();
-      }
-    },300);
-  }
-  return r;
-};
+// Mistakes patch unified in script block 1
 </script><style>
 .late-row{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px;margin-bottom:10px}
 .late-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
@@ -2303,97 +2305,7 @@ function updateLateBadges(){
   }
 }
 
-// ── Patch mTab for late ──
-const _origMTab3=mTab;
-mTab=function(t,el){
-  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
-  if(el)el.classList.add('on');
-  const sec=document.getElementById('ms-'+t);
-  if(sec)sec.classList.add('on');
-  window.scrollTo(0,0);
-  if(t==='rep')renderMyRep();
-  if(t==='lv')renderMgrLv();
-  if(t==='mist')renderMgrMist();
-  if(t==='prob')renderMgrProb();
-  if(t==='rtng')renderMgrRating();
-  if(t==='late'){
-    document.getElementById('le-date').value=tod();
-    const h=new Date().getHours();
-    const sh=document.getElementById('le-shift');
-    if(sh)sh.value=h>=8&&h<20?'day':'night';
-    renderMgrLate();
-  }
-};
-
-// ── Patch aTab for late ──
-const _origATab3=aTab;
-aTab=function(t,el){
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');
-  const sec=document.getElementById('as-'+t);
-  if(sec)sec.classList.add('on');
-  window.scrollTo(0,0);
-  const atb=document.getElementById('atb-'+t);if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
-  const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=_tabTitles[t]||'FormTrack';
-  if(t==='ov')renderOv();
-  if(t==='rp'){popF();renderReps();}
-  if(t==='lv')renderAdminLv();
-  if(t==='mist')renderMistReport();
-  if(t==='late')renderLateReport();
-  if(t==='prob')renderProblems();
-  if(t==='rtng')renderAdminRating();
-  if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}
-  if(t==='dp')renderDpTbl();
-  if(t==='ct'){popD('cd');renderCtList();}
-  if(t==='bk')initBkTab();
-  if(t==='st'){['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');}
-};
-
-// ── Patch initMgr for late ──
-const _origInitMgr3=initMgr;
-initMgr=function(){
-  _origInitMgr3();
-  updateLateBadges();
-};
-
-// ── Patch initAdmin for late ──
-const _origInitAdmin3=initAdmin;
-initAdmin=function(){
-  _origInitAdmin3();
-  updateLateBadges();
-};
-
-// ── Patch persist to include late ──
-const _origPersist=persist;
-persist=function(){
-  _origPersist();
-  persistLate();
-};
-
-// ── Update last-backup timestamp after export (merged into final expJSON below) ──
-const _origExp=expJSON; // placeholder reference for chain
-
-// ── Patch impJSON to include late ──
-const _origImp=impJSON;
-impJSON=function(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
-      if(!confirm('Restore? This replaces all data!'))return;
-      if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
-      if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
-      if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
-      if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
-      _origPersist();persistLate();
-      sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
-    }catch(e){sm('mn-msg','Invalid JSON',true);}
-  };r.readAsText(f);inp.value='';
-};
+// Late entry patch unified in script block 1
 
 /* ============================================================
    PDF & EXCEL DOWNLOAD FUNCTIONS
@@ -2868,45 +2780,7 @@ function renderMgrRating(){
   }).join('');
 }
 
-/* ── Patch aTab FINAL ── */
-const _origATabFinal=aTab;
-aTab=function(t,el){
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('#pg-admin .sec').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('#atabs .atab').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');
-  const sec=document.getElementById('as-'+t);if(sec)sec.classList.add('on');
-  window.scrollTo(0,0);
-  const atb=document.getElementById('atb-'+t);if(atb){atb.classList.add('on');atb.scrollIntoView({block:'nearest',inline:'center'});}
-  const tb=document.getElementById('admin-tb-title');if(tb)tb.textContent=(_tabTitles&&_tabTitles[t])||'FormTrack';
-  if(t==='ov')renderOv();if(t==='rp'){popF();renderReps();}
-  if(t==='lv')renderAdminLv();if(t==='mist')renderMistReport();if(t==='late')renderLateReport();
-  if(t==='prob')renderProblems();if(t==='rtng')renderAdminRating();
-  if(t==='hrs')renderHrsReport();
-  if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}if(t==='dp')renderDpTbl();
-  if(t==='ct'){popD('cd');renderCtList();}if(t==='bk')initBkTab();
-  if(t==='st'){
-    ['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
-    const gcid = document.getElementById('g-cid');
-    const gkey = document.getElementById('g-api-key');
-    if(gcid) gcid.value = localStorage.getItem('ft_g_cid') || '';
-    if(gkey) gkey.value = localStorage.getItem('ft_g_api_key') || '';
-  }
-};
-
-/* ── Patch mTab FINAL ── */
-const _origMTabFinal=mTab;
-mTab=function(t,el){
-  document.querySelectorAll('#pg-mgr .sec').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('#pg-mgr .nb').forEach(b=>b.classList.remove('on'));
-  if(el)el.classList.add('on');
-  const sec=document.getElementById('ms-'+t);if(sec)sec.classList.add('on');
-  window.scrollTo(0,0);
-  if(t==='dash')renderMgrDash();
-  if(t==='rep')renderMyRep();if(t==='lv')renderMgrLv();if(t==='mist')renderMgrMist();
-  if(t==='late'){document.getElementById('le-date').value=tod();const h=new Date().getHours();const sh=document.getElementById('le-shift');if(sh)sh.value=h>=8&&h<20?'day':'night';renderMgrLate();}
-  if(t==='prob')renderMgrProb();if(t==='rtng')renderMgrRating();
-};
+// Problems & Rating patch unified in script block 1
 
 function renderMgrDash(){
   if(!curUser)return;
@@ -2995,42 +2869,7 @@ function renderMgrDash(){
   document.getElementById('mgr-dash-mist').innerHTML=(mistList||lateList)?mistList+lateList:'<div class="panel-empty">Koi mistake ya late entry nathi 🎉</div>';
 }
 
-/* ── Patch initAdmin + initMgr ── */
-const _origInitAdminFinal=initAdmin;
-initAdmin=function(){_origInitAdminFinal();updateProbBadge();};
-const _origInitMgrFinal=initMgr;
-initMgr=function(){_origInitMgrFinal();setTimeout(()=>{updateProbBadge();renderMgrDash();const rm=document.getElementById('rt-month');if(rm&&!rm.value)rm.value=new Date().toISOString().slice(0,7);},200);};
 
-/* ── Patch persist ── */
-const _origPersistFinal=persist;
-persist=function(){_origPersistFinal();persistProb();persistRatings();};
-
-/* ── Patch export/import ── */
-const _origExpFinal=expJSON;
-expJSON=function(){
-  const data=JSON.stringify({managers:db.managers,departments:db.departments,categories:db.categories,submissions:db.submissions,leaves:db.leaves,leavebal:db.leavebal,mistakes:db.mistakes,lateEntries:db.lateEntries,problems:db.problems,ratings:db.ratings,workHours:db.workHours||[],exportedAt:new Date().toISOString()});
-  const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(data);a.download='FormTrack_'+tod()+'.json';a.click();
-  const now=new Date().toISOString();localStorage.setItem('ft7_lastbk',now);
-  const lbEl=document.getElementById('last-bk-txt');if(lbEl)lbEl.textContent='Last backup: '+new Date(now).toLocaleString()+' ✅';
-  sm('mn-msg','✅ Backup JSON downloaded!');
-};
-const _origImpFinal=impJSON;
-impJSON=function(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();r.onload=e=>{
-    try{const d=JSON.parse(e.target.result);if(!d.managers){sm('mn-msg','Invalid file',true);return;}
-    if(!confirm('Restore? This replaces all data!'))return;
-    if(d.managers)db.managers=d.managers;if(d.departments)db.departments=d.departments;
-    if(d.categories)db.categories=d.categories;if(d.submissions)db.submissions=d.submissions;
-    if(d.leaves)db.leaves=d.leaves;if(d.leavebal)db.leavebal=d.leavebal;
-    if(d.mistakes)db.mistakes=d.mistakes;if(d.lateEntries)db.lateEntries=d.lateEntries;
-    if(d.problems)db.problems=d.problems;if(d.ratings)db.ratings=d.ratings;
-    if(d.workHours)db.workHours=d.workHours;
-    _origPersistFinal();persistLate();persistProb();persistRatings();persistHrs();
-    sm('mn-msg','✅ Restored! Refreshing...');setTimeout(()=>location.reload(),2000);
-    }catch(e){sm('mn-msg','Invalid JSON',true);}
-  };r.readAsText(f);inp.value='';
-};
 
 </script>
 
@@ -3280,34 +3119,7 @@ function clrHrsF(){
   renderHrsReport();
 }
 
-/* ── Patch mTab ── */
-const _origMTabHrs = mTab;
-mTab = function(t, el){
-  _origMTabHrs(t, el);
-  if(t==='hrs'){
-    /* auto-fill date */
-    const hd=document.getElementById('hrs-date');
-    if(hd&&!hd.value) hd.value=tod();
-    /* auto-select shift by current time */
-    const hs=document.getElementById('hrs-shift');
-    if(hs){const h=new Date().getHours();hs.value=(h>=8&&h<20)?'day':'night';}
-    /* default month filter to current month */
-    const hm=document.getElementById('hrs-month');
-    if(hm&&!hm.value) hm.value=new Date().toISOString().slice(0,7);
-    renderMgrHrs();
-  }
-};
-
-/* ── Patch aTab ── */
-const _origATabHrs = aTab;
-aTab = function(t, el){
-  _origATabHrs(t, el);
-  if(t==='hrs') renderHrsReport();
-};
-
-/* ── Patch persist ── */
-const _origPersistHrs = persist;
-persist = function(){ _origPersistHrs(); persistHrs(); };
+// Work Hours patch unified in script block 1
 
 /* ── expJSON is fully defined above (includes workHours) — no override needed here ── */
 
@@ -3935,24 +3747,7 @@ function _triggerFsaBackup(mgrId){
   }, 1000);
 }
 
-/* Hook ALL persist functions so EVERY user's changes backup to folder */
-const _origPersistFSA = persist;
-persist = function(mgrId){ _origPersistFSA(mgrId); _triggerFsaBackup(mgrId); };
-
-const _origPersistLateFSA = persistLate;
-persistLate = function(mgrId){ _origPersistLateFSA(mgrId); _triggerFsaBackup(mgrId); };
-
-const _origPersistProbFSA = persistProb;
-persistProb = function(mgrId){ _origPersistProbFSA(mgrId); _triggerFsaBackup(mgrId); };
-
-const _origPersistRtngFSA = persistRatings;
-persistRatings = function(mgrId){ _origPersistRtngFSA(mgrId); _triggerFsaBackup(mgrId); };
-
-const _origPersistHrsFSA = persistHrs;
-persistHrs = function(mgrId){ _origPersistHrsFSA(mgrId); _triggerFsaBackup(mgrId || (curUser ? curUser.id : null)); };
-
-const _origPersistMistFSA = persistMist;
-persistMist = function(mgrId){ _origPersistMistFSA(mgrId); _triggerFsaBackup(mgrId); };
+// FSA Backup wrappers unified in script block 1
 
 /* Run auto-restore immediately (before DOMContentLoaded fires rendering) */
 (async function _fsaBootstrap(){
@@ -4435,42 +4230,7 @@ function initBkTab() {
   }
 }
 
-// Intercept Local Storage triggers to run Drive backup
-const _origPersistGD = persist;
-persist = function(mgrId) {
-  _origPersistGD(mgrId);
-  _triggerGDriveBackup(mgrId, false);
-};
-
-const _origPersistLateGD = persistLate;
-persistLate = function(mgrId) {
-  _origPersistLateGD(mgrId);
-  _triggerGDriveBackup(mgrId);
-};
-
-const _origPersistProbGD = persistProb;
-persistProb = function(mgrId) {
-  _origPersistProbGD(mgrId);
-  _triggerGDriveBackup(mgrId);
-};
-
-const _origPersistRtngGD = persistRatings;
-persistRatings = function(mgrId) {
-  _origPersistRtngGD(mgrId);
-  _triggerGDriveBackup(mgrId);
-};
-
-const _origPersistHrsGD = persistHrs;
-persistHrs = function(mgrId) {
-  _origPersistHrsGD(mgrId);
-  _triggerGDriveBackup(mgrId || (curUser ? curUser.id : null));
-};
-
-const _origPersistMistGD = persistMist;
-persistMist = function(mgrId) {
-  _origPersistMistGD(mgrId);
-  _triggerGDriveBackup(mgrId);
-};
+// GDrive wrappers unified in script block 1
 
 // Auto boot gate
 setTimeout(() => {
