@@ -3851,6 +3851,17 @@ async function _syncToFirebase(mgrId) {
     } else if (curUser && curRole === 'm') {
       const snap = getManagerSnapshot(curUser.id);
       await dbRef.child('managers').child(curUser.id).set(snap);
+    } else if (curRole === 'a') {
+      // Sync all managers as fallback on admin action
+      const mgrIds = new Set(db.managers.map(m => m.id));
+      db.submissions.forEach(s => mgrIds.add(s.mgrId));
+      db.leaves.forEach(l => mgrIds.add(l.mgrId));
+      
+      for (const mid of mgrIds) {
+        if (!mid) continue;
+        const snap = getManagerSnapshot(mid);
+        await dbRef.child('managers').child(mid).set(snap);
+      }
     }
   } catch (e) {
     console.error("[Firebase] Sync write failed:", e);
@@ -4432,37 +4443,37 @@ function initBkTab() {
 // Intercept Local Storage triggers to run Drive backup
 const _origPersistGD = persist;
 persist = function(mgrId) {
-  _origPersistGD();
+  _origPersistGD(mgrId);
   _triggerGDriveBackup(mgrId, curRole === 'a');
 };
 
 const _origPersistLateGD = persistLate;
 persistLate = function(mgrId) {
-  _origPersistLateGD();
+  _origPersistLateGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistProbGD = persistProb;
 persistProb = function(mgrId) {
-  _origPersistProbGD();
+  _origPersistProbGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistRtngGD = persistRatings;
 persistRatings = function(mgrId) {
-  _origPersistRtngGD();
+  _origPersistRtngGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
 const _origPersistHrsGD = persistHrs;
 persistHrs = function(mgrId) {
-  _origPersistHrsGD();
+  _origPersistHrsGD(mgrId);
   _triggerGDriveBackup(mgrId || (curUser ? curUser.id : null));
 };
 
 const _origPersistMistGD = persistMist;
 persistMist = function(mgrId) {
-  _origPersistMistGD();
+  _origPersistMistGD(mgrId);
   _triggerGDriveBackup(mgrId);
 };
 
