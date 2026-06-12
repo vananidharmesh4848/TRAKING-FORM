@@ -1099,6 +1099,9 @@ let db={
   adminPw:     ls('ft6_apw')||'admin123'
 };
 function ls(k){return localStorage.getItem(k);}
+function hasBackup(){
+  return (typeof isFirebaseEnabled !== 'undefined' && isFirebaseEnabled) || !!localStorage.getItem('ft7_bkdir_name') || !!localStorage.getItem('ft_gd_token');
+}
 
 if(!db.departments) db.departments=[{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
 if(!db.categories)  db.categories=[
@@ -1117,11 +1120,22 @@ function persist(){
     localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
     localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
     localStorage.setItem('ft6_ct',JSON.stringify(db.categories));
-    localStorage.setItem('ft6_sb',JSON.stringify(db.submissions));
-    localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
-    localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
     localStorage.setItem('ft6_apw',db.adminPw);
-  }catch(e){alert('Storage full! Admin > Settings > Delete old submissions');}
+    
+    if (!hasBackup()) {
+      localStorage.setItem('ft6_sb',JSON.stringify(db.submissions));
+      localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
+      localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
+    } else {
+      localStorage.removeItem('ft6_sb');
+      localStorage.removeItem('ft6_lv');
+      localStorage.removeItem('ft6_lb');
+    }
+  }catch(e){
+    if (!hasBackup()) {
+      alert('Storage full! Admin > Settings > Delete old submissions');
+    }
+  }
 }
 
 /* ============================================================
@@ -1236,12 +1250,77 @@ function renderCats(){
       <div class="chips" id="ch-${c.id}"></div>
     </div>`).join('');
 }
+function compressImage(base64Str, mimeType, callback) {
+  if (!mimeType.startsWith('image/')) {
+    callback(base64Str);
+    return;
+  }
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const MAX_WIDTH = 800;
+    const MAX_HEIGHT = 800;
+    let width = img.width;
+    let height = img.height;
+    
+    if (width > height) {
+      if (width > MAX_WIDTH) {
+        height *= MAX_WIDTH / width;
+        width = MAX_WIDTH;
+      }
+    } else {
+      if (height > MAX_HEIGHT) {
+        width *= MAX_HEIGHT / height;
+        height = MAX_HEIGHT;
+      }
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(img, 0, 0, width, height);
+    
+    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+    callback(compressedBase64);
+  };
+  img.onerror = () => {
+    callback(base64Str);
+  };
+  img.src = base64Str;
+}
 function onFile(inp){
   const cid=inp.dataset.cid;const fs=Array.from(inp.files);
   if(!catFiles[cid])catFiles[cid]=[];
   if(catFiles[cid].length+fs.length>10){alert('Max 10 files');inp.value='';return;}
   let done=0;
-  fs.forEach(f=>{const r=new FileReader();r.onload=e=>{catFiles[cid].push({name:f.name,type:f.type,data:e.target.result});done++;if(done===fs.length)refCh(cid);};r.readAsDataURL(f);});
+  fs.forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const base64Data = e.target.result;
+      if(f.type.startsWith('image/')){
+        compressImage(base64Data, f.type, (compressedData)=>{
+          let finalName = f.name;
+          if (!finalName.toLowerCase().endsWith('.jpg') && !finalName.toLowerCase().endsWith('.jpeg')) {
+            const lastDot = finalName.lastIndexOf('.');
+            if (lastDot !== -1) {
+              finalName = finalName.substring(0, lastDot) + '.jpg';
+            } else {
+              finalName = finalName + '.jpg';
+            }
+          }
+          catFiles[cid].push({name:finalName,type:'image/jpeg',data:compressedData});
+          done++;
+          if(done===fs.length)refCh(cid);
+        });
+      } else {
+        catFiles[cid].push({name:f.name,type:f.type,data:base64Data});
+        done++;
+        if(done===fs.length)refCh(cid);
+      }
+    };
+    r.readAsDataURL(f);
+  });
   inp.value='';
 }
 function refCh(cid){
@@ -1768,7 +1847,11 @@ const MISTAKE_CATS=['Form Error','Late Submission','Missing Data','Process Viola
 if(!db.mistakes) db.mistakes=JSON.parse(localStorage.getItem('ft6_mist')||'[]');
 
 function persistMist(){
-  localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
+  if (!hasBackup()) {
+    localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
+  } else {
+    localStorage.removeItem('ft6_mist');
+  }
 }
 
 // Severity config
@@ -2022,7 +2105,11 @@ restoreSession=function(){
 if(!db.lateEntries) db.lateEntries = JSON.parse(localStorage.getItem('ft7_late')||'[]');
 
 function persistLate(){
-  localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
+  if (!hasBackup()) {
+    localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
+  } else {
+    localStorage.removeItem('ft7_late');
+  }
 }
 
 // ── Manager: submit late entry ──
@@ -2493,7 +2580,13 @@ function dlLateRepExcel(){
 <script>
 /* ═══════════════════ PROBLEM / SOLUTION SYSTEM ═══════════════════ */
 if(!db.problems) db.problems = JSON.parse(localStorage.getItem('ft8_prob')||'[]');
-function persistProb(){ localStorage.setItem('ft8_prob', JSON.stringify(db.problems)); }
+function persistProb(){ 
+  if (!hasBackup()) {
+    localStorage.setItem('ft8_prob', JSON.stringify(db.problems)); 
+  } else {
+    localStorage.removeItem('ft8_prob');
+  }
+}
 const PROB_CATS=['Work Issue','Behavior Issue','Process Issue','Communication Issue','Quality Issue','Other'];
 
 /* ── Manager submits a problem ── */
@@ -2623,7 +2716,13 @@ function renderMgrProb(){
 
 /* ═══════════════════ RATING SYSTEM ═══════════════════ */
 if(!db.ratings)db.ratings=JSON.parse(localStorage.getItem('ft8_rtng')||'[]');
-function persistRatings(){localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));}
+function persistRatings(){
+  if (!hasBackup()) {
+    localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));
+  } else {
+    localStorage.removeItem('ft8_rtng');
+  }
+}
 
 function starHTML(n){n=Math.round(n);return '<span style="color:#FBBF24;font-size:16px">'+'⭐'.repeat(n)+'</span>';}
 
@@ -2958,7 +3057,13 @@ impJSON=function(inp){
 if(!db.workHours) db.workHours = JSON.parse(localStorage.getItem('ft7_hrs')||'[]');
 
 function persistHrs(){
-  try{ localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); }catch(e){}
+  try{ 
+    if (!hasBackup()) {
+      localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); 
+    } else {
+      localStorage.removeItem('ft7_hrs');
+    }
+  }catch(e){}
 }
 
 /* ── OT Check & Live Preview ── */
