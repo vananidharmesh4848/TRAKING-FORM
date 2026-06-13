@@ -1186,7 +1186,15 @@ if(!db.managers){
 
 let catFiles={}, curUser=null, editId=null, curRole=null;
 
-function persistLocal() {
+function persistLocal(mgrId) {
+  const now = new Date().toISOString();
+  if (mgrId) {
+    localStorage.setItem('ft_last_write_' + mgrId, now);
+  } else if (curUser && curRole === 'm') {
+    localStorage.setItem('ft_last_write_' + curUser.id, now);
+  } else if (curRole === 'a') {
+    localStorage.setItem('ft_last_write_admin', now);
+  }
   try{
     localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
     localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
@@ -1205,7 +1213,7 @@ function persistLocal() {
 const _origPersistFSA = persistLocal;
 
 function persist(mgrId){
-  persistLocal();
+  persistLocal(mgrId);
   if (typeof _triggerFsaBackup === 'function') _triggerFsaBackup(mgrId);
   if (typeof _triggerGDriveBackup === 'function') _triggerGDriveBackup(mgrId, false);
 }
@@ -1237,6 +1245,8 @@ function restoreSession(){
     if(s.r==='a'){
       curRole='a';showPg('pg-admin');initAdmin();
       setTimeout(()=>{ if(typeof updateMistBadge === 'function') updateMistBadge(); }, 300);
+      triggerSyncRestore();
+      initFirebaseListeners();
       return true;
     }
     if(s.r==='m'){
@@ -1250,6 +1260,8 @@ function restoreSession(){
           if(b){b.textContent=unseen;b.style.display=unseen?'inline':'none';}
         }
       },300);
+      triggerSyncRestore();
+      initFirebaseListeners();
       return true;
     }
   }catch(e){clearSession();}
@@ -1258,7 +1270,7 @@ function restoreSession(){
 
 /* ============================================================
    LOGIN
-============================================================ */
+ ============================================================ */
 function selR(r){
   curRole=r;
   document.getElementById('rc-m').classList.toggle('on',r==='m');
@@ -1288,13 +1300,23 @@ function doLogin(){
     if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
     curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
     triggerSyncRestore();
+    initFirebaseListeners();
   }else{
     if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
     saveSession('a','admin');showPg('pg-admin');initAdmin();
     triggerSyncRestore();
+    initFirebaseListeners();
   }
 }
 function doLogout(){
+  if (typeof isFirebaseEnabled !== 'undefined' && isFirebaseEnabled) {
+    try {
+      const dbRef = firebase.database().ref('formtrack');
+      dbRef.child('global').off();
+      dbRef.child('managers').off();
+      if (curUser) dbRef.child('managers').child(curUser.id).off();
+    } catch(e) {}
+  }
   curUser=null;catFiles={};curRole=null;clearSession();
   showPg('pg-login');
 }
@@ -1928,8 +1950,8 @@ const MISTAKE_CATS=['Form Error','Late Submission','Missing Data','Process Viola
 // Init mistake data
 if(!db.mistakes) db.mistakes=JSON.parse(localStorage.getItem('ft6_mist')||'[]');
 
-function persistMist(){
-  localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
+function persistMist(mgrId){
+  persist(mgrId);
 }
 
 // Severity config
@@ -2115,8 +2137,8 @@ function updateMistBadge(){
 /* ═══════════════════ LATE ENTRY SYSTEM ═══════════════════ */
 if(!db.lateEntries) db.lateEntries = JSON.parse(localStorage.getItem('ft7_late')||'[]');
 
-function persistLate(){
-  localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
+function persistLate(mgrId){
+  persist(mgrId);
 }
 
 // ── Manager: submit late entry ──
@@ -2497,7 +2519,7 @@ function dlLateRepExcel(){
 <script>
 /* ═══════════════════ PROBLEM / SOLUTION SYSTEM ═══════════════════ */
 if(!db.problems) db.problems = JSON.parse(localStorage.getItem('ft8_prob')||'[]');
-function persistProb(){ localStorage.setItem('ft8_prob', JSON.stringify(db.problems)); }
+function persistProb(mgrId){ persist(mgrId); }
 const PROB_CATS=['Work Issue','Behavior Issue','Process Issue','Communication Issue','Quality Issue','Other'];
 
 /* ── Manager submits a problem ── */
@@ -2514,7 +2536,7 @@ function mgrSubmitProblem(){
     addedAt:new Date().toISOString(), addedBy:'manager',
     seenByAdmin:false, seenByMgr:true
   });
-  persistProb();
+  persistProb(curUser.id);
   sm('mgr-pr-msg','✅ Problem submit thayi! Admin solution aapshhe.');
   document.getElementById('mgr-pr-desc').value='';
   renderMgrProb(); updateProbBadge();
@@ -2528,7 +2550,7 @@ function solveProblem(id){
   p.status='solved';
   p.solvedAt=new Date().toISOString();
   p.seenByMgr=false; // manager ne notification
-  persistProb(); renderProblems(); updateProbBadge();
+  persistProb(p.mgrId); renderProblems(); updateProbBadge();
 }
 
 /* ── Admin: delete ── */
@@ -2627,7 +2649,7 @@ function renderMgrProb(){
 
 /* ═══════════════════ RATING SYSTEM ═══════════════════ */
 if(!db.ratings)db.ratings=JSON.parse(localStorage.getItem('ft8_rtng')||'[]');
-function persistRatings(){localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));}
+function persistRatings(mgrId){persist(mgrId);}
 
 function starHTML(n){n=Math.round(n);return '<span style="color:#FBBF24;font-size:16px">'+'⭐'.repeat(n)+'</span>';}
 
@@ -2888,8 +2910,8 @@ function renderMgrDash(){
 /* ── Data init ── */
 if(!db.workHours) db.workHours = JSON.parse(localStorage.getItem('ft7_hrs')||'[]');
 
-function persistHrs(){
-  try{ localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours)); }catch(e){}
+function persistHrs(mgrId){
+  persist(mgrId);
 }
 
 /* ── OT Check & Live Preview ── */
@@ -3552,13 +3574,20 @@ function _showFsaRestoreBanner(dirHandle){
 /* Core restore logic — call only when permission already granted */
 async function _doFsaRestore(dirHandle){
   try {
-    const perm = await dirHandle.requestPermission({mode:'read'});
+    const perm = await dirHandle.requestPermission({mode:'readwrite'});
     if(perm !== 'granted'){ _updateFsaStatus('⚠️ Folder permission denied'); return; }
     
     // 1. Fetch Global config
     const globalData = await _fsaReadFile(dirHandle, 'FormTrack_Global.json');
     if (globalData) {
-      applyGlobalSnapshot(globalData);
+      const remoteTime = globalData.updatedAt || '';
+      const localTime = localStorage.getItem('ft_last_write_global') || '';
+      if (localTime && remoteTime < localTime) {
+        await _fsaWriteFile(dirHandle, 'FormTrack_Global.json', getGlobalSnapshot());
+      } else {
+        applyGlobalSnapshot(globalData);
+        localStorage.setItem('ft_last_write_global', remoteTime);
+      }
     }
     
     // 2. Fetch Manager-wise data
@@ -3567,7 +3596,17 @@ async function _doFsaRestore(dirHandle){
         const subDir = await dirHandle.getDirectoryHandle(curUser.id);
         const mgrData = await _fsaReadFile(subDir, `FormTrack_${curUser.id}.json`);
         if (mgrData) {
-          applyManagerSnapshot(mgrData);
+          const remoteTime = mgrData.updatedAt || '';
+          const localTime = localStorage.getItem('ft_last_write_' + curUser.id) || '';
+          if (localTime && remoteTime < localTime) {
+            const subDirWrite = await dirHandle.getDirectoryHandle(curUser.id, {create: true});
+            const snapshot = getManagerSnapshot(curUser.id);
+            await _fsaWriteFile(subDirWrite, `FormTrack_${curUser.id}.json`, snapshot);
+            await _saveManagerRawFiles(subDirWrite, snapshot);
+          } else {
+            applyManagerSnapshot(mgrData);
+            localStorage.setItem('ft_last_write_' + curUser.id, remoteTime);
+          }
         }
       } catch (e) {
         console.warn('[FSA] Manager folder or file not found for:', curUser.id);
@@ -3591,7 +3630,19 @@ async function _doFsaRestore(dirHandle){
           const subDir = await dirHandle.getDirectoryHandle(mid);
           const mgrData = await _fsaReadFile(subDir, `FormTrack_${mid}.json`);
           if (mgrData) {
-            applyManagerSnapshot(mgrData);
+            const remoteTime = mgrData.updatedAt || '';
+            const localTime = localStorage.getItem('ft_last_write_' + mid) || '';
+            
+            if (localTime && remoteTime < localTime) {
+              const localSnap = getManagerSnapshot(mid);
+              const subDirWrite = await dirHandle.getDirectoryHandle(mid, {create: true});
+              await _fsaWriteFile(subDirWrite, `FormTrack_${mid}.json`, localSnap);
+              await _saveManagerRawFiles(subDirWrite, localSnap);
+              applyManagerSnapshot(localSnap);
+            } else {
+              applyManagerSnapshot(mgrData);
+              localStorage.setItem('ft_last_write_' + mid, remoteTime);
+            }
           }
         } catch (e) {
           // Folder or file does not exist for this manager yet, which is fine
@@ -3676,7 +3727,14 @@ async function _restoreFromFirebase() {
     const globalSnap = await dbRef.child('global').once('value');
     const globalData = globalSnap.val();
     if (globalData) {
-      applyGlobalSnapshot(globalData);
+      const remoteTime = globalData.updatedAt || '';
+      const localTime = localStorage.getItem('ft_last_write_global') || '';
+      if (localTime && remoteTime < localTime) {
+        await syncGlobalToFirebase();
+      } else {
+        applyGlobalSnapshot(globalData);
+        localStorage.setItem('ft_last_write_global', remoteTime);
+      }
     }
     
     // 2. Restore manager data
@@ -3684,12 +3742,22 @@ async function _restoreFromFirebase() {
       const mgrSnap = await dbRef.child('managers').child(curUser.id).once('value');
       const mgrData = mgrSnap.val();
       if (mgrData) {
-        applyManagerSnapshot(mgrData);
+        const remoteTime = mgrData.updatedAt || '';
+        const localTime = localStorage.getItem('ft_last_write_' + curUser.id) || '';
+        if (localTime && remoteTime < localTime) {
+          await _syncToFirebase(curUser.id);
+        } else {
+          applyManagerSnapshot(mgrData);
+          localStorage.setItem('ft_last_write_' + curUser.id, remoteTime);
+        }
       }
       _origPersistFSA(); // Save locally
       initMgr(); // Refresh UI
     } else if (curRole === 'a') {
-      // Clear database arrays before merge
+      const managersSnap = await dbRef.child('managers').once('value');
+      const managersData = managersSnap.val() || {};
+      
+      // Reset Admin combined database before merge
       db.submissions = [];
       db.leaves = [];
       db.leavebal = {};
@@ -3699,10 +3767,23 @@ async function _restoreFromFirebase() {
       db.ratings = [];
       db.workHours = [];
       
-      const managersSnap = await dbRef.child('managers').once('value');
-      const managersData = managersSnap.val() || {};
-      for (const mid of Object.keys(managersData)) {
-        applyManagerSnapshot(managersData[mid]);
+      const localMgrIds = new Set(db.managers.map(m => m.id));
+      const allMgrIds = new Set([...Object.keys(managersData), ...localMgrIds]);
+      
+      for (const mid of allMgrIds) {
+        if (!mid) continue;
+        const remoteSnap = managersData[mid];
+        const remoteTime = remoteSnap ? (remoteSnap.updatedAt || '') : '';
+        const localTime = localStorage.getItem('ft_last_write_' + mid) || '';
+        
+        if (localTime && remoteTime < localTime) {
+          const localSnap = getManagerSnapshot(mid);
+          await dbRef.child('managers').child(mid).set(localSnap);
+          applyManagerSnapshot(localSnap);
+        } else if (remoteSnap) {
+          applyManagerSnapshot(remoteSnap);
+          localStorage.setItem('ft_last_write_' + mid, remoteTime);
+        }
       }
       _origPersistFSA(); // Save locally
       initAdmin(); // Refresh UI
@@ -4120,7 +4201,14 @@ async function gdRestore() {
     const globalDataRaw = await getFileContent(globalId);
     const globalData = safeParseJson(globalDataRaw);
     if (globalData) {
-      applyGlobalSnapshot(globalData);
+      const remoteTime = globalData.updatedAt || '';
+      const localTime = localStorage.getItem('ft_last_write_global') || '';
+      if (localTime && remoteTime < localTime) {
+        await gdBackup();
+      } else {
+        applyGlobalSnapshot(globalData);
+        localStorage.setItem('ft_last_write_global', remoteTime);
+      }
     }
     
     // 2. Fetch Manager-wise data
@@ -4130,17 +4218,36 @@ async function gdRestore() {
       const mgrDataRaw = await getFileContent(mgrFileId);
       const mgrData = safeParseJson(mgrDataRaw);
       if (mgrData) {
-        applyManagerSnapshot(mgrData);
+        const remoteTime = mgrData.updatedAt || '';
+        const localTime = localStorage.getItem('ft_last_write_' + curUser.id) || '';
+        if (localTime && remoteTime < localTime) {
+          await _triggerGDriveBackup(curUser.id);
+        } else {
+          applyManagerSnapshot(mgrData);
+          localStorage.setItem('ft_last_write_' + curUser.id, remoteTime);
+        }
       }
       _origPersistFSA(); // Save to local storage
       initMgr(); // Refresh Mgr UI
     } else if (curRole === 'a') {
       const resp = await gapi.client.drive.files.list({
-        q: "name contains 'FormTrack_MGR-' and name contains '.json' and trashed = false",
+        q: "name contains 'FormTrack_' and name contains '.json' and name != 'FormTrack_Global.json' and trashed = false",
         fields: 'files(id, name)',
         spaces: 'drive'
       });
       const files = resp.result.files || [];
+      const driveDataMap = {};
+      for (const file of files) {
+        const midMatch = file.name.match(/FormTrack_(.+)\.json/);
+        if (midMatch) {
+          const mid = midMatch[1];
+          const dataRaw = await getFileContent(file.id);
+          const data = safeParseJson(dataRaw);
+          if (data) {
+            driveDataMap[mid] = data;
+          }
+        }
+      }
       
       // Reset Admin combined database before merge
       db.submissions = [];
@@ -4152,11 +4259,24 @@ async function gdRestore() {
       db.ratings = [];
       db.workHours = [];
       
-      for (const file of files) {
-        const dataRaw = await getFileContent(file.id);
-        const data = safeParseJson(dataRaw);
-        if (data) {
-          applyManagerSnapshot(data);
+      const localMgrIds = new Set(db.managers.map(m => m.id));
+      const allMgrIds = new Set([...Object.keys(driveDataMap), ...localMgrIds]);
+      
+      for (const mid of allMgrIds) {
+        if (!mid) continue;
+        const remoteSnap = driveDataMap[mid];
+        const remoteTime = remoteSnap ? (remoteSnap.updatedAt || '') : '';
+        const localTime = localStorage.getItem('ft_last_write_' + mid) || '';
+        
+        if (localTime && remoteTime < localTime) {
+          const localSnap = getManagerSnapshot(mid);
+          const mgrFileName = `FormTrack_${mid}.json`;
+          const mgrFileId = await getOrCreateFile(mgrFileName);
+          await updateFileContent(mgrFileId, localSnap);
+          applyManagerSnapshot(localSnap);
+        } else if (remoteSnap) {
+          applyManagerSnapshot(remoteSnap);
+          localStorage.setItem('ft_last_write_' + mid, remoteTime);
         }
       }
       _origPersistFSA(); // Save combined locally
@@ -4292,6 +4412,9 @@ function triggerGDriveGlobalBackup() {
 }
 
 function persistGlobal() {
+  const now = new Date().toISOString();
+  localStorage.setItem('ft_last_write_global', now);
+  
   // 1. Save locally
   if (typeof _origPersistFSA === 'function') {
     _origPersistFSA();
@@ -4327,41 +4450,178 @@ function persistGlobal() {
   }
 }
 
+let _fbGlobalRef = null;
+let _fbMgrRef = null;
+let _fbAllMgrsRef = null;
+
+function refreshMgrUI() {
+  const activeSec = document.querySelector('#pg-mgr .sec.on');
+  if (!activeSec) return;
+  const t = activeSec.id.replace('ms-', '');
+  if (t === 'dash' && typeof renderMgrDash === 'function') renderMgrDash();
+  if (t === 'rep') renderMyRep();
+  if (t === 'lv') renderMgrLv();
+  if (t === 'mist' && typeof renderMgrMist === 'function') renderMgrMist();
+  if (t === 'prob' && typeof renderMgrProb === 'function') renderMgrProb();
+  if (t === 'rtng' && typeof renderMgrRating === 'function') renderMgrRating();
+  if (t === 'hrs' && typeof renderMgrHrs === 'function') renderMgrHrs();
+  if (t === 'late' && typeof renderMgrLate === 'function') renderMgrLate();
+  
+  if (typeof updateLateBadges === 'function') updateLateBadges();
+  if (typeof updateProbBadge === 'function') updateProbBadge();
+  if (curUser && db.mistakes) {
+    const unseen = db.mistakes.filter(m => m.mgrId === curUser.id && !m.seenByMgr).length;
+    const b = document.getElementById('mist-mgr-badge');
+    if (b) { b.textContent = unseen; b.style.display = unseen ? 'inline' : 'none'; }
+  }
+}
+
+function refreshAdminUI() {
+  const activeSec = document.querySelector('#pg-admin .sec.on');
+  if (!activeSec) return;
+  const t = activeSec.id.replace('as-', '');
+  if (t === 'ov') renderOv();
+  if (t === 'rp') renderReps();
+  if (t === 'lv') renderAdminLv();
+  if (t === 'mist' && typeof renderMistReport === 'function') renderMistReport();
+  if (t === 'late' && typeof renderLateReport === 'function') renderLateReport();
+  if (t === 'prob' && typeof renderProblems === 'function') renderProblems();
+  if (t === 'rtng' && typeof renderAdminRating === 'function') renderAdminRating();
+  if (t === 'hrs' && typeof renderHrsReport === 'function') renderHrsReport();
+  if (t === 'mg') renderMgTbl();
+  if (t === 'dp') renderDpTbl();
+  if (t === 'ct') renderCtList();
+  
+  if (typeof updateMistBadge === 'function') updateMistBadge();
+  if (typeof updateLateBadges === 'function') updateLateBadges();
+  if (typeof updateProbBadge === 'function') updateProbBadge();
+}
+
 function initFirebaseListeners() {
   if (!isFirebaseEnabled) return;
   try {
     const dbRef = firebase.database().ref('formtrack');
     
-    // Listen to global changes in real-time
-    dbRef.child('global').on('value', (snapshot) => {
+    // Clean up existing listeners
+    if (_fbGlobalRef) _fbGlobalRef.off();
+    if (_fbMgrRef) _fbMgrRef.off();
+    if (_fbAllMgrsRef) _fbAllMgrsRef.off();
+    
+    // 1. Global Listener
+    _fbGlobalRef = dbRef.child('global');
+    _fbGlobalRef.on('value', (snapshot) => {
       const globalData = snapshot.val();
       if (globalData) {
-        // Simple comparison to prevent redundant updates
         if (JSON.stringify(globalData.managers) === JSON.stringify(db.managers) &&
             JSON.stringify(globalData.departments) === JSON.stringify(db.departments) &&
             JSON.stringify(globalData.categories) === JSON.stringify(db.categories) &&
             globalData.adminPw === db.adminPw) {
-          return; // Identical, ignore
+          return;
+        }
+        
+        const remoteTime = globalData.updatedAt || '';
+        const localTime = localStorage.getItem('ft_last_write_global') || '';
+        if (localTime && remoteTime < localTime) {
+          return;
         }
         
         console.log("[Firebase] Global sync update received in real-time");
         applyGlobalSnapshot(globalData);
-        if (typeof _origPersistFSA === 'function') _origPersistFSA();
+        localStorage.setItem('ft_last_write_global', remoteTime);
         
-        // Refresh UI
         if (curRole === 'a') {
-          const activeSec = document.querySelector('#pg-admin .sec.on');
-          if (activeSec) {
-            const tabId = activeSec.id.replace('as-', '');
-            if (tabId === 'mg') renderMgTbl();
-            if (tabId === 'dp') renderDpTbl();
-            if (tabId === 'ct') renderCtList();
-          }
-          renderOv();
+          refreshAdminUI();
+        } else if (curRole === 'm') {
+          refreshMgrUI();
         }
       }
     });
-  } catch(e) {
+
+    // 2. User Specific Listeners
+    if (curRole === 'm' && curUser) {
+      _fbMgrRef = dbRef.child('managers').child(curUser.id);
+      _fbMgrRef.on('value', (snapshot) => {
+        const mgrData = snapshot.val();
+        if (mgrData) {
+          const remoteTime = mgrData.updatedAt || '';
+          const localTime = localStorage.getItem('ft_last_write_' + curUser.id) || '';
+          
+          if (localTime && remoteTime < localTime) {
+            return;
+          }
+          
+          const currentSnap = getManagerSnapshot(curUser.id);
+          const cleanCompare = (a, b) => {
+            const copyA = {...a, updatedAt: null};
+            const copyB = {...b, updatedAt: null};
+            return JSON.stringify(copyA) === JSON.stringify(copyB);
+          };
+          if (cleanCompare(mgrData, currentSnap)) return;
+          
+          console.log("[Firebase] Manager sync update received in real-time");
+          applyManagerSnapshot(mgrData);
+          localStorage.setItem('ft_last_write_' + curUser.id, remoteTime);
+          _origPersistFSA();
+          refreshMgrUI();
+        }
+      });
+    } else if (curRole === 'a') {
+      _fbAllMgrsRef = dbRef.child('managers');
+      _fbAllMgrsRef.on('value', (snapshot) => {
+        const managersData = snapshot.val() || {};
+        
+        let hasChanges = false;
+        const mgrIds = new Set(db.managers.map(m => m.id));
+        for (const mid of mgrIds) {
+          const currentSnap = getManagerSnapshot(mid);
+          const remoteSnap = managersData[mid];
+          const remoteTime = remoteSnap ? (remoteSnap.updatedAt || '') : '';
+          const localTime = localStorage.getItem('ft_last_write_' + mid) || '';
+          
+          if (localTime && remoteTime < localTime) {
+            continue;
+          }
+          
+          const copyA = {...currentSnap, updatedAt: null};
+          const copyB = remoteSnap ? {...remoteSnap, updatedAt: null} : null;
+          if (JSON.stringify(copyA) !== JSON.stringify(copyB)) {
+            hasChanges = true;
+            break;
+          }
+        }
+        if (!hasChanges) return;
+        
+        console.log("[Firebase] All managers sync update received in real-time");
+        
+        db.submissions = [];
+        db.leaves = [];
+        db.leavebal = {};
+        db.mistakes = [];
+        db.lateEntries = [];
+        db.problems = [];
+        db.ratings = [];
+        db.workHours = [];
+        
+        for (const mid of Object.keys(managersData)) {
+          const remoteSnap = managersData[mid];
+          const remoteTime = remoteSnap ? (remoteSnap.updatedAt || '') : '';
+          const localTime = localStorage.getItem('ft_last_write_' + mid) || '';
+          
+          if (localTime && remoteTime < localTime) {
+            const localSnap = getManagerSnapshot(mid);
+            applyManagerSnapshot(localSnap);
+          } else {
+            applyManagerSnapshot(remoteSnap);
+            if (remoteTime) {
+              localStorage.setItem('ft_last_write_' + mid, remoteTime);
+            }
+          }
+        }
+        _origPersistFSA();
+        refreshAdminUI();
+      });
+    }
+  } catch (e) {
     console.error("[Firebase] Listener setup failed:", e);
   }
 }
