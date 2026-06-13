@@ -1816,7 +1816,7 @@ function addMgr(){
   if(pw!==pw2){sm('mg-msg','Passwords do not match',true);return;}
   if(db.managers.find(m=>m.id===id)){sm('mg-msg','ID already exists',true);return;}
   if(db.managers.length>=50){sm('mg-msg','Max 50',true);return;}
-  db.managers.push({id,name:nm,deptId:dp,pw});persistGlobal();
+  db.managers.push({id,name:nm,deptId:dp,pw});persistGlobal();persist(id);
   ['ni','nn','np','np2'].forEach(x=>document.getElementById(x).value='');document.getElementById('nd').value='';
   sm('mg-msg','✅ '+nm+' added!');renderMgTbl();
 }
@@ -1845,7 +1845,7 @@ function saveEdit(){
   if(!nm||!dp){sm('e-msg','Fill all fields',true);return;}
   if(pw&&pw!==pw2){sm('e-msg','Passwords do not match',true);return;}
   const m=db.managers.find(x=>x.id===editId);if(!m)return;
-  m.name=nm;m.deptId=dp;if(pw)m.pw=pw;persistGlobal();closeEdit();sm('mg-msg','✅ '+nm+' updated!');renderMgTbl();
+  m.name=nm;m.deptId=dp;if(pw)m.pw=pw;persistGlobal();persist(editId);closeEdit();sm('mg-msg','✅ '+nm+' updated!');renderMgTbl();
 }
 function delMgr(id){if(!confirm('Delete?'))return;db.managers=db.managers.filter(m=>m.id!==id);persistGlobal();renderMgTbl();renderOv();}
 
