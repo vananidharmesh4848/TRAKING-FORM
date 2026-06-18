@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>FormTrack — Office System</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
 :root{
@@ -20,6 +21,19 @@
   --r:12px;--rs:8px;--rl:16px;--rx:22px;
   --sh:0 2px 12px rgba(0,0,0,0.08);
   --sidebar-w:190px;
+}
+[data-theme=dark]{
+  --bg:#0D1117;--s:#161B22;--s2:#1C2333;--s3:#21262D;
+  --bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.15);
+  --t:#E6EDF3;--t2:#8B949E;--t3:#5D6775;
+  --ac:#58A6FF;--ac2:rgba(88,166,255,0.12);--ac3:rgba(88,166,255,0.3);
+  --gr:#3FB950;--gr2:rgba(63,185,80,0.12);--gr3:rgba(63,185,80,0.3);
+  --am:#D29922;--am2:rgba(210,153,34,0.12);--am3:rgba(210,153,34,0.3);
+  --re:#F85149;--re2:rgba(248,81,73,0.12);--re3:rgba(248,81,73,0.3);
+  --pu:#BC8CFF;--pu2:rgba(188,140,255,0.12);
+  --te:#39D2C0;--te2:rgba(57,210,192,0.12);
+  --or:#F0883E;--or2:rgba(240,136,62,0.12);
+  --sh:0 2px 12px rgba(0,0,0,0.4);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
@@ -220,6 +234,19 @@ textarea{resize:vertical;min-height:56px}
 @keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 .mhnd{width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 1rem}
 .mtit{font-size:16px;font-weight:700;color:var(--t);margin-bottom:1.25rem}
+/* BULK BAR + SEARCH + CHECKBOX */
+.bulk-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:1rem 0 10px;padding:10px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--bd)}
+.bulk-bar .srch-inp{padding:6px 10px;border:1px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);font-size:13px;flex:1;min-width:140px;outline:none}
+.bulk-bar .srch-inp:focus{border-color:var(--ac)}.bulk-bar .srch-inp::placeholder{color:var(--t3)}
+.cb-wrap{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;user-select:none}
+.cb-wrap input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
+.cb-chip{display:inline-flex;align-items:center;margin-right:6px;padding:2px;cursor:pointer}
+.cb-chip input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
+.late-row,.lv-row,.mist-row,.prob-row,.sug-row,.hrs-row{position:relative}
+/* Dark mode fixes for modals */
+[data-theme=dark] .mbox{background:var(--s);border-color:var(--bd);color:var(--t)}
+[data-theme=dark] .mhnd{background:var(--s3)}
+[data-theme=dark] .bulk-bar{border-color:var(--bd)}
 /* LIGHTBOX */
 .lb{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.93);align-items:center;justify-content:center;padding:1rem}
 .lb.open{display:flex}.lb img{max-width:100%;max-height:85vh;border-radius:var(--r);object-fit:contain}
@@ -313,14 +340,20 @@ textarea{resize:vertical;min-height:56px}
       <button class="atab" id="mn-prob" onclick="mTab('prob',this)">🔧 Problems <span class="nbadge" id="prob-mgr-badge" style="display:none;position:static;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
       <button class="atab" id="mn-rtng" onclick="mTab('rtng',this)">⭐ Rating</button>
       <button class="atab" id="mn-hrs" onclick="mTab('hrs',this)">⏱️ Hours</button>
+      <button class="atab" id="mn-sug" onclick="mTab('sug',this)">💡 Suggestions <span class="nbadge" id="sug-mgr-badge" style="display:none;position:static;background:var(--re);color:#fff;border-radius:100px;padding:0 5px;font-size:10px;margin-left:2px">0</span></button>
     </div>
 
     <!-- MANAGER DASHBOARD -->
     <div class="sec on" id="ms-dash">
       <div class="pg-header">
         <div class="pg-title">📊 Maru Dashboard</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+          <label style="margin:0;font-size:12px">📅 Aa Mahino:</label>
+          <input type="month" id="mgr-ov-month" style="width:auto;flex:1;max-width:200px;padding:6px 10px" onchange="renderMgrDash()">
+        </div>
       </div>
       <div class="sg" id="mgr-dash-stats"></div>
+      <div id="mgr-drill-area" style="display:none;margin-bottom:1rem"></div>
       <div class="panels-row">
         <div class="panel">
           <div class="panel-title">📄 Recent Submissions</div>
@@ -385,7 +418,13 @@ textarea{resize:vertical;min-height:56px}
 
     <!-- MISTAKES -->
     <div class="sec" id="ms-mist">
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Mistake Reports</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">My Mistake Reports</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn bgr bxs" onclick="dlMgrMistPDF()">📄 PDF</button>
+          <button class="btn bam bxs" onclick="dlMgrMistExcel()">📊 Excel</button>
+        </div>
+      </div>
       <div id="mgr-mist-list"></div>
     </div>
 
@@ -407,10 +446,16 @@ textarea{resize:vertical;min-height:56px}
         </div>
         <div class="fg"><label>Actual Arrival Time</label><input type="time" id="le-time"></div>
         <div class="fg"><label>Reason</label><textarea id="le-reason" placeholder="Late aavana no reason lakhao..."></textarea></div>
-        <button class="btn ba bsm" onclick="submitLateEntry()">📨 Submit Late Entry</button>
+        <button class="btn ba bsm" id="le-submit-btn" onclick="submitLateEntry()">📨 Submit Late Entry</button>
         <div class="ok" id="le-msg"></div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Late Entry History</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">My Late Entry History</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn bgr bxs" onclick="dlMgrLatePDF()">📄 PDF</button>
+          <button class="btn bam bxs" onclick="dlMgrLateExcel()">📊 Excel</button>
+        </div>
+      </div>
       <div id="mgr-late-list"></div>
     </div>
 
@@ -444,6 +489,15 @@ textarea{resize:vertical;min-height:56px}
         <div class="ct">⭐ Maru Rating</div>
         <div id="mgr-my-rating"></div>
       </div>
+      <!-- Date Filter -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div class="fg" style="margin:0"><label>From</label><input type="date" id="mrf-from" onchange="renderMgrRating()"></div>
+        <div class="fg" style="margin:0"><label>To</label><input type="date" id="mrf-to" onchange="renderMgrRating()"></div>
+        <button class="btn bg2 bsm" onclick="clrMrtngF()">🔄 Clear</button>
+        <div style="flex:1"></div>
+        <button class="btn bgr bsm" onclick="dlMrtngRepPDF()">📄 PDF</button>
+        <button class="btn bam bsm" onclick="dlMrtngRepExcel()">📊 Excel</button>
+      </div>
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏬 Mara Department na Managers</div>
       <div class="card" style="padding:0;overflow:hidden">
         <div style="overflow-x:auto"><table class="tbl" id="dept-rtng-tbl">
@@ -458,6 +512,12 @@ textarea{resize:vertical;min-height:56px}
           <tbody id="office-rtng-body"></tbody>
         </table></div>
       </div>
+    </div>
+
+    <!-- SUGGESTIONS (MANAGER) -->
+    <div class="sec" id="ms-sug">
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">💡 Admin na Suggestions</div>
+      <div id="mgr-sug-list"></div>
     </div>
 
     <!-- HOURS (MANAGER) -->
@@ -508,7 +568,7 @@ textarea{resize:vertical;min-height:56px}
           <textarea id="hrs-note" placeholder="Aaj koi khaas kaam karyu..." style="min-height:44px"></textarea>
         </div>
 
-        <button class="btn ba bsm bfu" onclick="submitHours()">✅ Hours Submit Karo</button>
+        <button class="btn ba bsm bfu" id="hrs-save-btn" onclick="submitHours()">💾 Save Hours</button>
         <div class="ok" id="hrs-msg"></div>
       </div>
 
@@ -519,7 +579,13 @@ textarea{resize:vertical;min-height:56px}
         <button class="btn bg2 bsm" onclick="document.getElementById('hrs-month').value='';renderMgrHrs()">All</button>
       </div>
       <div class="sg" id="hrs-my-stats"></div>
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Mara Hours — History</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Mara Hours — History</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn bgr bxs" onclick="dlMgrHrsPDF()">📄 PDF</button>
+          <button class="btn bam bxs" onclick="dlMgrHrsExcel()">📊 Excel</button>
+        </div>
+      </div>
       <div id="mgr-hrs-list"></div>
     </div>
 
@@ -549,11 +615,13 @@ textarea{resize:vertical;min-height:56px}
         <button class="sb-item" id="sbi-mist" onclick="aTab('mist',this)"><span class="si">⚠️</span><span class="sl">Mistake Reports</span><span class="sb-badge" id="mist-badge" style="display:none">0</span></button>
         <button class="sb-item" id="sbi-rtng" onclick="aTab('rtng',this)"><span class="si">⭐</span><span class="sl">Manager Rating</span></button>
         <button class="sb-item" id="sbi-prob" onclick="aTab('prob',this)"><span class="si">🔧</span><span class="sl">Problem / Solution</span><span class="sb-badge" id="prob-badge" style="display:none">0</span></button>
+        <button class="sb-item" id="sbi-sug" onclick="aTab('sug',this)"><span class="si">💡</span><span class="sl">Suggestions</span><span class="sb-badge" id="sug-badge" style="display:none">0</span></button>
         <div class="sb-divider" style="margin-top:8px">Manage</div>
         <button class="sb-item" id="sbi-mg" onclick="aTab('mg',this)"><span class="si">👥</span><span class="sl">Managers</span></button>
         <button class="sb-item" id="sbi-dp" onclick="aTab('dp',this)"><span class="si">🏬</span><span class="sl">Departments</span></button>
         <button class="sb-item" id="sbi-ct" onclick="aTab('ct',this)"><span class="si">🏷️</span><span class="sl">Categories</span></button>
         <button class="sb-item" id="sbi-bk" onclick="aTab('bk',this)"><span class="si">☁️</span><span class="sl">Backup / Restore</span></button>
+        <button class="sb-item" id="sbi-al" onclick="aTab('al',this)"><span class="si">📋</span><span class="sl">Activity Log</span></button>
         <button class="sb-item" id="sbi-st" onclick="aTab('st',this)"><span class="si">⚙️</span><span class="sl">Settings</span></button>
       </div>
       <div class="sb-logout">
@@ -573,6 +641,7 @@ textarea{resize:vertical;min-height:56px}
         </div>
         <div class="tb-right">
           <div id="gd-topbar-dot" style="display:none;font-size:11px;color:var(--gr);background:var(--gr2);padding:3px 10px;border-radius:100px;border:1px solid var(--gr3);cursor:pointer" onclick="aTab('bk',document.getElementById('sbi-bk'))" title="Google Drive Live Sync ON — Click for settings">☁️ Live Sync</div>
+          <button class="btn bg2 bxs" id="dm-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" style="font-size:14px;padding:3px 8px">🌙</button>
           <div class="tb-user"><div class="tb-dot"></div><span style="font-size:12px;font-weight:600;color:var(--t)">Admin</span></div>
         </div>
       </div>
@@ -582,8 +651,20 @@ textarea{resize:vertical;min-height:56px}
     <div class="sec on" id="as-ov">
       <div class="pg-header">
         <div class="pg-title">📊 Manager Summary</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+          <label style="margin:0;font-size:12px">📅 Aa Mahino:</label>
+          <input type="month" id="ov-month" style="width:auto;flex:1;max-width:200px;padding:6px 10px" onchange="renderOv()">
+        </div>
       </div>
       <div class="sg" id="a-stats"></div>
+      <div id="ov-drill-area" style="display:none;margin-bottom:1rem"></div>
+      <!-- Charts -->
+      <div class="chart-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card" style="padding:1rem"><canvas id="ch-sub-month" style="max-height:260px"></canvas></div>
+        <div class="card" style="padding:1rem"><canvas id="ch-late-pie" style="max-height:260px"></canvas></div>
+        <div class="card" style="padding:1rem"><canvas id="ch-mist-trend" style="max-height:260px"></canvas></div>
+        <div class="card" style="padding:1rem"><canvas id="ch-ot-bar" style="max-height:260px"></canvas></div>
+      </div>
       <div class="panels-row">
         <div class="panel">
           <div class="panel-title">📄 Recent Submissions</div>
@@ -640,6 +721,13 @@ textarea{resize:vertical;min-height:56px}
       <div class="sg3" id="lv-stats"></div>
       <!-- Quick actions: pending -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Pending Approvals</div>
+      <div class="bulk-bar">
+        <label class="cb-wrap"><input type="checkbox" id="selall-leave" onchange="toggleAll('leave',this.checked)"> Select All</label>
+        <input type="text" class="srch-inp" id="srch-leave" placeholder="🔍 Search..." oninput="renderAdminLv()">
+        <button class="btn bgr bxs" onclick="bulkAction('leave','approve')">✅ Bulk Approve</button>
+        <button class="btn bre bxs" onclick="bulkAction('leave','reject')">❌ Bulk Reject</button>
+        <button class="btn bg2 bxs" onclick="bulkAction('leave','delete')">🗑️ Bulk Delete</button>
+      </div>
       <div id="lv-pending-list"></div>
       <div class="div"></div>
       <!-- Full report -->
@@ -860,6 +948,12 @@ textarea{resize:vertical;min-height:56px}
           <tbody id="perf-body"></tbody>
         </table></div>
       </div>
+      <!-- Bulk + Search Bar -->
+      <div class="bulk-bar">
+        <label class="cb-wrap"><input type="checkbox" id="selall-mistake" onchange="toggleAll('mistake',this.checked)"> Select All</label>
+        <input type="text" class="srch-inp" id="srch-mistake" placeholder="🔍 Search..." oninput="renderMistReport()">
+        <button class="btn bre bxs" onclick="bulkAction('mistake','delete')">🗑️ Bulk Delete</button>
+      </div>
       <!-- Mistake List -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Mistake Reports</div>
       <div id="mist-list"></div>
@@ -915,6 +1009,14 @@ textarea{resize:vertical;min-height:56px}
           <tbody id="late-sum-body"></tbody>
         </table></div>
       </div>
+      <!-- Bulk + Search Bar -->
+      <div class="bulk-bar">
+        <label class="cb-wrap"><input type="checkbox" id="selall-late" onchange="toggleAll('late',this.checked)"> Select All</label>
+        <input type="text" class="srch-inp" id="srch-late" placeholder="🔍 Search..." oninput="renderLateReport()">
+        <button class="btn bgr bxs" onclick="bulkAction('late','excuse')">✅ Bulk Excuse</button>
+        <button class="btn bre bxs" onclick="bulkAction('late','unexcuse')">❌ Bulk Unexcuse</button>
+        <button class="btn bg2 bxs" onclick="bulkAction('late','delete')">🗑️ Bulk Delete</button>
+      </div>
       <!-- Full List -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Late Entries</div>
       <div id="late-list"></div>
@@ -940,8 +1042,37 @@ textarea{resize:vertical;min-height:56px}
           <button class="btn bam bsm" onclick="dlProbRepExcel()">📊 Excel Download</button>
         </div>
       </div>
+      <!-- Bulk + Search Bar -->
+      <div class="bulk-bar">
+        <label class="cb-wrap"><input type="checkbox" id="selall-problem" onchange="toggleAll('problem',this.checked)"> Select All</label>
+        <input type="text" class="srch-inp" id="srch-problem" placeholder="🔍 Search..." oninput="renderProblems()">
+        <button class="btn bgr bxs" onclick="bulkAction('problem','solve')">✅ Bulk Solve</button>
+        <button class="btn bre bxs" onclick="bulkAction('problem','delete')">🗑️ Bulk Delete</button>
+      </div>
       <!-- Problem List (Admin sees all, can reply) -->
       <div id="prob-list"></div>
+    </div>
+
+    <!-- SUGGESTIONS -->
+    <div class="sec" id="as-sug">
+      <div class="card">
+        <div class="ct">💡 New Suggestion</div>
+        <div class="fg" style="margin:0">
+          <label>Department(s) <span style="font-size:11px;color:var(--t3);font-weight:400">(check karela department na badha managers ne suggestion automatic jashe)</span></label>
+          <div id="asug-dp-sel" style="display:flex;flex-wrap:wrap;gap:10px;background:var(--s2);border:1.5px solid var(--bd);border-radius:var(--rs);padding:12px"></div>
+          <div style="font-size:11px;color:var(--ac);margin-top:6px;font-weight:500" id="asug-mg-count"></div>
+        </div>
+        <div class="fg"><label>Suggestion / Message</label><textarea id="asug-msg" placeholder="Suggestion lakho..." rows="4"></textarea></div>
+        <button class="btn ba bsm" onclick="submitSug()">📨 Send Suggestion</button>
+        <div class="ok" id="asug-msg-status"></div>
+      </div>
+      <div class="bulk-bar">
+        <label class="cb-wrap"><input type="checkbox" id="selall-suggestion" onchange="toggleAll('suggestion',this.checked)"> Select All</label>
+        <input type="text" class="srch-inp" id="srch-suggestion" placeholder="🔍 Search..." oninput="renderAdminSug()">
+        <button class="btn bre bxs" onclick="bulkAction('suggestion','delete')">🗑️ Bulk Delete</button>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">📋 Sent Suggestions</div>
+      <div id="asug-list"></div>
     </div>
 
     <!-- RATING -->
@@ -970,6 +1101,15 @@ textarea{resize:vertical;min-height:56px}
         <button class="btn ba bsm" onclick="addRating()">⚡ Auto Save Rating</button>
         <div class="ok" id="rt-msg"></div>
       </div>
+      <!-- Date Filter + Export -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div class="fg" style="margin:0"><label>From</label><input type="date" id="rf-from" onchange="renderAdminRating()"></div>
+        <div class="fg" style="margin:0"><label>To</label><input type="date" id="rf-to" onchange="renderAdminRating()"></div>
+        <button class="btn bg2 bsm" onclick="clrRtngF()">🔄 Clear</button>
+        <div style="flex:1"></div>
+        <button class="btn bgr bsm" onclick="dlRtngRepPDF()">📄 PDF</button>
+        <button class="btn bam bsm" onclick="dlRtngRepExcel()">📊 Excel</button>
+      </div>
       <!-- Office Leaderboard -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏆 Office Leaderboard (All Departments)</div>
       <div class="card" style="padding:0;overflow:hidden">
@@ -979,14 +1119,17 @@ textarea{resize:vertical;min-height:56px}
         </table></div>
       </div>
       <!-- Rating History -->
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:1rem 0 10px">
-        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em">Rating History</div>
-        <div style="display:flex;gap:6px">
-          <button class="btn bgr bsm" onclick="dlRtngRepPDF()">📄 PDF</button>
-          <button class="btn bam bsm" onclick="dlRtngRepExcel()">📊 Excel</button>
-        </div>
-      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">Rating History</div>
       <div id="rtng-list"></div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div class="sec" id="as-al">
+      <div class="bulk-bar" style="margin-bottom:12px">
+        <button class="btn bre bxs" onclick="if(confirm('Clear activity log?')){db.activityLog=[];localStorage.setItem('ft_log','[]');renderActivityLog();}">🗑️ Clear Log</button>
+        <button class="btn bam bxs" onclick="dlActivityExcel()">📊 Excel</button>
+      </div>
+      <div id="al-list" style="max-height:600px;overflow-y:auto"></div>
     </div>
 
     <div class="sec" id="as-st">
@@ -1046,10 +1189,15 @@ textarea{resize:vertical;min-height:56px}
           <tbody id="hrs-sum-body"></tbody>
         </table></div>
       </div>
+      <div class="bulk-bar">
+        <label class="cb-wrap"><input type="checkbox" id="selall-hours" onchange="toggleAll('hours',this.checked)"> Select All</label>
+        <input type="text" class="srch-inp" id="srch-hours" placeholder="🔍 Search..." oninput="renderHrsReport()">
+        <button class="btn bre bxs" onclick="bulkAction('hours','delete')">🗑️ Bulk Delete</button>
+      </div>
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Hours Entries</div>
       <div class="card" style="padding:0;overflow:hidden">
         <div style="overflow-x:auto"><table class="tbl" id="hrs-list-tbl">
-          <thead><tr><th>Manager</th><th>ID</th><th>Dept</th><th>Date</th><th>Shift</th><th style="text-align:center">Regular Hrs</th><th style="text-align:center">OT Hrs</th><th style="text-align:center">Total Hrs</th><th>OT Remark</th><th>Note</th><th>Submitted At</th></tr></thead>
+          <thead><tr><th></th><th>Manager</th><th>ID</th><th>Dept</th><th>Date</th><th>Shift</th><th style="text-align:center">Regular Hrs</th><th style="text-align:center">OT Hrs</th><th style="text-align:center">Total Hrs</th><th>OT Remark</th><th>Note</th><th>Submitted At</th></tr></thead>
           <tbody id="hrs-list"></tbody>
         </table></div>
       </div>
@@ -1065,6 +1213,43 @@ textarea{resize:vertical;min-height:56px}
   <button class="lbx" onclick="closeLB()">✕</button>
   <img id="lb-img" src="" alt="">
 </div>
+
+<!-- CUSTOM CONFIRM MODAL -->
+<div class="mbg" id="cfm-modal" style="z-index:9999">
+  <div class="mbox" style="max-width:400px;text-align:center">
+    <div class="mtit" id="cfm-title">Confirm</div>
+    <div id="cfm-msg" style="padding:1rem 0;font-size:14px;color:var(--t2)"></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn bg2 bsm" id="cfm-cancel" onclick="closeCfm()">Cancel</button>
+      <button class="btn ba bsm" id="cfm-ok" onclick="closeCfm()">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+let _cfmResolve=null;
+function showCfm(msg,title='Confirm?'){
+  return new Promise(res=>{
+    _cfmResolve=res;
+    document.getElementById('cfm-title').textContent=title;
+    document.getElementById('cfm-msg').textContent=msg;
+    document.getElementById('cfm-modal').classList.add('on');
+    document.getElementById('cfm-ok').onclick=()=>{closeCfm();res(true);};
+    document.getElementById('cfm-cancel').onclick=()=>{closeCfm();res(false);};
+  });
+}
+function closeCfm(){document.getElementById('cfm-modal').classList.remove('on');}
+function showPrompt(msg,defaultVal='',title='Input'){
+  return new Promise(res=>{
+    _cfmResolve=res;
+    document.getElementById('cfm-title').textContent=title;
+    document.getElementById('cfm-msg').innerHTML=msg+'<br><input type="text" id="cfm-input" value="'+defaultVal+'" style="margin-top:10px;width:100%;padding:8px 12px;border:1px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);font-size:14px">';
+    document.getElementById('cfm-modal').classList.add('on');
+    document.getElementById('cfm-ok').onclick=()=>{const v=document.getElementById('cfm-input').value;closeCfm();res(v);};
+    document.getElementById('cfm-cancel').onclick=()=>{closeCfm();res(null);};
+    setTimeout(()=>{const el=document.getElementById('cfm-input');if(el)el.focus();},100);
+  });
+}
+</script>
 
 <!-- EDIT MANAGER MODAL -->
 <div class="mbg" id="edit-m">
@@ -1208,6 +1393,7 @@ function persistLocal(mgrId) {
     if (db.problems) localStorage.setItem('ft8_prob',JSON.stringify(db.problems));
     if (db.ratings) localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));
     if (db.workHours) localStorage.setItem('ft7_hrs',JSON.stringify(db.workHours));
+    if (db.suggestions) localStorage.setItem('ft_sug',JSON.stringify(db.suggestions));
   }catch(e){console.warn('Storage write failed:',e);}
 }
 const _origPersistFSA = persistLocal;
@@ -1221,6 +1407,14 @@ function persist(mgrId){
 /* ============================================================
    UTILS
 ============================================================ */
+function toggleDarkMode(){
+  const d=document.documentElement;
+  const isDark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',isDark?'':'dark');
+  localStorage.setItem('ft_dark',isDark?'':'1');
+  document.getElementById('dm-toggle').textContent=isDark?'🌙':'☀️';
+}
+(function(){if(localStorage.getItem('ft_dark'))document.documentElement.setAttribute('data-theme','dark');})();
 const ini=n=>n.trim().split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
 const fmtD=d=>{if(!d)return'';const[y,m,dy]=d.split('-');return dy+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y;};
 const fmtDT=iso=>{const d=new Date(iso);return fmtD(d.toISOString().split('T')[0])+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
@@ -1368,6 +1562,7 @@ function mTab(t,el){
   if(t==='mist' && typeof renderMgrMist === 'function') renderMgrMist();
   if(t==='prob' && typeof renderMgrProb === 'function') renderMgrProb();
   if(t==='rtng' && typeof renderMgrRating === 'function') renderMgrRating();
+  if(t==='sug')renderMgrSug();
   if(t==='hrs' && typeof renderMgrHrs === 'function'){
     const hd=document.getElementById('hrs-date');
     if(hd&&!hd.value) hd.value=tod();
@@ -1504,6 +1699,8 @@ function delSub(id){
 function lvRow(l,isA){
   const sb=l.status==='pending'?'<span class="badge b-am">⏳ Pending</span>':l.status==='approved'?'<span class="badge b-gr">✅ Approved</span>':'<span class="badge b-re">❌ Rejected</span>';
   return `<div class="lv-row">
+    ${isA?`<label class="cb-chip"><input type="checkbox" class="cb-leave" value="${l.id}" onchange="bulkUpdateBtn('leave')"><span></span></label>`:''}
+    <div style="flex:1">
     <div class="lv-top">
       <div><div class="lv-name">${isA?l.mgrName:l.type}</div>${isA?`<div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${l.mgrId} · ${l.deptName}</div>`:''}</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
@@ -1520,30 +1717,39 @@ function lvRow(l,isA){
     </div>
     ${l.reason?`<div class="notebox">💬 ${l.reason}</div>`:''}
     ${l.remark?`<div class="notebox" style="border-left-color:${l.status==='approved'?'var(--gr)':'var(--re)'}">📝 Admin: ${l.remark}</div>`:''}
-  </div>`;
+  </div></div>`;
 }
 function approveLv(id){
   const l=db.leaves.find(x=>x.id===id);if(!l)return;
-  const rem=prompt('Approval remark (optional):')||'';
-  l.status='approved';l.approvedAt=Date.now();l.remark=rem;
-  const bal=getLvBal(l.mgrId);
-  bal[l.type]=Math.max(0,(bal[l.type]??DEF_BAL[l.type])-l.days);
-  db.leavebal[l.mgrId]=bal;
-  persist(l.mgrId);sm('lv-admin-msg','✅ Leave approved for '+l.mgrName);renderAdminLv();
+  showPrompt('Approval remark (optional):','','✅ Approve Leave').then(rem=>{
+    if(rem===null)return;
+    l.status='approved';l.approvedAt=Date.now();l.remark=rem||'';
+    const bal=getLvBal(l.mgrId);
+    bal[l.type]=Math.max(0,(bal[l.type]??DEF_BAL[l.type])-l.days);
+    db.leavebal[l.mgrId]=bal;
+    addLog('approve-leave',l.mgrId,l.mgrName,'Leave: '+l.type+' '+l.days+' days');
+    persist(l.mgrId);sm('lv-admin-msg','✅ Leave approved for '+l.mgrName);renderAdminLv();
+  });
 }
 function rejectLv(id){
   const l=db.leaves.find(x=>x.id===id);if(!l)return;
-  const rem=prompt('Rejection reason:')||'Not approved';
-  l.status='rejected';l.approvedAt=Date.now();l.remark=rem;
-  persist(l.mgrId);sm('lv-admin-msg','Leave rejected for '+l.mgrName);renderAdminLv();
+  showPrompt('Rejection reason:','Not approved','❌ Reject Leave').then(rem=>{
+    if(rem===null)return;
+    l.status='rejected';l.approvedAt=Date.now();l.remark=rem;
+    addLog('reject-leave',l.mgrId,l.mgrName,'Reason: '+rem);
+    persist(l.mgrId);sm('lv-admin-msg','Leave rejected for '+l.mgrName);renderAdminLv();
+  });
 }
 function delLv(id){
-  if(!confirm('Delete?'))return;
-  const l=db.leaves.find(x=>x.id===id);
-  const mid=l?l.mgrId:null;
-  db.leaves=db.leaves.filter(l=>l.id!==id);
-  persist(mid);
-  renderAdminLv();
+  showCfm('Delete leave entry?','🗑️ Confirm').then(ok=>{
+    if(!ok)return;
+    const l=db.leaves.find(x=>x.id===id);
+    const mid=l?l.mgrId:null;
+    if(l)addLog('delete-leave',l.mgrId,l.mgrName,'Type: '+l.type);
+    db.leaves=db.leaves.filter(l=>l.id!==id);
+    persist(mid);
+    renderAdminLv();
+  });
 }
 function updateLvBadge(){
   const p=db.leaves.filter(l=>l.status==='pending').length;
@@ -1575,6 +1781,7 @@ function initAdmin(){
       <button class="atab"    id="atb-dp"  onclick="aTab('dp', document.getElementById('sbi-dp'))">🏬 Depts</button>
       <button class="atab"    id="atb-ct"  onclick="aTab('ct', document.getElementById('sbi-ct'))">🏷️ Categories</button>
       <button class="atab"    id="atb-bk"  onclick="aTab('bk', document.getElementById('sbi-bk'))">☁️ Backup</button>
+      <button class="atab"    id="atb-al"  onclick="aTab('al', document.getElementById('sbi-al'))">📋 Activity Log</button>
       <button class="atab"    id="atb-st"  onclick="aTab('st', document.getElementById('sbi-st'))">⚙️ Settings</button>
     `;
   }
@@ -1587,7 +1794,7 @@ function initAdmin(){
 }
 
 /* Sidebar tab titles map */
-const _tabTitles={ov:'📊 Manager Summary',rp:'📁 Form Reports',lv:'🏖️ Leave Management',hrs:'⏱️ Hours Report',late:'⏰ Late Entry',mist:'⚠️ Mistake Reports',rtng:'⭐ Manager Rating',prob:'🔧 Problem / Solution',mg:'👥 Managers',dp:'🏬 Departments',ct:'🏷️ Categories',bk:'☁️ Backup / Restore',st:'⚙️ Settings'};
+const _tabTitles={ov:'📊 Manager Summary',rp:'📁 Form Reports',lv:'🏖️ Leave Management',hrs:'⏱️ Hours Report',late:'⏰ Late Entry',mist:'⚠️ Mistake Reports',rtng:'⭐ Manager Rating',prob:'🔧 Problem / Solution',sug:'💡 Suggestions',mg:'👥 Managers',dp:'🏬 Departments',ct:'🏷️ Categories',bk:'☁️ Backup / Restore',al:'📋 Activity Log',st:'⚙️ Settings'};
 
 function aTab(t,el){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
@@ -1605,12 +1812,14 @@ function aTab(t,el){
   if(t==='mist' && typeof renderMistReport === 'function') renderMistReport();
   if(t==='late' && typeof renderLateReport === 'function') renderLateReport();
   if(t==='prob' && typeof renderProblems === 'function') renderProblems();
+  if(t==='sug')renderAdminSug();
   if(t==='rtng' && typeof renderAdminRating === 'function') renderAdminRating();
   if(t==='hrs' && typeof renderHrsReport === 'function') renderHrsReport();
   if(t==='mg'){popDs(['nd','e-dp']);renderMgTbl();}
   if(t==='dp')renderDpTbl();
   if(t==='ct'){popD('cd');renderCtList();}
   if(t==='bk' && typeof initBkTab === 'function') initBkTab();
+  if(t==='al')renderActivityLog();
   if(t==='st'){
     ['cp1','cp2','cp3'].forEach(id=>document.getElementById(id).value='');
     const gcid = document.getElementById('g-cid');
@@ -1620,26 +1829,182 @@ function aTab(t,el){
   }
 }
 
+/* ── Current month helper ── */
+const _curMonth = () => new Date().toISOString().slice(0,7);
+
 /* OVERVIEW */
+/* ── Drill helper functions ── */
+function subsDrill(selMo,mid){
+  const d = mid ? db.submissions.filter(s=>s.mgrId===mid&&(s.date||'').startsWith(selMo)) : db.submissions.filter(s=>(s.date||'').startsWith(selMo));
+  if (!d.length) return '<div class="empty" style="padding:8px"><p>No data</p></div>';
+  if (mid) {
+    // Manager: per-date view
+    return d.map(s => `<div class="drill-item" style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bd)">
+      <span class="dc" style="font-size:12px;font-weight:500">${fmtD(s.date)}</span>
+      <span class="dc" style="font-size:11px">${s.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+      <span class="dc" style="font-size:11px;color:var(--ac);font-weight:600">${Object.values(s.categories||{}).reduce((a,c)=>a+c.files.length,0)} files</span>
+    </div>`).join('');
+  }
+  // Admin: summary table by manager
+  const mgrMap = {};
+  d.forEach(s => {
+    const mId = s.mgrId || '?';
+    const mgr = db.managers.find(m => m.id === mId);
+    const deptId = mgr ? mgr.deptId : '';
+    const allCats = db.categories.filter(c => c.deptId === deptId);
+    if (!mgrMap[mId]) mgrMap[mId] = { name: s.mgrName || mId, dept: s.deptName || '—', subs: 0, files: 0, filledSet: new Set(), allCatCount: allCats.length };
+    mgrMap[mId].subs++;
+    mgrMap[mId].files += Object.values(s.categories||{}).reduce((a,c)=>a+c.files.length,0);
+    Object.keys(s.categories||{}).forEach(c => mgrMap[mId].filledSet.add(c));
+  });
+  return `<table class="tbl" style="font-size:12px">
+    <thead><tr><th>Manager</th><th>Dept</th><th style="text-align:center">Assigned Categories</th><th style="text-align:center">Filled</th><th style="text-align:center">%</th><th style="text-align:center">Submissions</th><th style="text-align:center">Files</th></tr></thead>
+    <tbody>${Object.values(mgrMap).map(m => {
+      const pct = m.allCatCount ? Math.round(m.filledSet.size / m.allCatCount * 100) : 0;
+      return `<tr class="drill-item">
+      <td class="dc" style="font-weight:600">${m.name}</td>
+      <td class="dc" style="color:var(--t2)">${m.dept}</td>
+      <td class="dc" style="text-align:center">${m.allCatCount}</td>
+      <td class="dc" style="text-align:center;font-weight:600;color:${m.filledSet.size === m.allCatCount ? 'var(--gr)' : 'var(--am)'}">${m.filledSet.size}</td>
+      <td class="dc" style="text-align:center;font-weight:600;color:${pct >= 100 ? 'var(--gr)' : pct >= 50 ? 'var(--am)' : 'var(--re)'}">${pct}%</td>
+      <td class="dc" style="text-align:center;color:var(--ac);font-weight:600">${m.subs}</td>
+      <td class="dc" style="text-align:center;font-weight:600;color:var(--gr)">${m.files}</td>
+    </tr>`;
+    }).join('')}</tbody></table>`;
+}
+function leavesDrill(selMo){
+  const d = db.leaves.filter(l=>l.status==='pending'&&(l.from||'').startsWith(selMo));
+  return d.length ? d.map(l => `<div class="drill-item" style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bd)">
+    <span class="dc" style="font-size:12px;font-weight:500">${l.mgrName}</span>
+    <span class="dc" style="font-size:11px;color:var(--t2)">${l.type}</span>
+    <span class="dc" style="font-size:11px">${fmtD(l.from)}</span>
+    <span class="dc" style="font-size:11px">${fmtD(l.to)}</span>
+    <span class="dc" style="font-size:11px;color:var(--am);font-weight:600">${l.days}d</span>
+  </div>`).join('') : '<div class="empty" style="padding:8px"><p>No data</p></div>';
+}
+function mistDrill(selMo,mid){
+  const d = mid ? (db.mistakes||[]).filter(m=>m.mgrId===mid&&(m.date||'').startsWith(selMo)) : (db.mistakes||[]).filter(m=>(m.date||'').startsWith(selMo));
+  return d.length ? d.map(m => `<div class="drill-item" style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bd)">
+    <span class="dc" style="font-size:12px;font-weight:500">${mid?'':(m.mgrName||'—')}</span>
+    <span class="dc" style="font-size:11px">${m.severity||'—'}</span>
+    <span class="dc" style="font-size:11px;color:var(--t2)">${m.category||'—'}</span>
+    <span class="dc" style="font-size:11px;color:var(--t3)">${fmtD(m.date)}</span>
+  </div>`).join('') : '<div class="empty" style="padding:8px"><p>No data</p></div>';
+}
+function lateDrill(selMo,mid){
+  const d = mid ? (db.lateEntries||[]).filter(l=>l.mgrId===mid&&(l.date||'').startsWith(selMo)) : (db.lateEntries||[]).filter(l=>(l.date||'').startsWith(selMo));
+  return d.length ? d.map(l => `<div class="drill-item" style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bd)">
+    <span class="dc" style="font-size:12px;font-weight:500">${mid?'':(l.mgrName||'—')}</span>
+    <span class="dc" style="font-size:11px;font-weight:600;color:var(--am)">${l.lateMinutes} min</span>
+    <span class="dc" style="font-size:11px;color:var(--t3)">${fmtD(l.date)}</span>
+    <span class="dc" style="font-size:11px">${l.shift==='day'?'☀️ Day':'🌙 Night'}</span>
+  </div>`).join('') : '<div class="empty" style="padding:8px"><p>No data</p></div>';
+}
+function otDrill(selMo,mid){
+  const d = mid ? (db.workHours||[]).filter(h=>h.mgrId===mid&&(h.date||'').startsWith(selMo)&&h.otHours>0) : (db.workHours||[]).filter(h=>(h.date||'').startsWith(selMo)&&h.otHours>0);
+  return d.length ? d.map(h => `<div class="drill-item" style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bd)">
+    <span class="dc" style="font-size:12px;font-weight:500">${mid?'':(h.mgrName||'—')}</span>
+    <span class="dc" style="font-size:11px;font-weight:600;color:var(--am)">${h.otHours.toFixed(1)}h</span>
+    <span class="dc" style="font-size:11px;color:var(--t3)">${fmtD(h.date)}</span>
+    <span class="dc" style="font-size:11px;color:var(--t2)">${h.remarkOT||'—'}</span>
+  </div>`).join('') : '<div class="empty" style="padding:8px"><p>No data</p></div>';
+}
+function leaveTakenDrill(selMo,mid){
+  const d = mid ? db.leaves.filter(l=>l.mgrId===mid&&l.status==='approved'&&(l.from||'').startsWith(selMo)) : db.leaves.filter(l=>l.status==='approved'&&(l.from||'').startsWith(selMo));
+  return d.length ? d.map(l => `<div class="drill-item" style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bd)">
+    <span class="dc" style="font-size:12px;font-weight:500">${mid?'':(l.mgrName||'—')}</span>
+    <span class="dc" style="font-size:11px;color:var(--t2)">${l.type}</span>
+    <span class="dc" style="font-size:11px">${fmtD(l.from)} → ${fmtD(l.to)}</span>
+    <span class="dc" style="font-size:11px;font-weight:600;color:var(--gr)">${l.days}d</span>
+  </div>`).join('') : '<div class="empty" style="padding:8px"><p>No data</p></div>';
+}
+
+/* ── Inline drill-down + Excel ── */
+let _drillType = '';
+function ovDrill(type, label, rows){
+  const el = document.getElementById('ov-drill-area');
+  if (!el) return;
+  const key = 'a'+type;
+  if (_drillType === key) { el.style.display = 'none'; _drillType = ''; return; }
+  _drillType = key;
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600">${label}</span>
+      <button class="btn bgr bxs" onclick="dlDrillExcel()">📊 Excel</button>
+      <button class="btn bg2 bxs" onclick="document.getElementById('ov-drill-area').style.display='none';_drillType=''">✕</button>
+    </div>
+    <div id="drill-content">${rows}</div>`;
+}
+function mgrDrill(type, label, rows){
+  const el = document.getElementById('mgr-drill-area');
+  if (!el) return;
+  const key = 'm'+type;
+  if (_drillType === key) { el.style.display = 'none'; _drillType = ''; return; }
+  _drillType = key;
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600">${label}</span>
+      <button class="btn bgr bxs" onclick="dlDrillExcel()">📊 Excel</button>
+      <button class="btn bg2 bxs" onclick="document.getElementById('mgr-drill-area').style.display='none';_drillType=''">✕</button>
+    </div>
+    <div id="drill-content">${rows}</div>`;
+}
+function dlDrillExcel(){
+  const areas = ['ov-drill-area','mgr-drill-area'];
+  let area = null;
+  for (const id of areas) {
+    const el = document.getElementById(id);
+    if (el && el.style.display !== 'none' && el.innerHTML.trim()) { area = el; break; }
+  }
+  if (!area) return;
+  const content = document.getElementById('drill-content');
+  if (!content) return;
+  const items = content.querySelectorAll('.drill-item');
+  if (!items.length) return;
+  const headers = ['#', ...Array.from(items[0].querySelectorAll('.dc')).map((h,i) => ['Item','Type','Detail','Extra','Info'][i] || 'Col'+(i+1))];
+  const rows = Array.from(items).map((item,i) => [i+1, ...Array.from(item.querySelectorAll('.dc')).map(c=>c.textContent.trim())]);
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',()=>{
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws['!cols'] = headers.map(()=>({wch:24}));
+    XLSX.utils.book_append_sheet(wb, ws, 'DrillDown');
+    XLSX.writeFile(wb, 'FormTrack_Detail_'+tod()+'.xlsx');
+  });
+}
+
 function renderOv(){
+  const selMo = document.getElementById('ov-month')?.value || _curMonth();
+  const prevMo=prevMonth(selMo);
   const s=db.submissions,td=tod();
-  const tc=s.filter(x=>x.date===td).length;
-  const tf=s.reduce((a,x)=>a+Object.values(x.categories||{}).reduce((b,c)=>b+c.files.length,0),0);
+  const filtered=s.filter(x=>(x.date||'').startsWith(selMo));
+  const mc=filtered.length;
+  const tf=filtered.reduce((a,x)=>a+Object.values(x.categories||{}).reduce((b,c)=>b+c.files.length,0),0);
   const pLeaves=db.leaves.filter(l=>l.status==='pending').length;
-  const mist=(db.mistakes||[]).length;
-  const otH=((db.workHours||[]).reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
+  const moMist=(db.mistakes||[]).filter(m=>(m.date||'').startsWith(selMo)).length;
+  const prevMist=(db.mistakes||[]).filter(m=>(m.date||'').startsWith(prevMo)).length;
+  const moLate=(db.lateEntries||[]).filter(l=>(l.date||'').startsWith(selMo)&&l.status==='pending').length;
+  const prevLate=(db.lateEntries||[]).filter(l=>(l.date||'').startsWith(prevMo)&&l.status==='pending').length;
+  const moOT=((db.workHours||[]).filter(h=>(h.date||'').startsWith(selMo)&&h.otHours>0).reduce((a,h)=>a+h.otHours,0)).toFixed(1);
+  const prevOT=((db.workHours||[]).filter(h=>(h.date||'').startsWith(prevMo)&&h.otHours>0).reduce((a,h)=>a+h.otHours,0)).toFixed(1);
   const avgRat=db.ratings&&db.ratings.length?(db.ratings.reduce((a,r)=>a+(r.stars||0),0)/db.ratings.length).toFixed(1):0;
-  const totalLeavesTaken=(db.leaves||[]).filter(l=>l.status==='approved').reduce((a,l)=>a+l.days,0);
+  const moLeavesTaken=(db.leaves||[]).filter(l=>l.status==='approved'&&(l.from||'').startsWith(selMo)).reduce((a,l)=>a+l.days,0);
+  const prevLeaves=(db.leaves||[]).filter(l=>l.status==='approved'&&(l.from||'').startsWith(prevMo)).reduce((a,l)=>a+l.days,0);
+  const prevSubs=db.submissions.filter(x=>(x.date||'').startsWith(prevMo)).length;
+  function tr(cur,prev){if(prev==0)return'';const d=((cur-prev)/prev*100).toFixed(1);return d>0?`<span style="font-size:10px;color:var(--gr)">↑${d}%</span>`:d<0?`<span style="font-size:10px;color:var(--re)">↓${Math.abs(d)}%</span>`:'<span style="font-size:10px;color:var(--t3)">→0%</span>';}
   document.getElementById('a-stats').innerHTML=`
     <div class="sc sc-blue"><div class="sc-ico">👤</div><div class="sn">${db.managers.length}</div><div class="sl">Total Managers</div></div>
-    <div class="sc sc-purple"><div class="sc-ico">📋</div><div class="sn">${s.length}</div><div class="sl">Total Submissions</div></div>
-    <div class="sc sc-orange"><div class="sc-ico">🏖️</div><div class="sn">${pLeaves}</div><div class="sl">Pending Leaves</div></div>
-    <div class="sc sc-red"><div class="sc-ico">⚠️</div><div class="sn">${mist}</div><div class="sl">Mistake Reports</div></div>
-    <div class="sc sc-amber"><div class="sc-ico">⏰</div><div class="sn">${tc}</div><div class="sl">Late Entries</div></div>
-    <div class="sc sc-teal"><div class="sc-ico">⏱️</div><div class="sn">${otH}h</div><div class="sl">OT Hours</div></div>
+    <div class="sc sc-purple" onclick="ovDrill('subs','📋 Submissions (${mc})',subsDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">📋</div><div class="sn">${mc}<span style="font-size:9px;margin-left:4px">${tr(mc,prevSubs)}</span></div><div class="sl">Submissions</div></div>
+    <div class="sc sc-orange" onclick="ovDrill('leaves','🏖️ Pending Leaves (${pLeaves})',leavesDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">🏖️</div><div class="sn">${pLeaves}</div><div class="sl">Pending Leaves</div></div>
+    <div class="sc sc-red" onclick="ovDrill('mistakes','⚠️ Mistakes (${moMist})',mistDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">⚠️</div><div class="sn">${moMist}${tr(-(moMist-prevMist),prevMist)}</div><div class="sl">Mistakes ${tr(moMist,prevMist)}</div></div>
+    <div class="sc sc-amber" onclick="ovDrill('late','⏰ Late Entries (${moLate})',lateDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">⏰</div><div class="sn">${moLate}${tr(-(moLate-prevLate),prevLate)}</div><div class="sl">Late Entries ${tr(moLate,prevLate)}</div></div>
+    <div class="sc sc-teal" onclick="ovDrill('ot','⏱️ OT Hours (${moOT}h)',otDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">⏱️</div><div class="sn">${moOT}h${tr(parseFloat(moOT),parseFloat(prevOT))}</div><div class="sl">OT Hours ${tr(parseFloat(moOT),parseFloat(prevOT))}</div></div>
     <div class="sc sc-yellow"><div class="sc-ico">⭐</div><div class="sn">${avgRat||'—'}</div><div class="sl">Avg Rating</div></div>
-    <div class="sc sc-green"><div class="sc-ico">📅</div><div class="sn">${totalLeavesTaken}</div><div class="sl">Total Leaves Taken</div></div>
+    <div class="sc sc-green" onclick="ovDrill('leavetaken','📅 Leave Days (${moLeavesTaken})',leaveTakenDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">📅</div><div class="sn">${moLeavesTaken}${tr(moLeavesTaken,prevLeaves)}</div><div class="sl">Leave Days ${tr(moLeavesTaken,prevLeaves)}</div></div>
   `;
+  // Hide drill area when month changes
+  document.getElementById('ov-drill-area').style.display='none'; _drillType='';
   /* Recent Submissions panel */
   const recent=s.slice(0,5);
   const recEl=document.getElementById('a-sum-recent');
@@ -1690,12 +2055,66 @@ function renderOv(){
       }).join('');
     }
   }
+  renderCharts(selMo);
 }
+
+/* ── Dashboard Charts ── */
+let _charts={};
+function renderCharts(selMo){
+  const mo=selMo||_curMonth();
+  const prevMo=prevMonth(mo);
+  // Destroy existing charts
+  Object.values(_charts).forEach(c=>{if(c){c.destroy()}}); _charts={};
+  // 1. Bar chart — monthly submissions (last 6 months)
+  const months=[];
+  const subData=[];
+  for(let i=5;i>=0;i--){
+    const m=offsetMonth(mo,-i);
+    months.push(monthLabel(m));
+    subData.push(db.submissions.filter(s=>(s.date||'').startsWith(m)).length);
+  }
+  const ctx1=document.getElementById('ch-sub-month');
+  if(ctx1)_charts.sub=ctx1&&new Chart(ctx1,{type:'bar',data:{labels:months,datasets:[{label:'Submissions',data:subData,backgroundColor:'rgba(61,90,241,0.6)',borderColor:'#3D5AF1',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+
+  // 2. Pie chart — late entry status
+  const pendLate=db.lateEntries.filter(l=>l.status==='pending').length;
+  const excLate=db.lateEntries.filter(l=>l.status==='approved').length;
+  const unexcLate=db.lateEntries.filter(l=>l.status==='unexcused').length;
+  const ctx2=document.getElementById('ch-late-pie');
+  if(ctx2)_charts.late=new Chart(ctx2,{type:'doughnut',data:{labels:['⏳ Pending','✅ Excused','❌ Unexcused'],datasets:[{data:[pendLate,excLate,unexcLate],backgroundColor:['rgba(245,158,11,0.8)','rgba(16,185,129,0.8)','rgba(239,68,68,0.8)'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}}}});
+
+  // 3. Line chart — mistake trend (last 6 months)
+  const mistMonths=[];
+  const mistData=[];
+  for(let i=5;i>=0;i--){
+    const m=offsetMonth(mo,-i);
+    mistMonths.push(monthLabel(m));
+    mistData.push(db.mistakes.filter(mk=>(mk.date||'').startsWith(m)).length);
+  }
+  const ctx3=document.getElementById('ch-mist-trend');
+  if(ctx3)_charts.mist=new Chart(ctx3,{type:'line',data:{labels:mistMonths,datasets:[{label:'Mistakes',data:mistData,borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.3,pointBackgroundColor:'#EF4444',pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+
+  // 4. Bar chart — OT hours per manager (current month)
+  const moOTData=db.workHours.filter(h=>(h.date||'').startsWith(mo));
+  const mgrOT={};
+  moOTData.forEach(h=>{if(h.otHours>0){mgrOT[h.mgrName]=(mgrOT[h.mgrName]||0)+h.otHours;}});
+  const otNames=Object.keys(mgrOT).slice(0,10);
+  const otVals=otNames.map(n=>mgrOT[n]);
+  const ctx4=document.getElementById('ch-ot-bar');
+  if(ctx4)_charts.ot=new Chart(ctx4,{type:'bar',data:{labels:otNames.length?otNames:['No OT'],datasets:[{label:'OT Hours',data:otVals.length?otVals:[0],backgroundColor:'rgba(245,158,11,0.6)',borderColor:'#F59E0B',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+}
+
+function prevMonth(m){const[y,mn]=m.split('-');const d=new Date(+y,+mn-2,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function offsetMonth(m,off){const[y,mn]=m.split('-');const d=new Date(+y,+mn-1+off,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function monthLabel(m){const[y,mn]=m.split('-');return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+mn-1]+"'"+y.slice(2);}
 
 /* FORM REPORTS */
 function popF(){
   const ms=document.getElementById('fm');ms.innerHTML='<option value="">All</option>';db.managers.forEach(m=>ms.add(new Option(m.name,m.id)));
   const ds=document.getElementById('fd');ds.innerHTML='<option value="">All</option>';db.departments.forEach(d=>ds.add(new Option(d.name,d.id)));
+  const today = new Date().toISOString().slice(0,10);
+  const ff=document.getElementById('ff');if(!ff.value)ff.value=today;
+  const ft=document.getElementById('ft');if(!ft.value)ft.value=today;
 }
 function renderReps(){
   let data=[...db.submissions];
@@ -1703,9 +2122,91 @@ function renderReps(){
   const sh=document.getElementById('fsh').value,mg=document.getElementById('fm').value,dp=document.getElementById('fd').value;
   if(from)data=data.filter(s=>s.date>=from);if(to)data=data.filter(s=>s.date<=to);
   if(sh)data=data.filter(s=>s.shift===sh);if(mg)data=data.filter(s=>s.mgrId===mg);if(dp)data=data.filter(s=>s.deptId===dp);
-  document.getElementById('all-reps').innerHTML=data.length?data.map(s=>repCard(s,true)).join(''):'<div class="empty"><div class="ee">🔍</div><p>No results</p></div>';
+  if(!data.length){document.getElementById('all-reps').innerHTML='<div class="empty"><div class="ee">🔍</div><p>No results</p></div>';return;}
+
+  // ── 1. Daily Summary Table ──
+  const todayStr = new Date().toISOString().slice(0,10);
+  const dayMap = {};
+  data.forEach(s => {
+    const key = s.date + '|' + (s.mgrId||'?') + '|' + (s.shift||'');
+    if (!dayMap[key]) {
+      const cats = Object.values(s.categories||{});
+      const files = cats.reduce((a,c)=>a+c.files.length,0);
+      const mgr = db.managers.find(m => m.id === s.mgrId);
+      const deptId = mgr ? mgr.deptId : '';
+      const allCats = db.categories.filter(c => c.deptId === deptId);
+      dayMap[key] = {
+        date: s.date, mgrName: s.mgrName||s.mgrId||'—', dept: s.deptName||'—',
+        shift: s.shift, filledCatCount: cats.length, assignedCatCount: allCats.length,
+        filledNames: cats.map(c=>c.name).join(', '), files, note: s.note||'',
+        mgrId: s.mgrId, deptId
+      };
+    }
+  });
+  const dayEntries = Object.values(dayMap).sort((a,b) => b.date.localeCompare(a.date) || a.mgrName.localeCompare(b.mgrName));
+  let html = '<div class="card" style="padding:0;overflow:hidden;margin-bottom:1rem"><div style="overflow-x:auto"><table class="tbl" style="font-size:12px;min-width:700px"><thead><tr>'+
+    '<th>Date</th><th>Manager</th><th>Dept</th><th>Shift</th><th style="text-align:center">Assigned</th><th style="text-align:center">Filled</th><th style="text-align:center">%</th><th style="text-align:center">Files</th><th>Note</th></tr></thead><tbody>';
+  dayEntries.forEach(e => {
+    const pct = e.assignedCatCount ? Math.round(e.filledCatCount/e.assignedCatCount*100) : 0;
+    const isToday = e.date === todayStr;
+    html += `<tr${isToday?' style="background:var(--bg3);font-weight:600"':''}>
+      <td style="white-space:nowrap;font-weight:500">${fmtD(e.date)}${isToday?' <span style="font-size:10px;color:var(--ac)">Today</span>':''}</td>
+      <td style="font-weight:600">${e.mgrName}</td>
+      <td style="color:var(--t2)">${e.dept}</td>
+      <td>${e.shift==='day'?'☀️ Day':'🌙 Night'}</td>
+      <td style="text-align:center;font-weight:600;color:var(--ac)">${e.assignedCatCount}</td>
+      <td style="text-align:center;font-weight:600;color:${e.filledCatCount===e.assignedCatCount?'var(--gr)':'var(--am)'}">${e.filledCatCount}</td>
+      <td style="text-align:center;font-weight:600;color:${pct>=100?'var(--gr)':pct>=50?'var(--am)':'var(--re)'}">${pct}%</td>
+      <td style="text-align:center;font-weight:600;color:var(--gr)">${e.files}</td>
+      <td style="font-size:11px;color:var(--t3);max-width:120px;overflow:hidden;text-overflow:ellipsis">${e.note||'—'}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div></div>';
+
+  // ── 2. Per-Manager Summary Table (current month only) ──
+  const now=new Date(),cmYY=now.getFullYear(),cmMM=String(now.getMonth()+1).padStart(2,'0');
+  const cmStart=cmYY+'-'+cmMM+'-01',cmEnd=cmYY+'-'+cmMM+'-'+new Date(cmYY,now.getMonth()+1,0).getDate().toString().padStart(2,'0');
+  const cmData=db.submissions.filter(s=>s.date>=cmStart&&s.date<=cmEnd);
+  const mgrMap = {};
+  cmData.forEach(s => {
+    const mId = s.mgrId || '?';
+    if (!mgrMap[mId]) {
+      const mgr = db.managers.find(m => m.id === mId);
+      const deptId = mgr ? mgr.deptId : '';
+      const allCats = db.categories.filter(c => c.deptId === deptId);
+      mgrMap[mId] = { id: mId, name: s.mgrName || mId, dept: s.deptName || dn(deptId) || '—', subs: 0, files: 0, filledSet: new Set(), allCatCount: allCats.length };
+    }
+    mgrMap[mId].subs++;
+    mgrMap[mId].files += Object.values(s.categories||{}).reduce((a,c)=>a+c.files.length,0);
+    Object.keys(s.categories||{}).forEach(c => mgrMap[mId].filledSet.add(c));
+  });
+  const entries = Object.values(mgrMap);
+  const moName=new Date(cmYY,now.getMonth()).toLocaleString('default',{month:'long'});
+  html += '<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📊 Manager-wise Summary — '+moName+' '+cmYY+'</div>';
+  html += '<div class="card" style="padding:0;overflow:hidden;margin-bottom:1rem"><div style="overflow-x:auto"><table class="tbl" style="font-size:12px"><thead><tr>'+
+    '<th>#</th><th>Manager</th><th>Dept</th><th style="text-align:center">Assigned Categories</th><th style="text-align:center">Filled</th><th style="text-align:center">%</th><th style="text-align:center">Submissions</th><th style="text-align:center">Files</th></tr></thead><tbody>';
+  entries.sort((a,b)=>b.subs-a.subs).forEach((m,i) => {
+    const pct = m.allCatCount ? Math.round(m.filledSet.size / m.allCatCount * 100) : 0;
+    html += `<tr>
+      <td style="color:var(--t3);font-size:11px">${i+1}</td>
+      <td style="font-weight:600">${m.name}</td>
+      <td style="color:var(--t2)">${m.dept}</td>
+      <td style="text-align:center">${m.allCatCount}</td>
+      <td style="text-align:center;font-weight:600;color:${m.filledSet.size===m.allCatCount?'var(--gr)':'var(--am)'}">${m.filledSet.size}</td>
+      <td style="text-align:center;font-weight:600;color:${pct>=100?'var(--gr)':pct>=50?'var(--am)':'var(--re)'}">${pct}%</td>
+      <td style="text-align:center;color:var(--ac);font-weight:600">${m.subs}</td>
+      <td style="text-align:center;font-weight:600;color:var(--gr)">${m.files}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div></div>';
+
+  // ── 3. Detailed Report Cards ──
+  html += '<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 Detailed Submissions</div>';
+  html += data.map(s=>repCard(s,true)).join('');
+
+  document.getElementById('all-reps').innerHTML = html;
 }
-function clrF(){['ff','ft','fsh','fm','fd'].forEach(id=>document.getElementById(id).value='');renderReps();}
+function clrF(){const t=new Date().toISOString().slice(0,10);document.getElementById('ff').value=t;document.getElementById('ft').value=t;['fsh','fm','fd'].forEach(id=>document.getElementById(id).value='');renderReps();}
 
 /* ============================================================
    ADMIN LEAVE REPORT
@@ -1734,10 +2235,14 @@ function renderAdminLv(){
   `;
 
   // PENDING LIST (quick actions)
-  const pendList=db.leaves.filter(l=>l.status==='pending').sort((a,b)=>b.appliedAt-a.appliedAt);
-  document.getElementById('lv-pending-list').innerHTML=pendList.length
-    ?pendList.map(l=>lvRow(l,true)).join('')
+  let pendData=[...db.leaves].filter(l=>l.status==='pending').sort((a,b)=>b.appliedAt-a.appliedAt);
+  const lvq=document.getElementById('srch-leave')?.value?.toLowerCase().trim();
+  if(lvq)pendData=pendData.filter(l=>(l.mgrName||'').toLowerCase().includes(lvq)||(l.reason||'').toLowerCase().includes(lvq)||(l.remark||'').toLowerCase().includes(lvq)||(l.type||'').toLowerCase().includes(lvq));
+  document.getElementById('lv-pending-list').innerHTML=pendData.length
+    ?pendData.map(l=>lvRow(l,true)).join('')
     :'<div class="empty" style="padding:1rem"><div class="ee">✅</div><p>No pending approvals</p></div>';
+  const sa=document.getElementById('selall-leave');
+  if(sa)sa.checked=false;
 
   // LEAVE REPORT TABLE (filtered)
   renderLvReport();
@@ -1769,6 +2274,8 @@ function renderLvReport(){
   if(tp)data=data.filter(l=>l.type===tp);
   if(from)data=data.filter(l=>l.from>=from);
   if(to)data=data.filter(l=>l.to<=to);
+  const lvq=document.getElementById('srch-leave')?.value?.toLowerCase().trim();
+  if(lvq)data=data.filter(l=>(l.mgrName||'').toLowerCase().includes(lvq)||(l.reason||'').toLowerCase().includes(lvq)||(l.remark||'').toLowerCase().includes(lvq)||(l.type||'').toLowerCase().includes(lvq));
 
   const tbody=document.getElementById('lv-rep-body');
   if(!data.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--t3);padding:1.5rem">No records found</td></tr>`;return;}
@@ -1823,14 +2330,21 @@ function addMgr(){
 function renderMgTbl(){
   document.getElementById('mg-cnt').textContent=db.managers.length;
   document.getElementById('mg-tbl').innerHTML=db.managers.length?`<table class="tbl">
-    <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Subs</th><th></th></tr></thead>
+    <thead><tr><th>ID</th><th>Password</th><th>Name</th><th>Dept</th><th>Subs</th><th></th></tr></thead>
     <tbody>${db.managers.map(m=>`<tr>
       <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${m.id}</td>
+      <td style="font-family:'DM Mono';font-size:11px;white-space:nowrap"><span class="badge b-am" id="mgpw-${m.id}" style="letter-spacing:1px">••••••</span> <button class="btn bg2 bxs" style="padding:2px 7px" onclick="tglMgPw('${m.id}')">👁</button></td>
       <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
       <td><span class="badge b-te">${dn(m.deptId)}</span></td>
       <td><span class="badge b-gr">${db.submissions.filter(s=>s.mgrId===m.id).length}</span></td>
       <td style="white-space:nowrap"><button class="btn bam bxs" onclick="openEdit('${m.id}')" style="margin-right:4px">Edit</button><button class="btn bre bxs" onclick="delMgr('${m.id}')">Delete</button></td>
     </tr>`).join('')}</tbody></table>`:'<div class="empty" style="padding:1.5rem"><p>No managers yet</p></div>';
+}
+function tglMgPw(id){
+  const m=db.managers.find(x=>x.id===id);if(!m)return;
+  const el=document.getElementById('mgpw-'+id);if(!el)return;
+  if(el.dataset.shown==='1'){el.textContent='••••••';el.dataset.shown='0';}
+  else{el.textContent=m.pw||'—';el.dataset.shown='1';}
 }
 function openEdit(id){
   const m=db.managers.find(x=>x.id===id);if(!m)return;editId=id;popDs(['e-dp']);
@@ -1921,6 +2435,9 @@ function clrRange(){
 ============================================================ */
 window.addEventListener('DOMContentLoaded',()=>{
   const rm=document.getElementById('rt-month');if(rm)rm.value=new Date().toISOString().slice(0,7);
+  const cm=new Date().toISOString().slice(0,7);
+  const ovm=document.getElementById('ov-month');if(ovm)ovm.value=cm;
+  const mgrm=document.getElementById('mgr-ov-month');if(mgrm)mgrm.value=cm;
   if(!restoreSession()) showPg('pg-login');
 });
 </script>
@@ -2071,9 +2588,15 @@ function renderMistReport(){
   if(ffrom)data=data.filter(m=>m.date>=ffrom);
   if(fto)data=data.filter(m=>m.date<=fto);
 
+  // Text search
+  const q=document.getElementById('srch-mistake')?.value?.toLowerCase().trim();
+  if(q)data=data.filter(m=>(m.mgrName||'').toLowerCase().includes(q)||(m.description||'').toLowerCase().includes(q)||(m.actionTaken||'').toLowerCase().includes(q)||(m.category||'').toLowerCase().includes(q));
+
   document.getElementById('mist-list').innerHTML=data.length
     ?data.map(m=>mistCard(m,true)).join('')
     :'<div class="empty"><div class="ee">✅</div><p>No mistake reports found</p></div>';
+  const sa=document.getElementById('selall-mistake');
+  if(sa)sa.checked=false;
 }
 
 function clrMistF(){
@@ -2085,6 +2608,8 @@ function clrMistF(){
 function mistCard(m, isAdmin){
   const sv=SV_CONFIG[m.severity]||SV_CONFIG.minor;
   return `<div class="mist-row" style="border-left:3px solid ${m.severity==='critical'?'#EF4444':m.severity==='major'?'var(--re)':m.severity==='moderate'?'#FB923C':'var(--am)'}">
+    ${isAdmin?`<label class="cb-chip"><input type="checkbox" class="cb-mistake" value="${m.id}" onchange="bulkUpdateBtn('mistake')"><span></span></label>`:''}
+    <div style="flex:1">
     <div class="mist-top">
       <div>
         <div class="mist-name">${isAdmin?m.mgrName:'Mistake Report'}</div>
@@ -2108,15 +2633,18 @@ function mistCard(m, isAdmin){
       <div style="font-size:10px;font-weight:600;color:var(--gr);margin-bottom:3px">ACTION TAKEN</div>
       ${m.actionTaken}
     </div>`:''}
-  </div>`;
+  </div></div>`;
 }
 
 function delMist(id){
-  if(!confirm('Delete?'))return;
-  const m=db.mistakes.find(x=>x.id===id);
-  const mid=m?m.mgrId:null;
-  db.mistakes=db.mistakes.filter(m=>m.id!==id);
-  persistMist(mid);renderMistReport();updateMistBadge();
+  showCfm('Delete mistake report?','🗑️ Confirm').then(ok=>{
+    if(!ok)return;
+    const m=db.mistakes.find(x=>x.id===id);
+    const mid=m?m.mgrId:null;
+    if(m)addLog('delete-mistake',m.mgrId,m.mgrName,'Severity: '+m.severity+', Cat: '+m.category);
+    db.mistakes=db.mistakes.filter(m=>m.id!==id);
+    persistMist(mid);renderMistReport();updateMistBadge();
+  });
 }
 
 function updateMistBadge(){
@@ -2141,7 +2669,9 @@ function persistLate(mgrId){
   persist(mgrId);
 }
 
-// ── Manager: submit late entry ──
+let editLateId=null;
+
+// ── Manager: submit / update late entry ──
 function submitLateEntry(){
   if(!curUser) return;
   const date  = document.getElementById('le-date').value;
@@ -2152,21 +2682,56 @@ function submitLateEntry(){
   if(!date){sm('le-msg','Date nakho',true);return;}
   if(!mins||mins<1){sm('le-msg','Late minutes nakho',true);return;}
   if(!reason){sm('le-msg','Reason lakhao',true);return;}
-  db.lateEntries.unshift({
-    id:Date.now(), mgrId:curUser.id, mgrName:curUser.name,
-    deptId:curUser.deptId, deptName:dn(curUser.deptId),
-    date, shift, lateMinutes:mins, arrivalTime:time, reason,
-    status:'pending', remark:'', addedBy:'manager',
-    submittedAt:new Date().toISOString()
-  });
-  persistLate(curUser.id);
-  sm('le-msg','✅ Late entry submit thayi! Admin review karshhe.');
+  if(editLateId){
+    const l=db.lateEntries.find(x=>x.id===editLateId);
+    if(l){l.date=date;l.shift=shift;l.lateMinutes=mins;l.arrivalTime=time;l.reason=reason;}
+    persistLate(curUser.id);
+    sm('le-msg','✅ Late entry update thayi!');
+    editLateId=null;
+    document.getElementById('le-submit-btn').textContent='📨 Submit Late Entry';
+  } else {
+    db.lateEntries.unshift({
+      id:Date.now(), mgrId:curUser.id, mgrName:curUser.name,
+      deptId:curUser.deptId, deptName:dn(curUser.deptId),
+      date, shift, lateMinutes:mins, arrivalTime:time, reason,
+      status:'pending', remark:'', addedBy:'manager',
+      submittedAt:new Date().toISOString()
+    });
+    persistLate(curUser.id);
+    sm('le-msg','✅ Late entry submit thayi! Admin review karshhe.');
+  }
   document.getElementById('le-date').value='';
   document.getElementById('le-mins').value='';
   document.getElementById('le-time').value='';
   document.getElementById('le-reason').value='';
   renderMgrLate();
   updateLateBadges();
+}
+function editLate(id){
+  const l=db.lateEntries.find(x=>x.id===id);
+  if(!l||l.mgrId!==curUser.id)return;
+  editLateId=id;
+  document.getElementById('le-date').value=l.date;
+  document.getElementById('le-shift').value=l.shift;
+  document.getElementById('le-mins').value=l.lateMinutes;
+  document.getElementById('le-time').value=l.arrivalTime||'';
+  document.getElementById('le-reason').value=l.reason;
+  document.getElementById('le-submit-btn').textContent='✏️ Update Late Entry';
+  document.getElementById('le-date').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ── Admin: edit any late entry ──
+function editLateAdmin(id){
+  const l=db.lateEntries.find(x=>x.id===id);
+  if(!l)return;
+  const d=prompt('Date:',l.date);if(d===null)return;
+  const sh=prompt('Shift (day/night):',l.shift);if(sh===null)return;
+  const mn=parseInt(prompt('Late minutes:',l.lateMinutes));if(isNaN(mn))return;
+  const ti=prompt('Arrival time:',l.arrivalTime||'');if(ti===null)return;
+  const rn=prompt('Reason:',l.reason);if(rn===null)return;
+  const rm=prompt('Admin remark:',l.remark||'');if(rm===null)return;
+  l.date=d;l.shift=sh;l.lateMinutes=mn;l.arrivalTime=ti;l.reason=rn;l.remark=rm;
+  persistLate(l.mgrId);renderLateReport();updateLateBadges();
 }
 
 // ── Manager: view own late entries ──
@@ -2210,23 +2775,31 @@ function adminAddLate(){
 // ── Admin: approve/reject/delete ──
 function excuseLate(id){
   const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
-  const rem=prompt('Excuse remark (optional):')||'Excused by admin';
-  l.status='approved';l.remark=rem;
-  persistLate(l.mgrId);renderLateReport();
+  showPrompt('Excuse remark:','Excused by admin','✅ Excuse Late').then(rem=>{
+    if(rem===null)return;
+    l.status='approved';l.remark=rem;
+    addLog('excuse-late',l.mgrId,l.mgrName,l.lateMinutes+' min on '+l.date);
+    persistLate(l.mgrId);renderLateReport();
+  });
 }
 function unexcuseLate(id){
   const l=db.lateEntries.find(x=>x.id===id);if(!l)return;
-  const rem=prompt('Reason for unexcused:')||'Not acceptable';
-  l.status='unexcused';l.remark=rem;
-  persistLate(l.mgrId);renderLateReport();
+  showPrompt('Reason for unexcused:','Not acceptable','❌ Unexcuse Late').then(rem=>{
+    if(rem===null)return;
+    l.status='unexcused';l.remark=rem;
+    addLog('unexcuse-late',l.mgrId,l.mgrName,l.lateMinutes+' min on '+l.date);
+    persistLate(l.mgrId);renderLateReport();
+  });
 }
 function delLate(id){
-  if(!confirm('Delete?'))return;
-  const l=db.lateEntries.find(x=>x.id===id);
-  const mid=l?l.mgrId:null;
+  showCfm('Delete late entry?','🗑️ Confirm').then(ok=>{
+    if(!ok)return;
+    const l=db.lateEntries.find(x=>x.id===id);
+    const mid=l?l.mgrId:null;
+    if(l)addLog('delete-late',l.mgrId,l.mgrName,l.lateMinutes+' min on '+l.date);
   db.lateEntries=db.lateEntries.filter(l=>l.id!==id);
   persistLate(mid);renderLateReport();updateLateBadges();
-}
+  });}
 
 // ── Late Card ──
 function lateCard(l, isAdmin){
@@ -2236,6 +2809,8 @@ function lateCard(l, isAdmin){
     ?'<span class="badge b-exc">✅ Excused</span>'
     :'<span class="badge b-unexc">❌ Unexcused</span>';
   return `<div class="late-row" style="border-left:3px solid ${l.status==='approved'?'var(--gr)':l.status==='unexcused'?'var(--re)':'var(--am)'}">
+    ${isAdmin?`<label class="cb-chip"><input type="checkbox" class="cb-late" value="${l.id}" onchange="bulkUpdateBtn('late')"><span></span></label>`:''}
+    <div style="flex:1">
     <div class="late-top">
       <div>
         <div class="late-name">${isAdmin?l.mgrName:'Late Entry'}</div>
@@ -2244,7 +2819,8 @@ function lateCard(l, isAdmin){
       <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
         ${sb}
         ${isAdmin&&l.status==='pending'?`<button class="btn bgr bxs" onclick="excuseLate(${l.id})">✅ Excuse</button><button class="btn bre bxs" onclick="unexcuseLate(${l.id})">❌ Unexcuse</button>`:''}
-        ${isAdmin?`<button class="btn bg2 bxs" onclick="delLate(${l.id})">🗑️</button>`:''}
+        ${!isAdmin&&l.status==='pending'?`<button class="btn ba bxs" onclick="editLate(${l.id})">✏️</button>`:''}
+        ${isAdmin?`<button class="btn bg2 bxs" onclick="editLateAdmin(${l.id})">✏️</button><button class="btn bg2 bxs" onclick="delLate(${l.id})">🗑️</button>`:''}
       </div>
     </div>
     <div class="late-meta">
@@ -2256,6 +2832,7 @@ function lateCard(l, isAdmin){
     </div>
     ${l.reason?`<div class="notebox">💬 ${l.reason}</div>`:''}
     ${l.remark?`<div class="notebox" style="border-left-color:${l.status==='approved'?'var(--gr)':'var(--re)'}">📝 Admin: ${l.remark}</div>`:''}
+    </div>
   </div>`;
 }
 
@@ -2310,14 +2887,59 @@ function renderLateReport(){
   if(ffrom)data=data.filter(l=>l.date>=ffrom);
   if(fto)data=data.filter(l=>l.date<=fto);
 
+  // Text search
+  const q=document.getElementById('srch-late')?.value?.toLowerCase().trim();
+  if(q)data=data.filter(l=>(l.mgrName||'').toLowerCase().includes(q)||(l.reason||'').toLowerCase().includes(q)||(l.remark||'').toLowerCase().includes(q)||(l.deptName||'').toLowerCase().includes(q));
+
   const listEl=document.getElementById('late-list');
   if(listEl) listEl.innerHTML=data.length
     ?data.map(l=>lateCard(l,true)).join('')
     :'<div class="empty"><div class="ee">⏰</div><p>Koi late entry nathi</p></div>';
+  // Reset select-all if it was checked
+  const sa=document.getElementById('selall-late');
+  if(sa)sa.checked=false;
 }
 function clrLateF(){
   ['lef-mg','lef-sh','lef-st','lef-from','lef-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   renderLateReport();
+}
+
+// ── Bulk + Search helpers ──
+let _bulkSrch={};
+function toggleAll(section,checked){
+  document.querySelectorAll('.cb-'+section).forEach(cb=>cb.checked=checked);
+}
+function getChecked(section){
+  return [...document.querySelectorAll('.cb-'+section+':checked')].map(cb=>cb.value);
+}
+function bulkUpdateBtn(section){
+  const sa=document.getElementById('selall-'+section);
+  if(!sa)return;
+  const all=document.querySelectorAll('.cb-'+section);
+  const chk=document.querySelectorAll('.cb-'+section+':checked');
+  sa.checked=all.length>0&&all.length===chk.length;
+}
+function bulkAction(section,action){
+  const ids=getChecked(section);
+  if(!ids.length)return showCfm('Koi entry select nathi kari!','⚠️ Select karo').then(()=>{});
+  if(section==='late'){
+    if(action==='excuse')showCfm(ids.length+' late entry ne excuse karva?','✅ Bulk Excuse').then(ok=>{if(!ok)return;ids.forEach(id=>{const l=db.lateEntries.find(x=>x.id==+id);if(l&&l.status==='pending'){l.status='approved';if(!l.remark)l.remark='Bulk excused by admin';}});persist();renderLateReport();});
+    else if(action==='unexcuse')showCfm(ids.length+' late entry ne unexcuse karva?','❌ Bulk Unexcuse').then(ok=>{if(!ok)return;ids.forEach(id=>{const l=db.lateEntries.find(x=>x.id==+id);if(l&&l.status==='pending'){l.status='unexcused';if(!l.remark)l.remark='Bulk unexcused by admin';}});persist();renderLateReport();});
+    else if(action==='delete')showCfm(ids.length+' late entry delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.lateEntries.findIndex(x=>x.id==+id);if(i>-1)db.lateEntries.splice(i,1);});persist();renderLateReport();});
+  }else if(section==='mistake'){
+    if(action==='delete')showCfm(ids.length+' mistake entry delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.mistakes.findIndex(x=>x.id==+id);if(i>-1)db.mistakes.splice(i,1);});persist();renderMistReport();});
+  }else if(section==='problem'){
+    if(action==='solve')showCfm(ids.length+' problem solve mark karva?','✅ Bulk Solve').then(ok=>{if(!ok)return;ids.forEach(id=>{const p=db.problems.find(x=>x.id==+id);if(p){p.status='solved';p.adminSolved=true;p.solvedAt=new Date().toISOString();if(!p.adminSolution)p.adminSolution='Bulk solved by admin';}});persist();renderProblems();});
+    else if(action==='delete')showCfm(ids.length+' problem delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.problems.findIndex(x=>x.id==+id);if(i>-1)db.problems.splice(i,1);});persist();renderProblems();});
+  }else if(section==='leave'){
+    if(action==='approve')showCfm(ids.length+' leave approve karva?','✅ Bulk Approve').then(ok=>{if(!ok)return;ids.forEach(id=>{const l=db.leaves.find(x=>x.id==+id);if(l&&l.status==='pending'){l.status='approved';if(!l.remark)l.remark='Bulk approved by admin';}});persist();renderAdminLv();});
+    else if(action==='reject')showCfm(ids.length+' leave reject karva?','❌ Bulk Reject').then(ok=>{if(!ok)return;ids.forEach(id=>{const l=db.leaves.find(x=>x.id==+id);if(l&&l.status==='pending'){l.status='rejected';if(!l.remark)l.remark='Bulk rejected by admin';}});persist();renderAdminLv();});
+    else if(action==='delete')showCfm(ids.length+' leave delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.leaves.findIndex(x=>x.id==+id);if(i>-1)db.leaves.splice(i,1);});persist();renderAdminLv();});
+  }else if(section==='hours'){
+    if(action==='delete')showCfm(ids.length+' hours entry delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.workHours.findIndex(x=>x.id==+id);if(i>-1)db.workHours.splice(i,1);});persist();renderHrsReport();});
+  }else if(section==='suggestion'){
+    if(action==='delete')showCfm(ids.length+' suggestions delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.suggestions.findIndex(x=>x.id==+id);if(i>-1)db.suggestions.splice(i,1);});persist();renderAdminSug();});
+  }
 }
 
 // ── Badges ──
@@ -2558,6 +3180,8 @@ function delProb(id){
   if(!confirm('Delete?'))return;
   const p=db.problems.find(x=>x.id===id);
   const mid=p?p.mgrId:null;
+  const p2=db.problems.find(x=>x.id===id);
+  if(p2)addLog('delete-problem',p2.mgrId,p2.mgrName,'Problem: '+(p2.description||'').slice(0,60));
   db.problems=db.problems.filter(p=>p.id!==id);
   persistProb(mid); renderProblems(); updateProbBadge();
 }
@@ -2585,13 +3209,19 @@ function renderProblems(){
   const fst=document.getElementById('prf-st')?.value;const ffrom=document.getElementById('prf-from')?.value;const fto=document.getElementById('prf-to')?.value;
   if(fmg)data=data.filter(p=>p.mgrId===fmg);if(fcat)data=data.filter(p=>p.category===fcat);
   if(fst)data=data.filter(p=>p.status===fst);if(ffrom)data=data.filter(p=>p.date>=ffrom);if(fto)data=data.filter(p=>p.date<=fto);
+  const q=document.getElementById('srch-problem')?.value?.toLowerCase().trim();
+  if(q)data=data.filter(p=>(p.mgrName||'').toLowerCase().includes(q)||(p.description||'').toLowerCase().includes(q)||(p.solution||'').toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q));
   document.getElementById('prob-list').innerHTML=data.length?data.map(p=>probCard(p,true)).join(''):'<div class="empty"><div class="ee">✅</div><p>Koi problems nathi</p></div>';
+  const sa=document.getElementById('selall-problem');
+  if(sa)sa.checked=false;
 }
 
 /* ── Problem card — used by both admin and manager ── */
 function probCard(p,isAdmin){
   const timeAgo=p.addedAt?fmtDT(p.addedAt):'—';
   return `<div class="prob-row ${p.status==='open'?'prob-open':'prob-solved'}">
+    ${isAdmin?`<label class="cb-chip"><input type="checkbox" class="cb-problem" value="${p.id}" onchange="bulkUpdateBtn('problem')"><span></span></label>`:''}
+    <div style="flex:1">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px">
       <div>
         ${isAdmin?`<div style="font-weight:600;font-size:14px">${p.mgrName}</div><div style="font-size:11px;color:var(--t2);font-family:'DM Mono'">${p.mgrId} · ${p.deptName}</div>`:''}
@@ -2615,7 +3245,7 @@ function probCard(p,isAdmin){
         </div>`
       :'<div style="font-size:11px;color:var(--t3);font-style:italic;padding:4px 0">⏳ Admin solution pending...</div>'
     }
-  </div>`;
+  </div></div>`;
 }
 
 function clrProbF(){
@@ -2645,6 +3275,136 @@ function renderMgrProb(){
   persistProb(); updateProbBadge();
   const el=document.getElementById('mgr-prob-list');
   if(el)el.innerHTML=myP.length?myP.map(p=>probCard(p,false)).join(''):'<div class="empty"><div class="ee">📨</div><p>Koi problem submit nathi karyu</p></div>';
+}
+
+/* ── Activity Log ── */
+function renderActivityLog(){
+  const el=document.getElementById('al-list');
+  if(!el)return;
+  if(!db.activityLog||!db.activityLog.length){
+    el.innerHTML='<div class="empty"><div class="ee">📋</div><p>Activity log empty</p></div>';return;
+  }
+  el.innerHTML=db.activityLog.map(l=>{
+    const actionMap={'delete-late':'🗑️ Late entry delete','delete-mistake':'🗑️ Mistake delete','delete-problem':'🗑️ Problem delete','delete-leave':'🗑️ Leave delete','delete-hours':'🗑️ Hours delete','delete-suggestion':'🗑️ Suggestion delete','approve-leave':'✅ Leave approve','reject-leave':'❌ Leave reject','excuse-late':'✅ Late excuse','unexcuse-late':'❌ Late unexcuse','edit-late':'✏️ Late edit','edit-hours':'✏️ Hours edit','solve-problem':'✅ Problem solve','bulk-excuse':'✅ Bulk excuse','bulk-unexcuse':'❌ Bulk unexcuse','bulk-delete':'🗑️ Bulk delete','bulk-approve':'✅ Bulk approve','bulk-reject':'❌ Bulk reject','bulk-solve':'✅ Bulk solve'};
+    const act=actionMap[l.action]||l.action;
+    return `<div style="display:flex;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bd);align-items:flex-start">
+      <div style="font-size:16px;width:24px;text-align:center">${act.split(' ')[0]||'📌'}</div>
+      <div style="flex:1;font-size:12px">
+        <div><strong>${act}</strong> ${l.detail||''}</div>
+        <div style="color:var(--t2);font-size:11px">${l.mgrName?l.mgrName+' · ':''}${fmtDT(l.time)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function dlActivityExcel(){
+  if(!db.activityLog||!db.activityLog.length)return;
+  const h=[['Time','Action','Manager','Detail']];
+  const r=db.activityLog.map(l=>[l.time,l.action,l.mgrName||'',l.detail||'']);
+  const w=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([...h,...r]);
+  XLSX.utils.book_append_sheet(w,ws,'Activity');
+  XLSX.writeFile(w,'activity-log.xlsx');
+}
+
+/* ═══════════════════ SUGGESTIONS SYSTEM ═══════════════════ */
+if(!db.suggestions) db.suggestions=JSON.parse(localStorage.getItem('ft_sug')||'[]');
+if(!db.activityLog) db.activityLog=[];
+function addLog(action,mgrId,mgrName,detail){
+  db.activityLog.unshift({id:Date.now()+Math.random(),action,mgrId,mgrName,detail,time:new Date().toISOString()});
+  if(db.activityLog.length>1000)db.activityLog.length=1000;
+  localStorage.setItem('ft_log',JSON.stringify(db.activityLog));
+}
+(function(){const l=localStorage.getItem('ft_log');if(l){try{db.activityLog=JSON.parse(l)}catch(e){}}})();
+function persistSug(mgrId){persist(mgrId);}
+function updateSugBadge(){
+  const unseen=db.suggestions.filter(s=>!s.seenByMgr).length;
+  const ab=document.getElementById('sug-badge');
+  if(ab){ab.textContent=unseen;ab.style.display=unseen?'inline':'none';}
+  if(curUser){
+    const myNew=db.suggestions.filter(s=>s.mgrId===curUser.id&&s.status==='pending'&&!s.seenByMgr).length;
+    const mb=document.getElementById('sug-mgr-badge');
+    if(mb){mb.textContent=myNew;mb.style.display=myNew?'inline':'none';}
+  }
+}
+function popSugMgrs(){
+  // render department checkboxes (keep current checked state if still valid)
+  const dpWrap=document.getElementById('asug-dp-sel');
+  const curChecked=[...dpWrap.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  dpWrap.innerHTML=db.departments.length?db.departments.map(d=>{
+    const cnt=db.managers.filter(m=>m.deptId===d.id).length;
+    return `<label class="cb-wrap" style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--t)"><input type="checkbox" value="${d.id}" onchange="popSugMgrs()" ${curChecked.includes(d.id)?'checked':''}> 🏬 ${d.name} <span style="color:var(--t3);font-weight:400">(${cnt})</span></label>`;
+  }).join(''):'<div style="font-size:12px;color:var(--t3)">No departments yet</div>';
+  const selDepts=[...dpWrap.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  const mgrs=selDepts.length?db.managers.filter(m=>selDepts.includes(m.deptId)):[];
+  const cntEl=document.getElementById('asug-mg-count');
+  if(cntEl)cntEl.textContent=selDepts.length?(mgrs.length?'👥 '+mgrs.length+' manager(s) ne suggestion jashe: '+mgrs.map(m=>m.name).join(', '):'⚠️ Aa department(s) ma koi manager nathi'):'';
+}
+function submitSug(){
+  const dpWrap=document.getElementById('asug-dp-sel');
+  const selDepts=[...dpWrap.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  const ids=db.managers.filter(m=>selDepts.includes(m.deptId)).map(m=>m.id);
+  const msg=document.getElementById('asug-msg').value.trim();
+  if(!selDepts.length){sm('asug-msg-status','Pela department select karo',true);return;}
+  if(!ids.length){sm('asug-msg-status','Aa department(s) ma koi manager nathi',true);return;}
+  if(!msg){sm('asug-msg-status','Suggestion lakho',true);return;}
+  ids.forEach(mgrId=>{
+    const mgr=db.managers.find(m=>m.id===mgrId);
+    db.suggestions.unshift({
+      id:Date.now(), mgrId, mgrName:mgr.name, deptId:mgr.deptId, deptName:dn(mgr.deptId),
+      suggestion:msg, status:'pending', responseNote:'',
+      createdAt:new Date().toISOString(), respondedAt:'', seenByMgr:false
+    });
+    persistSug(mgrId);
+  });
+  sm('asug-msg-status','✅ Suggestion '+ids.length+' manager ne mokli!');
+  document.getElementById('asug-msg').value='';
+  renderAdminSug(); updateSugBadge();
+}
+function respondSug(id,status){
+  const s=db.suggestions.find(x=>x.id===id);if(!s)return;
+  const note=prompt(status==='accepted'?'Response note (optional):'||'Accepted':'Reason for rejecting:'||'Rejected');
+  if(note===null)return;
+  s.status=status;
+  s.responseNote=note||(status==='accepted'?'Accepted':'Rejected');
+  s.respondedAt=new Date().toISOString();
+  persistSug(s.mgrId); renderMgrSug(); updateSugBadge();
+}
+function renderAdminSug(){
+  popSugMgrs();
+  let sorted=[...db.suggestions].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const q=document.getElementById('srch-suggestion')?.value?.toLowerCase().trim();
+  if(q)sorted=sorted.filter(s=>(s.mgrName||'').toLowerCase().includes(q)||(s.suggestion||'').toLowerCase().includes(q)||(s.responseNote||'').toLowerCase().includes(q));
+  document.getElementById('asug-list').innerHTML=sorted.length?sorted.map(s=>sugCard(s,true)).join(''):'<div class="empty"><div class="ee">💡</div><p>Haji koi suggestion mokli nathi</p></div>';
+  updateSugBadge();
+  const sa=document.getElementById('selall-suggestion');
+  if(sa)sa.checked=false;
+}
+function renderMgrSug(){
+  if(!curUser)return;
+  const myS=db.suggestions.filter(s=>s.mgrId===curUser.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  // mark as seen
+  myS.forEach(s=>{if(!s.seenByMgr)s.seenByMgr=true;});
+  persistSug(curUser.id); updateSugBadge();
+  document.getElementById('mgr-sug-list').innerHTML=myS.length?myS.map(s=>sugCard(s,false)).join(''):'<div class="empty"><div class="ee">💡</div><p>Admin taraf thi koi suggestion nathi</p></div>';
+}
+function sugCard(s,isAdmin){
+  const st=s.status==='pending'?'⏳ Pending':s.status==='accepted'?'✅ Accepted':'❌ Rejected';
+  const stCls=s.status==='pending'?'b-pend':s.status==='accepted'?'b-gr':'b-re';
+  return `<div class="prob-row ${s.status==='pending'?'prob-open':'prob-solved'}">
+    ${isAdmin?`<label class="cb-chip"><input type="checkbox" class="cb-suggestion" value="${s.id}" onchange="bulkUpdateBtn('suggestion')"><span></span></label>`:''}
+    <div style="flex:1">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px">
+      <div>
+        <div style="font-size:13px;color:var(--t3);font-weight:500">📅 ${fmtD(s.createdAt)} ${isAdmin?`· ${s.mgrName}`:''}</div>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+        <span class="badge ${stCls}">${st}</span>
+        ${!isAdmin&&s.status==='pending'?`<button class="btn bgr bxs" onclick="respondSug(${s.id},'accepted')">✅ Accept</button><button class="btn bre bxs" onclick="respondSug(${s.id},'rejected')">❌ Reject</button>`:''}
+      </div>
+    </div>
+    <div class="notebox" style="margin-bottom:6px">💬 ${s.suggestion}</div>
+    ${s.responseNote?`<div class="notebox" style="border-left-color:${s.status==='accepted'?'var(--gr)':'var(--re)'}">📝 ${isAdmin?'Manager:':'Tame:'} ${s.responseNote}</div>`:''}
+  </div></div>`;
 }
 
 /* ═══════════════════ RATING SYSTEM ═══════════════════ */
@@ -2722,12 +3482,24 @@ function addRating(){
   renderAdminRating();
 }
 
+function clrRtngF(){document.getElementById('rf-from').value='';document.getElementById('rf-to').value='';renderAdminRating();}
 function renderAdminRating(){
   const rtmg=document.getElementById('rt-mg');
   if(rtmg&&rtmg.options.length<=1)db.managers.forEach(m=>rtmg.add(new Option(m.name+' ('+m.id+')',m.id)));
+  const from=document.getElementById('rf-from').value,to=document.getElementById('rf-to').value;
+  const fromM=from?from.slice(0,7):'',toM=to?to.slice(0,7):'';
+  const inRange=d=>{const m=(d||'').slice(0,7);return (!fromM||m>=fromM)&&(!toM||m<=toM);};
+  const rated=data=>data.filter(r=>inRange(r.month||''));
+  const fRatings=rated(db.ratings);
   const ranked=db.managers.map(m=>{
-    const avg=getAvgRating(m.id);const{score,subs,leaveDays,lateCount,mistakeCount}=calcPerfScore(m.id);
-    return{m,avg,score,subs,leaveDays,lateCount,mistakeCount};
+    const myR=fRatings.filter(r=>r.mgrId===m.id);
+    const avg=myR.length?myR.reduce((a,r)=>a+r.stars,0)/myR.length:null;
+    const subs=db.submissions.filter(s=>s.mgrId===m.id&&inRange(s.date||'')).length;
+    const lv=db.leaves.filter(l=>l.mgrId===m.id&&l.status==='approved'&&inRange(l.fromDate||l.date||'')).reduce((a,l)=>a+l.days,0);
+    const lc=db.lateEntries.filter(l=>l.mgrId===m.id&&inRange(l.date||l.entryDate||'')).length;
+    const mc=db.mistakes.filter(m2=>m2.mgrId===m.id&&inRange(m2.date||m2.reportedAt||'')).length;
+    const score=Math.max(0,subs*2-lv*2-lc*3-mc*4);
+    return{m,avg,score,subs,leaveDays:lv,lateCount:lc,mistakeCount:mc};
   }).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
   document.getElementById('rtng-body').innerHTML=ranked.map((x,i)=>{
     const rankCls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
@@ -2745,7 +3517,7 @@ function renderAdminRating(){
       <td style="font-weight:600;color:${perfColor}">${x.score} pts</td>
     </tr>`;
   }).join('');
-  const sorted=[...db.ratings].sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
+  const sorted=fRatings.sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
   document.getElementById('rtng-list').innerHTML=sorted.length?sorted.map(r=>`
     <div class="rtng-row">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -2765,11 +3537,21 @@ function delRating(id){
   db.ratings=db.ratings.filter(r=>r.id!==id);persistRatings(mid);renderAdminRating();
 }
 
+function clrMrtngF(){document.getElementById('mrf-from').value='';document.getElementById('mrf-to').value='';renderMgrRating();}
 function renderMgrRating(){
   if(!curUser)return;
-  const myAvg=getAvgRating(curUser.id);
-  const{score,subs,leaveDays,lateCount}=calcPerfScore(curUser.id);
-  const myRatings=db.ratings.filter(r=>r.mgrId===curUser.id).sort((a,b)=>b.month.localeCompare(a.month));
+  const from=document.getElementById('mrf-from').value,to=document.getElementById('mrf-to').value;
+  const fromM=from?from.slice(0,7):'',toM=to?to.slice(0,7):'';
+  const inRange=d=>{const m=(d||'').slice(0,7);return (!fromM||m>=fromM)&&(!toM||m<=toM);};
+  const fRatings=db.ratings.filter(r=>inRange(r.month||''));
+  const myR=fRatings.filter(r=>r.mgrId===curUser.id);
+  const myAvg=myR.length?myR.reduce((a,r)=>a+r.stars,0)/myR.length:null;
+  const subs=db.submissions.filter(s=>s.mgrId===curUser.id&&inRange(s.date||'')).length;
+  const leaveDays=db.leaves.filter(l=>l.mgrId===curUser.id&&l.status==='approved'&&inRange(l.fromDate||l.date||'')).reduce((a,l)=>a+l.days,0);
+  const lateCount=db.lateEntries.filter(l=>l.mgrId===curUser.id&&inRange(l.date||l.entryDate||'')).length;
+  const mistakeCount=db.mistakes.filter(m=>m.mgrId===curUser.id&&inRange(m.date||m.reportedAt||'')).length;
+  const score=Math.max(0,subs*2-leaveDays*2-lateCount*3-mistakeCount*4);
+  const myRatings=fRatings.filter(r=>r.mgrId===curUser.id).sort((a,b)=>b.month.localeCompare(a.month));
   document.getElementById('mgr-my-rating').innerHTML=`
     <div style="text-align:center;padding:10px 0">
       <div style="font-size:28px;margin-bottom:4px">${myAvg!==null?starHTML(Math.round(myAvg)):'<span style="color:var(--t3);font-size:14px">Admin e haji rating nathi apyu</span>'}</div>
@@ -2784,7 +3566,12 @@ function renderMgrRating(){
     ${myRatings.length?'<div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px">'+myRatings.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="font-size:12px;color:var(--t2)">📅 ${r.month}</span>${starHTML(r.stars)}${r.note?`<span style="font-size:11px;color:var(--t2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 ${r.note}</span>`:''}</div>`).join('')+'</div>':''}
   `;
   const deptMgrs=db.managers.filter(m=>m.deptId===curUser.deptId);
-  const deptRanked=deptMgrs.map(m=>{const avg=getAvgRating(m.id);const{score}=calcPerfScore(m.id);return{m,avg,score};}).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
+  const deptRanked=deptMgrs.map(m=>{
+    const mr=fRatings.filter(r=>r.mgrId===m.id);
+    const avg=mr.length?mr.reduce((a,r)=>a+r.stars,0)/mr.length:null;
+    const s=Math.max(0,db.submissions.filter(sg=>sg.mgrId===m.id&&inRange(sg.date||'')).length*2-db.leaves.filter(l=>l.mgrId===m.id&&l.status==='approved'&&inRange(l.fromDate||l.date||'')).reduce((a,l)=>a+l.days,0)*2-db.lateEntries.filter(l=>l.mgrId===m.id&&inRange(l.date||l.entryDate||'')).length*3-db.mistakes.filter(m2=>m2.mgrId===m.id&&inRange(m2.date||m2.reportedAt||'')).length*4);
+    return{m,avg,score:s};
+  }).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
   document.getElementById('dept-rtng-body').innerHTML=deptRanked.map((x,i)=>{
     const isMe=x.m.id===curUser.id;const avg=x.avg!==null?x.avg.toFixed(1):'—';
     return `<tr style="${isMe?'background:var(--ac2)':''}">
@@ -2794,7 +3581,12 @@ function renderMgrRating(){
       <td style="font-weight:600;color:${x.score>=20?'var(--gr)':x.score>=10?'var(--am)':'var(--re)'}">${x.score} pts</td>
     </tr>`;
   }).join('');
-  const allRanked=db.managers.map(m=>{const avg=getAvgRating(m.id);const{score}=calcPerfScore(m.id);return{m,avg,score};}).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
+  const allRanked=db.managers.map(m=>{
+    const mr=fRatings.filter(r=>r.mgrId===m.id);
+    const avg=mr.length?mr.reduce((a,r)=>a+r.stars,0)/mr.length:null;
+    const s=Math.max(0,db.submissions.filter(sg=>sg.mgrId===m.id&&inRange(sg.date||'')).length*2-db.leaves.filter(l=>l.mgrId===m.id&&l.status==='approved'&&inRange(l.fromDate||l.date||'')).reduce((a,l)=>a+l.days,0)*2-db.lateEntries.filter(l=>l.mgrId===m.id&&inRange(l.date||l.entryDate||'')).length*3-db.mistakes.filter(m2=>m2.mgrId===m.id&&inRange(m2.date||m2.reportedAt||'')).length*4);
+    return{m,avg,score:s};
+  }).sort((a,b)=>(b.avg??-1)-(a.avg??-1)||(b.score-a.score));
   document.getElementById('office-rtng-body').innerHTML=allRanked.map((x,i)=>{
     const isMe=x.m.id===curUser.id;const avg=x.avg!==null?x.avg.toFixed(1):'—';
     return `<tr style="${isMe?'background:var(--ac2)':''}">
@@ -2812,30 +3604,31 @@ function renderMgrRating(){
 function renderMgrDash(){
   if(!curUser)return;
   const mid=curUser.id;
+  const selMo=document.getElementById('mgr-ov-month')?.value||_curMonth();
   const mySubs=db.submissions.filter(s=>s.mgrId===mid);
   const myLeaves=db.leaves.filter(l=>l.mgrId===mid);
-  const myMist=(db.mistakes||[]).filter(m=>m.mgrId===mid);
-  const myLate=(db.lateEntries||[]).filter(l=>l.mgrId===mid);
-  const myHrs=(db.workHours||[]).filter(h=>h.mgrId===mid);
-  const pendingLeaves=myLeaves.filter(l=>l.status==='pending').length;
-  const approvedLeaves=myLeaves.filter(l=>l.status==='approved').reduce((a,l)=>a+l.days,0);
-  const otHrs=(myHrs.reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
   const avgRat=getAvgRating(mid);
   const{score}=calcPerfScore(mid);
-  const thisMonth=new Date().toISOString().slice(0,7);
-  const thisMonthSubs=mySubs.filter(s=>(s.date||s.submittedAt||'').startsWith(thisMonth)).length;
+
+  const cmSubs=mySubs.filter(s=>(s.date||'').startsWith(selMo));
+  const cmPendingLeaves=myLeaves.filter(l=>l.status==='pending'&&(l.from||'').startsWith(selMo));
+  const cmApprovedLeaves=myLeaves.filter(l=>l.status==='approved'&&(l.from||'').startsWith(selMo)).reduce((a,l)=>a+l.days,0);
+  const cmMist=(db.mistakes||[]).filter(m=>m.mgrId===mid&&(m.date||'').startsWith(selMo));
+  const cmLate=(db.lateEntries||[]).filter(l=>l.mgrId===mid&&(l.date||'').startsWith(selMo));
+  const cmOT=((db.workHours||[]).filter(h=>h.mgrId===mid&&(h.date||'').startsWith(selMo)).reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
 
   // Stats cards
   document.getElementById('mgr-dash-stats').innerHTML=`
-    <div class="sc sc-blue"><div class="sc-ico">📋</div><div class="sn">${mySubs.length}</div><div class="sl">Total Submissions</div></div>
-    <div class="sc sc-purple"><div class="sc-ico">📅</div><div class="sn">${thisMonthSubs}</div><div class="sl">This Month</div></div>
-    <div class="sc sc-orange"><div class="sc-ico">🏖️</div><div class="sn">${pendingLeaves}</div><div class="sl">Pending Leaves</div></div>
-    <div class="sc sc-green"><div class="sc-ico">✅</div><div class="sn">${approvedLeaves}</div><div class="sl">Approved Leave Days</div></div>
-    <div class="sc sc-red"><div class="sc-ico">⚠️</div><div class="sn">${myMist.length}</div><div class="sl">Mistakes</div></div>
-    <div class="sc sc-amber"><div class="sc-ico">⏰</div><div class="sn">${myLate.length}</div><div class="sl">Late Entries</div></div>
-    <div class="sc sc-teal"><div class="sc-ico">⏱️</div><div class="sn">${otHrs}h</div><div class="sl">OT Hours</div></div>
-    <div class="sc sc-yellow"><div class="sc-ico">⭐</div><div class="sn">${avgRat!==null?avgRat.toFixed(1):'—'}</div><div class="sl">My Rating</div></div>
+    <div class="sc sc-blue" onclick="mgrDrill('subs','📋 Submissions: ${cmSubs.length}',subsDrill(selMo,mid))" style="cursor:pointer" title="Click to view"><div class="sc-ico">📋</div><div class="sn">${cmSubs.length}</div><div class="sl">Submissions</div></div>
+    <div class="sc sc-purple"><div class="sc-ico">📅</div><div class="sn">${mySubs.length}</div><div class="sl">Total</div></div>
+    <div class="sc sc-orange" onclick="mgrDrill('leaves','🏖️ Pending Leaves: ${cmPendingLeaves.length}',leavesDrill(selMo,mid))" style="cursor:pointer" title="Click to view"><div class="sc-ico">🏖️</div><div class="sn">${cmPendingLeaves.length}</div><div class="sl">Pending Leaves</div></div>
+    <div class="sc sc-green" onclick="mgrDrill('aleaves','✅ Approved Days: ${cmApprovedLeaves}',leaveTakenDrill(selMo,mid))" style="cursor:pointer" title="Click to view"><div class="sc-ico">✅</div><div class="sn">${cmApprovedLeaves}</div><div class="sl">Approved Days</div></div>
+    <div class="sc sc-red" onclick="mgrDrill('mist','⚠️ Mistakes: ${cmMist.length}',mistDrill(selMo,mid))" style="cursor:pointer" title="Click to view"><div class="sc-ico">⚠️</div><div class="sn">${cmMist.length}</div><div class="sl">Mistakes</div></div>
+    <div class="sc sc-amber" onclick="mgrDrill('late','⏰ Late: ${cmLate.length}',lateDrill(selMo,mid))" style="cursor:pointer" title="Click to view"><div class="sc-ico">⏰</div><div class="sn">${cmLate.length}</div><div class="sl">Late</div></div>
+    <div class="sc sc-teal" onclick="mgrDrill('ot','⏱️ OT: ${cmOT}h',otDrill(selMo,mid))" style="cursor:pointer" title="Click to view"><div class="sc-ico">⏱️</div><div class="sn">${cmOT}h</div><div class="sl">OT Hours</div></div>
+    <div class="sc sc-yellow"><div class="sc-ico">⭐</div><div class="sn">${avgRat!==null?avgRat.toFixed(1):'—'}</div><div class="sl">Rating</div></div>
   `;
+  document.getElementById('mgr-drill-area').style.display='none'; _drillType='';
 
   // Recent submissions panel
   const recent=mySubs.slice(0,5);
@@ -2913,6 +3706,7 @@ if(!db.workHours) db.workHours = JSON.parse(localStorage.getItem('ft7_hrs')||'[]
 function persistHrs(mgrId){
   persist(mgrId);
 }
+let editHrsId=null;
 
 /* ── OT Check & Live Preview ── */
 function chkOT(){
@@ -2951,7 +3745,7 @@ function chkOT(){
   if(otEl) otEl.value = ot > 0 ? ot : '';
 }
 
-/* ── Manager: Submit Hours ── */
+/* ── Manager: Submit / Update Hours ── */
 function submitHours(){
   if(!curUser){ sm('hrs-msg','Login required',true); return; }
   const date    = document.getElementById('hrs-date')?.value;
@@ -2968,26 +3762,35 @@ function submitHours(){
   if(reg > 11.25)      { sm('hrs-msg','Regular kalako max 11.25 hoy — OT alag bharvo',true); return; }
   if(ot > 0 && !remark) { sm('hrs-msg','OT hoy to remark FARAJIYAT che!',true); return; }
 
-  /* prevent duplicate date+shift */
-  const dup = db.workHours.find(h=>h.mgrId===curUser.id&&h.date===date&&h.shift===shift);
-  if(dup){ sm('hrs-msg','Aa date+shift mate already entry che!',true); return; }
+  if(editHrsId){
+    const h=db.workHours.find(x=>x.id===editHrsId);
+    if(h){h.date=date;h.shift=shift;h.regularHours=reg;h.otHours=ot;h.workedHours=worked;h.remarkOT=remark;h.note=note;}
+    persistHrs();
+    sm('hrs-msg','✅ Hours update thaya!');
+    editHrsId=null;
+    document.getElementById('hrs-save-btn').textContent='💾 Save Hours';
+  } else {
+    /* prevent duplicate date+shift */
+    const dup = db.workHours.find(h=>h.mgrId===curUser.id&&h.date===date&&h.shift===shift);
+    if(dup){ sm('hrs-msg','Aa date+shift mate already entry che!',true); return; }
 
-  db.workHours.unshift({
-    id: Date.now(),
-    mgrId: curUser.id, mgrName: curUser.name,
-    deptId: curUser.deptId, deptName: dn(curUser.deptId),
-    date, shift,
-    regularHours: reg,
-    otHours: ot,
-    workedHours: worked,   /* total — kept for backward compat */
-    remarkOT: remark, note,
-    submittedAt: new Date().toISOString()
-  });
-  persistHrs();
-  sm('hrs-msg', ot>0
-    ? `✅ Save thaya! Regular: ${reg}h + OT: ${ot}h = Total: ${worked}h`
-    : `✅ Save thaya! Regular: ${reg}h`
-  );
+    db.workHours.unshift({
+      id: Date.now(),
+      mgrId: curUser.id, mgrName: curUser.name,
+      deptId: curUser.deptId, deptName: dn(curUser.deptId),
+      date, shift,
+      regularHours: reg,
+      otHours: ot,
+      workedHours: worked,
+      remarkOT: remark, note,
+      submittedAt: new Date().toISOString()
+    });
+    persistHrs();
+    sm('hrs-msg', ot>0
+      ? `✅ Save thaya! Regular: ${reg}h + OT: ${ot}h = Total: ${worked}h`
+      : `✅ Save thaya! Regular: ${reg}h`
+    );
+  }
 
   /* clear form */
   document.getElementById('hrs-regular').value='';
@@ -2997,6 +3800,20 @@ function submitHours(){
   const ow=document.getElementById('hrs-ot-wrap'); if(ow) ow.style.display='none';
   const pv=document.getElementById('hrs-preview'); if(pv) pv.style.display='none';
   renderMgrHrs();
+}
+function editHrs(id){
+  const h=db.workHours.find(x=>x.id===id);
+  if(!h||h.mgrId!==curUser.id)return;
+  editHrsId=id;
+  document.getElementById('hrs-date').value=h.date;
+  document.getElementById('hrs-shift').value=h.shift;
+  document.getElementById('hrs-regular').value=h.regularHours;
+  document.getElementById('hrs-ot-manual').value=h.otHours||0;
+  document.getElementById('hrs-remark').value=h.remarkOT||'';
+  document.getElementById('hrs-note').value=h.note||'';
+  const ow=document.getElementById('hrs-ot-wrap');if(ow)ow.style.display='flex';
+  document.getElementById('hrs-save-btn').textContent='✏️ Update Hours';
+  document.getElementById('hrs-date').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
 /* ── Manager: Render own hours ── */
@@ -3052,7 +3869,10 @@ function renderMgrHrs(){
       </div>
       ${ot>0&&h.remarkOT?`<div class="notebox" style="border-left-color:var(--am)">⚠️ OT Remark: ${h.remarkOT}</div>`:''}
       ${h.note?`<div class="notebox">📝 ${h.note}</div>`:''}
-      <button class="btn bre bxs" style="margin-top:8px" onclick="delHrs(${h.id})">🗑️ Delete</button>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn ba bxs" onclick="editHrs(${h.id})">✏️</button>
+        <button class="btn bre bxs" onclick="delHrs(${h.id})">🗑️ Delete</button>
+      </div>
     </div>`}).join('');
 }
 
@@ -3082,6 +3902,8 @@ function renderHrsReport(){
   if(fot==='1') data = data.filter(h=>h.otHours>0);
   if(from) data = data.filter(h=>h.date>=from);
   if(to)   data = data.filter(h=>h.date<=to);
+  const hrq=document.getElementById('srch-hours')?.value?.toLowerCase().trim();
+  if(hrq)data=data.filter(h=>(h.mgrName||'').toLowerCase().includes(hrq)||(h.note||'').toLowerCase().includes(hrq)||(h.remarkOT||'').toLowerCase().includes(hrq)||(h.deptName||'').toLowerCase().includes(hrq)||(h.mgrId||'').toLowerCase().includes(hrq));
 
   /* stats */
   const totH  = data.reduce((a,h)=>a+h.workedHours,0);
@@ -3123,6 +3945,7 @@ function renderHrsReport(){
         const reg = h.regularHours ?? Math.max(0, h.workedHours-(h.otHours||0));
         const ot  = h.otHours||0;
         return `<tr>
+          <td><input type="checkbox" class="cb-hours" value="${h.id}" onchange="bulkUpdateBtn('hours')" style="width:16px;height:16px;cursor:pointer;accent-color:var(--ac)"></td>
           <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(h.mgrName)}</div>${h.mgrName}</div></td>
           <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${h.mgrId}</td>
           <td><span class="badge b-te" style="font-size:10px">${h.deptName||'—'}</span></td>
@@ -3136,7 +3959,9 @@ function renderHrsReport(){
           <td style="font-size:11px;color:var(--t3);white-space:nowrap">${fmtDT(h.submittedAt)}</td>
         </tr>`;
       }).join('')
-    : '<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--t3)">⏱️ No hours entries found</td></tr>';
+    : '<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--t3)">⏱️ No hours entries found</td></tr>';
+  const sa=document.getElementById('selall-hours');
+  if(sa)sa.checked=false;
 }
 
 function clrHrsF(){
@@ -3235,35 +4060,105 @@ function dlProbRepExcel(){
 }
 
 /* ── Rating: PDF + Excel ── */
+function getRtngFilter(){
+  const from=document.getElementById('rf-from')?.value,to=document.getElementById('rf-to')?.value;
+  const fromM=from?from.slice(0,7):'',toM=to?to.slice(0,7):'';
+  return r=>{const m=(r.month||'').slice(0,7);return(!fromM||m>=fromM)&&(!toM||m<=toM);};
+}
 function dlRtngRepPDF(){
-  const data=[...db.ratings||[]].sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
+  const fn=getRtngFilter();const data=[...db.ratings||[]].filter(fn).sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
   if(!data.length){alert('Koi data nathi!');return;}
   const headers=['Manager','Dept','Month','Stars','Note','Rated At'];
   const rows=data.map(r=>{
     const m=db.managers.find(x=>x.id===r.mgrId)||{};
-    return[
-      m.name||r.mgrId||'—',dn(m.deptId)||'—',
-      r.month||'—','★'.repeat(r.stars||0)+' ('+r.stars+')',
-      (r.note||'').substring(0,80),
-      r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''
-    ];
+    return[m.name||r.mgrId||'—',dn(m.deptId)||'—',r.month||'—','★'.repeat(r.stars||0)+' ('+r.stars+')',(r.note||'').substring(0,80),r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''];
   });
   makePDF('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.pdf');
 }
-
 function dlRtngRepExcel(){
-  const data=[...db.ratings||[]].sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
+  const fn=getRtngFilter();const data=[...db.ratings||[]].filter(fn).sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
   if(!data.length){alert('Koi data nathi!');return;}
   const headers=['Manager','ID','Dept','Month','Stars (1-5)','Note','Rated At'];
   const rows=data.map(r=>{
     const m=db.managers.find(x=>x.id===r.mgrId)||{};
-    return[
-      m.name||r.mgrId||'—',r.mgrId||'—',dn(m.deptId)||'—',
-      r.month||'—',r.stars||0,r.note||'',
-      r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''
-    ];
+    return[m.name||r.mgrId||'—',r.mgrId||'—',dn(m.deptId)||'—',r.month||'—',r.stars||0,r.note||'',r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''];
   });
   makeExcel('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.xlsx');
+}
+function dlMrtngRepPDF(){
+  const from=document.getElementById('mrf-from')?.value,to=document.getElementById('mrf-to')?.value;
+  const fromM=from?from.slice(0,7):'',toM=to?to.slice(0,7):'';
+  const fn=r=>{const m=(r.month||'').slice(0,7);return(!fromM||m>=fromM)&&(!toM||m<=toM);};
+  const data=[...db.ratings||[]].filter(fn).sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','Dept','Month','Stars','Note','Rated At'];
+  const rows=data.map(r=>{
+    const m=db.managers.find(x=>x.id===r.mgrId)||{};
+    return[m.name||r.mgrId||'—',dn(m.deptId)||'—',r.month||'—','★'.repeat(r.stars||0)+' ('+r.stars+')',(r.note||'').substring(0,80),r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''];
+  });
+  makePDF('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.pdf');
+}
+function dlMrtngRepExcel(){
+  const from=document.getElementById('mrf-from')?.value,to=document.getElementById('mrf-to')?.value;
+  const fromM=from?from.slice(0,7):'',toM=to?to.slice(0,7):'';
+  const fn=r=>{const m=(r.month||'').slice(0,7);return(!fromM||m>=fromM)&&(!toM||m<=toM);};
+  const data=[...db.ratings||[]].filter(fn).sort((a,b)=>b.month?.localeCompare(a.month||'')||0);
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Manager','ID','Dept','Month','Stars (1-5)','Note','Rated At'];
+  const rows=data.map(r=>{
+    const m=db.managers.find(x=>x.id===r.mgrId)||{};
+    return[m.name||r.mgrId||'—',r.mgrId||'—',dn(m.deptId)||'—',r.month||'—',r.stars||0,r.note||'',r.ratedAt?new Date(r.ratedAt).toLocaleString('en-IN'):''];
+  });
+  makeExcel('Rating Report',headers,rows,'FormTrack_RatingReport_'+tod()+'.xlsx');
+}
+// Manager-side exports
+function dlMgrLatePDF(){
+  if(!curUser){alert('Login karo');return;}
+  const data=db.lateEntries.filter(l=>l.mgrId===curUser.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Date','Shift','Minutes','Arrival Time','Reason','Status','Admin Remark'];
+  const rows=data.map(l=>[dlFmtD(l.date),l.shift==='day'?'Day':'Night',l.lateMinutes,l.arrivalTime||'—',l.reason,l.status,l.remark||'—']);
+  makePDF('My Late Entries',headers,rows,'LateEntries_'+tod()+'.pdf');
+}
+function dlMgrLateExcel(){
+  if(!curUser)return;
+  const data=db.lateEntries.filter(l=>l.mgrId===curUser.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Date','Shift','Minutes','Arrival Time','Reason','Status','Admin Remark'];
+  const rows=data.map(l=>[l.date,l.shift,l.lateMinutes,l.arrivalTime||'',l.reason,l.status,l.remark||'']);
+  makeExcel('My Late Entries',headers,rows,'LateEntries_'+tod()+'.xlsx');
+}
+function dlMgrMistPDF(){
+  if(!curUser)return;
+  const data=db.mistakes.filter(m=>m.mgrId===curUser.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Date','Severity','Category','Description','Action Taken'];
+  const rows=data.map(m=>[dlFmtD(m.date),m.severity,m.category||'—',m.description,m.actionTaken||'—']);
+  makePDF('My Mistake Reports',headers,rows,'Mistakes_'+tod()+'.pdf');
+}
+function dlMgrMistExcel(){
+  if(!curUser)return;
+  const data=db.mistakes.filter(m=>m.mgrId===curUser.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Date','Severity','Category','Description','Action Taken'];
+  const rows=data.map(m=>[m.date,m.severity,m.category||'',m.description,m.actionTaken||'']);
+  makeExcel('My Mistake Reports',headers,rows,'Mistakes_'+tod()+'.xlsx');
+}
+function dlMgrHrsPDF(){
+  if(!curUser)return;
+  const data=db.workHours.filter(h=>h.mgrId===curUser.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Date','Shift','Regular Hrs','OT Hrs','Total Hrs','OT Remark','Note'];
+  const rows=data.map(h=>[dlFmtD(h.date),h.shift==='day'?'Day':'Night',(h.regularHours??Math.max(0,h.workedHours-(h.otHours||0))).toFixed(1),(h.otHours||0).toFixed(1),h.workedHours.toFixed(1),h.remarkOT||'—',h.note||'—']);
+  makePDF('My Work Hours',headers,rows,'WorkHours_'+tod()+'.pdf');
+}
+function dlMgrHrsExcel(){
+  if(!curUser)return;
+  const data=db.workHours.filter(h=>h.mgrId===curUser.id).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!data.length){alert('Koi data nathi!');return;}
+  const headers=['Date','Shift','Regular Hrs','OT Hrs','Total Hrs','OT Remark','Note'];
+  const rows=data.map(h=>[h.date,h.shift,h.regularHours??Math.max(0,h.workedHours-(h.otHours||0)),h.otHours||0,h.workedHours,h.remarkOT||'',h.note||'']);
+  makeExcel('My Work Hours',headers,rows,'WorkHours_'+tod()+'.xlsx');
 }
 </script>
 <script>
@@ -4628,4 +5523,3 @@ function initFirebaseListeners() {
 </script>
 </body>
 </html>
-
