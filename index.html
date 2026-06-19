@@ -4779,7 +4779,7 @@ function initGapiClient(callback) {
         loadScript('https://accounts.google.com/gsi/client', () => {
           tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: cid,
-            scope: 'https://www.googleapis.com/auth/drive.file',
+            scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
             callback: '', // assigned during gdSignIn
           });
           callback(null);
@@ -4806,7 +4806,16 @@ function updateDriveUI(signedIn) {
     if (st) {
       st.className = 'drive-status on';
     }
-    if (stTxt) stTxt.textContent = 'Signed in (Google Drive Sync active)';
+    const signedEmail = localStorage.getItem('ft_gd_email') || '';
+    if (stTxt) {
+      if (signedEmail && signedEmail.toLowerCase() !== FT_OWNER_EMAIL.toLowerCase()) {
+        stTxt.textContent = '⚠️ Signed in as ' + signedEmail + ' (expected ' + FT_OWNER_EMAIL + ')';
+        stTxt.style.color = 'var(--re)';
+      } else {
+        stTxt.textContent = signedEmail ? 'Signed in as ' + signedEmail : 'Signed in (Google Drive Sync active)';
+        stTxt.style.color = '';
+      }
+    }
     if (bkBtn) bkBtn.style.display = 'inline-block';
     if (rsBtn) rsBtn.style.display = 'inline-block';
     if (outBtn) outBtn.style.display = 'inline-block';
@@ -4852,6 +4861,7 @@ function gdSignIn() {
       gdriveAccessToken = resp.access_token;
       localStorage.setItem('ft_gd_token', gdriveAccessToken);
       localStorage.setItem('ft_gd_token_expiry', Date.now() + resp.expires_in * 1000);
+      _checkGDriveAccountEmail();
       updateDriveUI(true);
       if (msgEl) {
         msgEl.textContent = '✅ Google Drive connected successfully!';
@@ -4866,6 +4876,7 @@ function gdSignIn() {
     if (savedToken && expiry > Date.now()) {
       gdriveAccessToken = savedToken;
       gapi.client.setToken({ access_token: gdriveAccessToken });
+      _checkGDriveAccountEmail();
       updateDriveUI(true);
       if (msgEl) {
         msgEl.textContent = '✅ Session restored!';
@@ -4878,9 +4889,27 @@ function gdSignIn() {
   });
 }
 
+const FT_OWNER_EMAIL = 'vanani.dharmesh4848@gmail.com';
+
+async function _checkGDriveAccountEmail() {
+  try {
+    const resp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + gdriveAccessToken }
+    });
+    const info = await resp.json();
+    if (info && info.email) {
+      localStorage.setItem('ft_gd_email', info.email);
+      updateDriveUI(true);
+    }
+  } catch (e) {
+    console.warn('[GDrive] Could not verify signed-in account email:', e);
+  }
+}
+
 function gdSignOut() {
   localStorage.removeItem('ft_gd_token');
   localStorage.removeItem('ft_gd_token_expiry');
+  localStorage.removeItem('ft_gd_email');
   gdriveAccessToken = null;
   updateDriveUI(false);
   const msgEl = document.getElementById('gd-msg');
@@ -4896,11 +4925,14 @@ async function getOrCreateFile(name) {
     const query = `name = '${name}' and trashed = false`;
     const resp = await gapi.client.drive.files.list({
       q: query,
-      fields: 'files(id, name)',
+      fields: 'files(id, name, createdTime)',
+      orderBy: 'createdTime',
       spaces: 'drive'
     });
     const files = resp.result.files;
     if (files && files.length > 0) {
+      // Always resolve to the oldest matching file so every device/session
+      // overwrites the SAME file instead of drifting onto a duplicate.
       return files[0].id;
     } else {
       const createResp = await gapi.client.drive.files.create({
@@ -5025,44 +5057,74 @@ function applyGlobalSnapshot(snapshot) {
   }
 }
 
+/* ── Single consolidated Drive file ──────────────────────────────
+   Every device/account reads & writes ONE file (FormTrack_LiveData.json)
+   so backups always overwrite in place instead of spawning a new file
+   per manager. ──────────────────────────────────────────────────── */
+const FT_LIVE_FILE = 'FormTrack_LiveData.json';
+let _gdLiveFileId = null;
+
+async function getLiveDataFileId() {
+  if (_gdLiveFileId) return _gdLiveFileId;
+  _gdLiveFileId = await getOrCreateFile(FT_LIVE_FILE);
+  return _gdLiveFileId;
+}
+
+function getFullSnapshot() {
+  const mgrIds = new Set((db.managers || []).map(m => m.id));
+  (db.submissions || []).forEach(s => mgrIds.add(s.mgrId));
+  (db.leaves || []).forEach(l => mgrIds.add(l.mgrId));
+  (db.mistakes || []).forEach(x => mgrIds.add(x.mgrId));
+  (db.lateEntries || []).forEach(x => mgrIds.add(x.mgrId));
+  (db.problems || []).forEach(x => mgrIds.add(x.mgrId));
+  (db.ratings || []).forEach(x => mgrIds.add(x.mgrId));
+  (db.workHours || []).forEach(x => mgrIds.add(x.mgrId));
+
+  const managers = {};
+  for (const mid of mgrIds) {
+    if (!mid) continue;
+    managers[mid] = getManagerSnapshot(mid);
+  }
+
+  return {
+    global: getGlobalSnapshot(),
+    managers: managers,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function applyFullSnapshot(snapshot) {
+  if (!snapshot) return;
+  if (snapshot.global) applyGlobalSnapshot(snapshot.global);
+
+  db.submissions = [];
+  db.leaves = [];
+  db.leavebal = {};
+  db.mistakes = [];
+  db.lateEntries = [];
+  db.problems = [];
+  db.ratings = [];
+  db.workHours = [];
+
+  const managers = snapshot.managers || {};
+  for (const mid of Object.keys(managers)) {
+    applyManagerSnapshot(managers[mid]);
+  }
+}
+
 // Sync Triggers
-async function gdBackup(specificMgrId = null) {
+async function gdBackup() {
   if (!gdriveAccessToken) return;
   const msgEl = document.getElementById('gd-msg');
   if (msgEl) {
     msgEl.textContent = '⬆️ Uploading to Google Drive...';
     msgEl.style.color = 'var(--am)';
   }
-  
+
   try {
-    // 1. Save global file (metadata)
-    const globalId = await getOrCreateFile('FormTrack_Global.json');
-    await updateFileContent(globalId, getGlobalSnapshot());
-    
-    // 2. Save manager files
-    if (curRole === 'm' && curUser) {
-      const mgrFileName = `FormTrack_${curUser.id}.json`;
-      const mgrFileId = await getOrCreateFile(mgrFileName);
-      await updateFileContent(mgrFileId, getManagerSnapshot(curUser.id));
-    } else if (curRole === 'a') {
-      if (specificMgrId) {
-        const mgrFileName = `FormTrack_${specificMgrId}.json`;
-        const mgrFileId = await getOrCreateFile(mgrFileName);
-        await updateFileContent(mgrFileId, getManagerSnapshot(specificMgrId));
-      } else {
-        const mgrIds = new Set(db.managers.map(m => m.id));
-        db.submissions.forEach(s => mgrIds.add(s.mgrId));
-        db.leaves.forEach(l => mgrIds.add(l.mgrId));
-        
-        for (const mid of mgrIds) {
-          if (!mid) continue;
-          const mgrFileName = `FormTrack_${mid}.json`;
-          const mgrFileId = await getOrCreateFile(mgrFileName);
-          await updateFileContent(mgrFileId, getManagerSnapshot(mid));
-        }
-      }
-    }
-    
+    const fileId = await getLiveDataFileId();
+    await updateFileContent(fileId, getFullSnapshot());
+
     const now = new Date().toISOString();
     localStorage.setItem('ft7_lastbk', now);
     const lbEl = document.getElementById('last-bk-txt');
@@ -5089,95 +5151,32 @@ async function gdRestore() {
     msgEl.textContent = '📥 Fetching latest from Google Drive...';
     msgEl.style.color = 'var(--am)';
   }
-  
+
   try {
-    // 1. Fetch Global config
-    const globalId = await getOrCreateFile('FormTrack_Global.json');
-    const globalDataRaw = await getFileContent(globalId);
-    const globalData = safeParseJson(globalDataRaw);
-    if (globalData) {
-      const remoteTime = globalData.updatedAt || '';
+    const fileId = await getLiveDataFileId();
+    const dataRaw = await getFileContent(fileId);
+    const remote = safeParseJson(dataRaw);
+
+    if (remote) {
+      const remoteTime = remote.updatedAt || '';
       const localTime = localStorage.getItem('ft_last_write_global') || '';
       if (localTime && remoteTime < localTime) {
-        await gdBackup();
+        // Local data is newer than Drive — push current data up instead of
+        // overwriting it with stale Drive content.
+        await updateFileContent(fileId, getFullSnapshot());
       } else {
-        applyGlobalSnapshot(globalData);
+        applyFullSnapshot(remote);
         localStorage.setItem('ft_last_write_global', remoteTime);
       }
+    } else {
+      // No data on Drive yet — seed the single file with what we have locally.
+      await updateFileContent(fileId, getFullSnapshot());
     }
-    
-    // 2. Fetch Manager-wise data
-    if (curRole === 'm' && curUser) {
-      const mgrFileName = `FormTrack_${curUser.id}.json`;
-      const mgrFileId = await getOrCreateFile(mgrFileName);
-      const mgrDataRaw = await getFileContent(mgrFileId);
-      const mgrData = safeParseJson(mgrDataRaw);
-      if (mgrData) {
-        const remoteTime = mgrData.updatedAt || '';
-        const localTime = localStorage.getItem('ft_last_write_' + curUser.id) || '';
-        if (localTime && remoteTime < localTime) {
-          await _triggerGDriveBackup(curUser.id);
-        } else {
-          applyManagerSnapshot(mgrData);
-          localStorage.setItem('ft_last_write_' + curUser.id, remoteTime);
-        }
-      }
-      _origPersistFSA(); // Save to local storage
-      initMgr(); // Refresh Mgr UI
-    } else if (curRole === 'a') {
-      const resp = await gapi.client.drive.files.list({
-        q: "name contains 'FormTrack_' and name contains '.json' and name != 'FormTrack_Global.json' and trashed = false",
-        fields: 'files(id, name)',
-        spaces: 'drive'
-      });
-      const files = resp.result.files || [];
-      const driveDataMap = {};
-      for (const file of files) {
-        const midMatch = file.name.match(/FormTrack_(.+)\.json/);
-        if (midMatch) {
-          const mid = midMatch[1];
-          const dataRaw = await getFileContent(file.id);
-          const data = safeParseJson(dataRaw);
-          if (data) {
-            driveDataMap[mid] = data;
-          }
-        }
-      }
-      
-      // Reset Admin combined database before merge
-      db.submissions = [];
-      db.leaves = [];
-      db.leavebal = {};
-      db.mistakes = [];
-      db.lateEntries = [];
-      db.problems = [];
-      db.ratings = [];
-      db.workHours = [];
-      
-      const localMgrIds = new Set(db.managers.map(m => m.id));
-      const allMgrIds = new Set([...Object.keys(driveDataMap), ...localMgrIds]);
-      
-      for (const mid of allMgrIds) {
-        if (!mid) continue;
-        const remoteSnap = driveDataMap[mid];
-        const remoteTime = remoteSnap ? (remoteSnap.updatedAt || '') : '';
-        const localTime = localStorage.getItem('ft_last_write_' + mid) || '';
-        
-        if (localTime && remoteTime < localTime) {
-          const localSnap = getManagerSnapshot(mid);
-          const mgrFileName = `FormTrack_${mid}.json`;
-          const mgrFileId = await getOrCreateFile(mgrFileName);
-          await updateFileContent(mgrFileId, localSnap);
-          applyManagerSnapshot(localSnap);
-        } else if (remoteSnap) {
-          applyManagerSnapshot(remoteSnap);
-          localStorage.setItem('ft_last_write_' + mid, remoteTime);
-        }
-      }
-      _origPersistFSA(); // Save combined locally
-      initAdmin(); // Refresh Admin UI
-    }
-    
+
+    _origPersistFSA(); // Save locally
+    if (curRole === 'a' && typeof initAdmin === 'function') initAdmin();
+    else if (curRole === 'm' && typeof initMgr === 'function') initMgr();
+
     const now = new Date().toISOString();
     localStorage.setItem('ft7_lastbk', now);
     const lbEl = document.getElementById('last-bk-txt');
@@ -5197,47 +5196,24 @@ async function gdRestore() {
   }
 }
 
-// Debounced Auto-Sync Logic
+// Debounced Auto-Sync Logic — always overwrites the single live-data file
 let _gdTimer = null;
-let _gdPendingMgrs = new Set();
-let _gdSyncGlobal = false;
 
-function _triggerGDriveBackup(mgrId, isGlobal = false) {
-  if (mgrId) _gdPendingMgrs.add(mgrId);
-  if (isGlobal) _gdSyncGlobal = true;
-  
+function _triggerGDriveBackup() {
   clearTimeout(_gdTimer);
   _gdTimer = setTimeout(async () => {
     if (!gdriveAccessToken) return;
     try {
-      if (_gdSyncGlobal && curRole === 'a') {
-        const globalId = await getOrCreateFile('FormTrack_Global.json');
-        await updateFileContent(globalId, getGlobalSnapshot());
-        _gdSyncGlobal = false;
-      }
-      
-      if (curRole === 'm' && curUser) {
-        const mgrFileName = `FormTrack_${curUser.id}.json`;
-        const mgrFileId = await getOrCreateFile(mgrFileName);
-        await updateFileContent(mgrFileId, getManagerSnapshot(curUser.id));
-      } else if (curRole === 'a') {
-        if (_gdPendingMgrs.size > 0) {
-          for (const mid of _gdPendingMgrs) {
-            const mgrFileName = `FormTrack_${mid}.json`;
-            const mgrFileId = await getOrCreateFile(mgrFileName);
-            await updateFileContent(mgrFileId, getManagerSnapshot(mid));
-          }
-          _gdPendingMgrs.clear();
-        } else {
-          await gdBackup();
-        }
-      }
+      const fileId = await getLiveDataFileId();
+      await updateFileContent(fileId, getFullSnapshot());
       const now = new Date().toISOString();
       localStorage.setItem('ft7_lastbk', now);
       const lbEl = document.getElementById('last-bk-txt');
       if (lbEl) lbEl.textContent = 'Last sync: ' + new Date(now).toLocaleString() + ' ✅';
+      updateSyncStatus('gdrive', 'ok');
     } catch (e) {
       console.error('Auto GDrive backup failed:', e);
+      updateSyncStatus('gdrive', 'error', 'Auto sync failed: ' + e.message);
     }
   }, 1000);
 }
@@ -5290,20 +5266,10 @@ async function syncGlobalToFirebase() {
 }
 
 function triggerGDriveGlobalBackup() {
-  if (!gdriveAccessToken) return;
-  _gdSyncGlobal = true;
-  clearTimeout(_gdTimer);
-  _gdTimer = setTimeout(async () => {
-    try {
-      const globalId = await getOrCreateFile('FormTrack_Global.json');
-      await updateFileContent(globalId, getGlobalSnapshot());
-      _gdSyncGlobal = false;
-      updateSyncStatus('gdrive', 'ok');
-    } catch(e) {
-      console.error("GDrive global backup failed:", e);
-      updateSyncStatus('gdrive', 'error', 'GDrive Global Backup Failed: ' + e.message);
-    }
-  }, 1000);
+  // Global config now lives inside the single FormTrack_LiveData.json file
+  // (vanani.dharmesh4848@gmail.com Drive), so this just delegates to the
+  // unified backup trigger — same file, overwritten in place.
+  _triggerGDriveBackup();
 }
 
 function persistGlobal() {
