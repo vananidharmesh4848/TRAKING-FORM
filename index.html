@@ -82,6 +82,22 @@ textarea{resize:vertical;min-height:56px}
 /* ═══ DESKTOP LAYOUT (Sidebar) ═══ */
 .admin-layout{display:flex;min-height:100vh}
 .sidebar{width:var(--sidebar-w);background:#1E2A5A;position:fixed;top:0;left:0;bottom:0;z-index:300;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+/* ═══ MOBILE ADMIN MODE ═══ */
+body.mobile-admin .sidebar{display:none}
+body.mobile-admin .main-area{margin-left:0}
+body.mobile-admin .admin-mobile-topbar{display:flex}
+body.mobile-admin .main-topbar{display:none}
+body.mobile-admin .main-content{padding-bottom:80px}
+.admin-mobile-topbar{display:none;position:sticky;top:0;z-index:200;background:#1E2A5A;padding:0 1rem;height:56px;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.admin-mobile-topbar .tlo{width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.admin-mobile-topbar .tnm{font-size:14px;font-weight:700;color:#fff}
+.admin-bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(30,42,90,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.1);padding:4px 0 max(4px,env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(0,0,0,0.3);overflow-x:auto;scrollbar-width:none}
+.admin-bnav::-webkit-scrollbar{display:none}
+.admin-bnav-inner{display:flex;min-width:max-content;padding:0 4px}
+body.mobile-admin .admin-bnav{display:block}
+.anb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 10px;cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.5);transition:color .15s;position:relative;white-space:nowrap}
+.anb.on{color:#fff}.anb .ni{font-size:18px;line-height:1}.anb .nl{font-size:9px;font-weight:500}
+.anb-badge{position:absolute;top:1px;right:4px;background:var(--re);color:#fff;border-radius:100px;font-size:9px;font-weight:600;padding:1px 4px;min-width:14px;text-align:center}
 .sidebar::-webkit-scrollbar{width:3px}
 .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1)}
 .sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0}
@@ -118,6 +134,9 @@ textarea{resize:vertical;min-height:56px}
 .tlo{width:32px;height:32px;background:linear-gradient(135deg,#3D5AF1,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .tnm{font-size:14px;font-weight:700;color:var(--t)}.tsb{font-size:11px;color:var(--t2)}
 .wrap{max-width:760px;margin:0 auto;padding:1.25rem 1rem 6.5rem}
+body.pc-mgr .wrap{max-width:1100px;padding:1.5rem 2rem 3rem}
+body.pc-mgr .bnav{display:none}
+body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
 
 /* ═══ BOTTOM NAV (Mobile) ═══ */
 .bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(0,0,0,0.08)}
@@ -140,12 +159,16 @@ textarea{resize:vertical;min-height:56px}
 .sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:1.25rem}
 @media(min-width:600px){.sg{grid-template-columns:repeat(4,1fr)}}
 .sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem}
-.sc{border-radius:14px;padding:18px 16px;text-align:left;position:relative;overflow:hidden;min-height:90px;display:flex;flex-direction:column;justify-content:space-between}
-.sc::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.12)}
-.sn{font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:#fff;line-height:1}
-.sl{font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;font-weight:500}
+.sc{border-radius:14px;padding:18px 16px;text-align:left;position:relative;overflow:hidden;min-height:90px;display:flex;flex-direction:column;justify-content:space-between;background:var(--s);border:1px solid var(--bd)}
+.sc::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(0,0,0,0.04)}
+.sn{font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:var(--t);line-height:1}
+.sl{font-size:12px;color:var(--t2);margin-top:6px;font-weight:500}
+/* Colored sc variants override text to white */
+.sc-blue,.sc-purple,.sc-orange,.sc-red,.sc-amber,.sc-teal,.sc-yellow,.sc-green,.sc-indigo{border:none}
+.sc-blue .sn,.sc-purple .sn,.sc-orange .sn,.sc-red .sn,.sc-amber .sn,.sc-teal .sn,.sc-yellow .sn,.sc-green .sn,.sc-indigo .sn{color:#fff}
+.sc-blue .sl,.sc-purple .sl,.sc-orange .sl,.sc-red .sl,.sc-amber .sl,.sc-teal .sl,.sc-yellow .sl,.sc-green .sl,.sc-indigo .sl{color:rgba(255,255,255,0.85)}
+.sc-blue::after,.sc-purple::after,.sc-orange::after,.sc-red::after,.sc-amber::after,.sc-teal::after,.sc-yellow::after,.sc-green::after,.sc-indigo::after{background:rgba(255,255,255,0.12)}
 .sc-ico{font-size:28px;margin-bottom:4px;opacity:0.9}
-/* Colored variants */
 .sc-blue{background:linear-gradient(135deg,#3D5AF1,#5B7BFF)}
 .sc-purple{background:linear-gradient(135deg,#7C3AED,#A78BFA)}
 .sc-orange{background:linear-gradient(135deg,#F97316,#FB923C)}
@@ -305,12 +328,22 @@ textarea{resize:vertical;min-height:56px}
         <div class="rc" id="rc-m" onclick="selR('m')"><div class="ri">👤</div><div class="rl">Manager</div><div class="rd">Submit forms</div></div>
         <div class="rc" id="rc-a" onclick="selR('a')"><div class="ri">🛡️</div><div class="rl">Admin</div><div class="rd">Full access</div></div>
       </div>
+      <!-- DEVICE SELECTION -->
+      <div style="margin-bottom:14px">
+        <p style="font-size:12px;color:var(--t2);margin-bottom:8px;font-weight:500">📱 Device Type select karo</p>
+        <div class="rgrid">
+          <div class="rc" id="rc-mobile" onclick="selDevice('mobile')"><div class="ri">📱</div><div class="rl">Mobile</div><div class="rd">Phone / Tablet</div></div>
+          <div class="rc" id="rc-pc" onclick="selDevice('pc')"><div class="ri">🖥️</div><div class="rl">PC / Laptop</div><div class="rd">Desktop view</div></div>
+        </div>
+      </div>
       <div id="mb" style="display:none">
         <div class="fg"><label>Manager ID</label><input type="text" id="l-id" placeholder="MGR-01" autocapitalize="characters" onkeydown="if(event.key==='Enter')document.getElementById('l-pw').focus()"></div>
         <div class="fg"><label>Password</label><div class="pww"><input type="password" id="l-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-pw',this)">👁</button></div></div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);margin:-2px 0 12px;cursor:pointer"><input type="checkbox" id="l-rem-m" style="width:14px;height:14px;cursor:pointer"> Password remember karo</label>
       </div>
       <div id="ab" style="display:none">
         <div class="fg"><label>Admin Password</label><div class="pww"><input type="password" id="l-apw" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()"><button class="eye" onclick="tpw('l-apw',this)">👁</button></div></div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);margin:-2px 0 12px;cursor:pointer"><input type="checkbox" id="l-rem-a" style="width:14px;height:14px;cursor:pointer"> Password remember karo</label>
       </div>
       <button class="btn ba bfu" onclick="doLogin()">Continue →</button>
       <div class="err" id="lerr"></div>
@@ -634,6 +667,17 @@ textarea{resize:vertical;min-height:56px}
     </nav>
     <!-- MAIN CONTENT -->
     <div class="main-area">
+      <!-- MOBILE ADMIN TOPBAR (only shown in mobile mode) -->
+      <div class="admin-mobile-topbar">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="tlo">📋</div>
+          <div><div class="tnm">FormTrack Admin</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn bxs" id="dm-toggle-mob" onclick="toggleDarkMode()" style="font-size:14px;padding:3px 8px;background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.2)">🌙</button>
+          <button class="btn bxs" onclick="doLogout()" style="background:rgba(248,113,113,0.2);color:#F87171;border-color:rgba(248,113,113,0.3);font-size:11px">Logout</button>
+        </div>
+      </div>
       <div class="main-topbar">
         <div>
           <div class="tb-title" id="admin-tb-title">📊 Manager Summary</div>
@@ -1206,6 +1250,25 @@ textarea{resize:vertical;min-height:56px}
       </div><!-- end main-content -->
     </div><!-- end main-area -->
   </div><!-- end admin-layout -->
+  <!-- MOBILE ADMIN BOTTOM NAV -->
+  <div class="admin-bnav" id="admin-bnav">
+    <div class="admin-bnav-inner">
+      <button class="anb on" id="anb-ov" onclick="aTabMob('ov',this)"><span class="ni">📊</span><span class="nl">Summary</span></button>
+      <button class="anb" id="anb-rp" onclick="aTabMob('rp',this)"><span class="ni">📁</span><span class="nl">Reports</span></button>
+      <button class="anb" id="anb-lv" onclick="aTabMob('lv',this)"><span class="ni">🏖️</span><span class="nl">Leave</span><span class="anb-badge" id="anb-lv-badge" style="display:none">0</span></button>
+      <button class="anb" id="anb-hrs" onclick="aTabMob('hrs',this)"><span class="ni">⏱️</span><span class="nl">Hours</span></button>
+      <button class="anb" id="anb-late" onclick="aTabMob('late',this)"><span class="ni">⏰</span><span class="nl">Late</span><span class="anb-badge" id="anb-late-badge" style="display:none">0</span></button>
+      <button class="anb" id="anb-mist" onclick="aTabMob('mist',this)"><span class="ni">⚠️</span><span class="nl">Mistakes</span><span class="anb-badge" id="anb-mist-badge" style="display:none">0</span></button>
+      <button class="anb" id="anb-rtng" onclick="aTabMob('rtng',this)"><span class="ni">⭐</span><span class="nl">Rating</span></button>
+      <button class="anb" id="anb-prob" onclick="aTabMob('prob',this)"><span class="ni">🔧</span><span class="nl">Problems</span><span class="anb-badge" id="anb-prob-badge" style="display:none">0</span></button>
+      <button class="anb" id="anb-sug" onclick="aTabMob('sug',this)"><span class="ni">💡</span><span class="nl">Suggest</span><span class="anb-badge" id="anb-sug-badge" style="display:none">0</span></button>
+      <button class="anb" id="anb-mg" onclick="aTabMob('mg',this)"><span class="ni">👥</span><span class="nl">Managers</span></button>
+      <button class="anb" id="anb-dp" onclick="aTabMob('dp',this)"><span class="ni">🏬</span><span class="nl">Depts</span></button>
+      <button class="anb" id="anb-ct" onclick="aTabMob('ct',this)"><span class="ni">🏷️</span><span class="nl">Category</span></button>
+      <button class="anb" id="anb-bk" onclick="aTabMob('bk',this)"><span class="ni">☁️</span><span class="nl">Backup</span></button>
+      <button class="anb" id="anb-st" onclick="aTabMob('st',this)"><span class="ni">⚙️</span><span class="nl">Settings</span></button>
+    </div>
+  </div>
 </div><!-- end pg-admin -->
 
 <!-- LIGHTBOX -->
@@ -1355,7 +1418,14 @@ let db={
   submissions: JSON.parse(ls('ft6_sb')||'[]'),
   leaves:      JSON.parse(ls('ft6_lv')||'[]'),
   leavebal:    JSON.parse(ls('ft6_lb')||'{}'),
-  adminPw:     ls('ft6_apw')||'admin123'
+  adminPw:     ls('ft6_apw')||'admin123',
+  mistakes:    JSON.parse(ls('ft6_mist')||'[]'),
+  lateEntries: JSON.parse(ls('ft7_late')||'[]'),
+  problems:    JSON.parse(ls('ft8_prob')||'[]'),
+  suggestions: JSON.parse(ls('ft_sug')||'[]'),
+  ratings:     JSON.parse(ls('ft8_rtng')||'[]'),
+  workHours:   JSON.parse(ls('ft7_hrs')||'[]'),
+  activityLog: []
 };
 function ls(k){return localStorage.getItem(k);}
 
@@ -1369,7 +1439,7 @@ if(!db.managers){
   for(let i=1;i<=10;i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'),name:'Manager '+i,deptId:'d1',pw:'pass'+String(i).padStart(2,'0')});
 }
 
-let catFiles={}, curUser=null, editId=null, curRole=null;
+let catFiles={}, curUser=null, editId=null, curRole=null, curDevice=localStorage.getItem('ft_device')||null;
 
 function persistLocal(mgrId) {
   const now = new Date().toISOString();
@@ -1437,7 +1507,7 @@ function restoreSession(){
     const s=JSON.parse(ls(SES)||'null');
     if(!s)return false;
     if(s.r==='a'){
-      curRole='a';showPg('pg-admin');initAdmin();
+      curRole='a';applyDeviceMode();showPg('pg-admin');initAdmin();
       setTimeout(()=>{ if(typeof updateMistBadge === 'function') updateMistBadge(); }, 300);
       triggerSyncRestore();
       initFirebaseListeners();
@@ -1446,7 +1516,10 @@ function restoreSession(){
     if(s.r==='m'){
       const m=db.managers.find(x=>x.id===s.uid);
       if(!m){clearSession();return false;}
-      curRole='m';curUser=m;showPg('pg-mgr');initMgr();
+      curRole='m';curUser=m;
+      if(curDevice==='pc') document.body.classList.add('pc-mgr');
+      else document.body.classList.remove('pc-mgr');
+      showPg('pg-mgr');initMgr();
       setTimeout(()=>{
         if(curUser && db.mistakes){
           const unseen=db.mistakes.filter(m=>m.mgrId===curUser.id&&!m.seenByMgr).length;
@@ -1471,6 +1544,76 @@ function selR(r){
   document.getElementById('rc-a').classList.toggle('on',r==='a');
   document.getElementById('mb').style.display=r==='m'?'block':'none';
   document.getElementById('ab').style.display=r==='a'?'block':'none';
+  _fillRememberedLogin(r);
+}
+
+/* ── Remember Password (Manager + Admin) ──
+   Saves credentials in localStorage only when the "Password remember karo"
+   checkbox is ticked. Auto-fills next time the role is selected on login page. */
+const _REM_KEY='ft_remember_login';
+function _saveRememberedLogin(role, id, pw){
+  try{
+    const remCb = document.getElementById(role==='m'?'l-rem-m':'l-rem-a');
+    const remember = remCb && remCb.checked;
+    const store = JSON.parse(localStorage.getItem(_REM_KEY)||'{}');
+    if(remember){
+      if(role==='m') store.m = {id, pw};
+      else store.a = {pw};
+    } else {
+      // unchecked → forget any previously saved creds for this role
+      if(role==='m') delete store.m;
+      else delete store.a;
+    }
+    localStorage.setItem(_REM_KEY, JSON.stringify(store));
+  }catch(e){}
+}
+function _fillRememberedLogin(role){
+  try{
+    const store = JSON.parse(localStorage.getItem(_REM_KEY)||'{}');
+    if(role==='m' && store.m){
+      const idEl=document.getElementById('l-id'), pwEl=document.getElementById('l-pw'), cbEl=document.getElementById('l-rem-m');
+      if(idEl) idEl.value = store.m.id||'';
+      if(pwEl) pwEl.value = store.m.pw||'';
+      if(cbEl) cbEl.checked = true;
+    } else if(role==='a' && store.a){
+      const pwEl=document.getElementById('l-apw'), cbEl=document.getElementById('l-rem-a');
+      if(pwEl) pwEl.value = store.a.pw||'';
+      if(cbEl) cbEl.checked = true;
+    }
+  }catch(e){}
+}
+function selDevice(d){
+  curDevice=d;
+  localStorage.setItem('ft_device',d);
+  document.getElementById('rc-mobile').classList.toggle('on',d==='mobile');
+  document.getElementById('rc-pc').classList.toggle('on',d==='pc');
+}
+function applyDeviceMode(){
+  if(curDevice==='mobile'){
+    document.body.classList.add('mobile-admin');
+  } else {
+    document.body.classList.remove('mobile-admin');
+  }
+}
+function aTabMob(t,el){
+  // Same as aTab but also updates mobile bottom nav buttons
+  aTab(t, document.getElementById('sbi-'+t)||el);
+  document.querySelectorAll('.anb').forEach(b=>b.classList.remove('on'));
+  if(el) el.classList.add('on');
+}
+function syncAdminMobBadges(){
+  // Sync badge counts from sidebar to mobile bottom nav
+  const map=[['lv','lv-badge'],['late','late-badge'],['mist','mist-badge'],['prob','prob-badge'],['sug','sug-badge']];
+  map.forEach(([key,sbId])=>{
+    const sbBadge=document.getElementById(sbId);
+    const anbBadge=document.getElementById('anb-'+key+'-badge');
+    if(sbBadge && anbBadge){
+      const txt=sbBadge.textContent;
+      const vis=sbBadge.style.display!=='none';
+      anbBadge.textContent=txt;
+      anbBadge.style.display=vis?'':'none';
+    }
+  });
 }
 async function triggerSyncRestore() {
   if (typeof _restoreFromFirebase === 'function') {
@@ -1486,18 +1629,26 @@ async function triggerSyncRestore() {
 function doLogin(){
   document.getElementById('lerr').textContent='';
   if(!curRole){document.getElementById('lerr').textContent='Select a role';return;}
+  if(!curDevice){document.getElementById('lerr').textContent='📱 Mobile ya PC select karo';return;}
   if(curRole==='m'){
     const id=document.getElementById('l-id').value.trim().toUpperCase();
     const pw=document.getElementById('l-pw').value;
     const m=db.managers.find(x=>x.id===id);
     if(!m){document.getElementById('lerr').textContent='Manager ID not found';return;}
     if(m.pw!==pw){document.getElementById('lerr').textContent='Wrong password';return;}
-    curUser=m;saveSession('m',id);showPg('pg-mgr');initMgr();
+    curUser=m;saveSession('m',id);
+    _saveRememberedLogin('m', id, pw);
+    if(curDevice==='pc') document.body.classList.add('pc-mgr');
+    else document.body.classList.remove('pc-mgr');
+    showPg('pg-mgr');initMgr();
     triggerSyncRestore();
     initFirebaseListeners();
   }else{
     if(document.getElementById('l-apw').value!==db.adminPw){document.getElementById('lerr').textContent='Wrong password';return;}
-    saveSession('a','admin');showPg('pg-admin');initAdmin();
+    _saveRememberedLogin('a', null, document.getElementById('l-apw').value);
+    saveSession('a','admin');
+    applyDeviceMode();
+    showPg('pg-admin');initAdmin();
     triggerSyncRestore();
     initFirebaseListeners();
   }
@@ -1975,7 +2126,10 @@ function dlDrillExcel(){
 }
 
 function renderOv(){
-  const selMo = document.getElementById('ov-month')?.value || _curMonth();
+  const cm=_curMonth();
+  const ovEl=document.getElementById('ov-month');
+  if(ovEl && !ovEl.value) ovEl.value=cm;
+  const selMo = ovEl?.value || cm;
   const prevMo=prevMonth(selMo);
   const s=db.submissions,td=tod();
   const filtered=s.filter(x=>(x.date||'').startsWith(selMo));
@@ -2438,6 +2592,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   const cm=new Date().toISOString().slice(0,7);
   const ovm=document.getElementById('ov-month');if(ovm)ovm.value=cm;
   const mgrm=document.getElementById('mgr-ov-month');if(mgrm)mgrm.value=cm;
+  // Pre-select saved device on login page
+  if(curDevice) selDevice(curDevice);
   if(!restoreSession()) showPg('pg-login');
 });
 </script>
@@ -2651,6 +2807,7 @@ function updateMistBadge(){
   // Admin badge — total mistakes
   const b=document.getElementById('mist-badge');
   if(b){b.textContent=db.mistakes.length;b.style.display=db.mistakes.length?'inline':'none';}
+  if(typeof syncAdminMobBadges==='function') syncAdminMobBadges();
 }
 
 // Mistakes patch unified in script block 1
@@ -3604,7 +3761,10 @@ function renderMgrRating(){
 function renderMgrDash(){
   if(!curUser)return;
   const mid=curUser.id;
-  const selMo=document.getElementById('mgr-ov-month')?.value||_curMonth();
+  const cm=_curMonth();
+  const mgrMoEl=document.getElementById('mgr-ov-month');
+  if(mgrMoEl && !mgrMoEl.value) mgrMoEl.value=cm;
+  const selMo=mgrMoEl?.value||cm;
   const mySubs=db.submissions.filter(s=>s.mgrId===mid);
   const myLeaves=db.leaves.filter(l=>l.mgrId===mid);
   const avgRat=getAvgRating(mid);
@@ -4335,6 +4495,12 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
         }
       }
     }
+
+    // 3. Date-wise single-file backup (admin only): backupFolder/<YYYY-MM-DD>/FormTrack_<YYYY-MM-DD>.json
+    // Same date => same file gets overwritten with latest full data (no duplicate files pile up).
+    if (curRole === 'a') {
+      await _writeDateFolderBackup(dirHandle);
+    }
     
     const now  = new Date().toISOString();
     localStorage.setItem('ft7_lastbk', now);
@@ -4344,6 +4510,22 @@ async function _writeBackupFile(dirHandle, specificMgrId = null){
   }catch(e){
     console.warn('[FSA] Write failed:', e);
     _updateFsaStatus('❌ Backup failed: '+e.message);
+  }
+}
+
+/* ── Date-wise single-file backup ──
+   backupFolder/2026-06-19/FormTrack_2026-06-19.json  ← all data, today's date.
+   Next save the SAME day → SAME file gets overwritten (no new file created).
+   New day → new date folder + new file starts fresh for that day. */
+async function _writeDateFolderBackup(dirHandle){
+  try{
+    const dateStr = tod(); // YYYY-MM-DD
+    const dateDir = await dirHandle.getDirectoryHandle(dateStr, {create:true});
+    const snapshot = JSON.parse(_buildSnapshot());
+    snapshot.backupDate = dateStr;
+    await _fsaWriteFile(dateDir, `FormTrack_${dateStr}.json`, snapshot);
+  }catch(e){
+    console.warn('[FSA] Date-folder backup failed:', e);
   }
 }
 
@@ -5124,6 +5306,7 @@ async function gdBackup() {
   try {
     const fileId = await getLiveDataFileId();
     await updateFileContent(fileId, getFullSnapshot());
+    await _writeDateFolderDriveBackup();
 
     const now = new Date().toISOString();
     localStorage.setItem('ft7_lastbk', now);
@@ -5196,6 +5379,88 @@ async function gdRestore() {
   }
 }
 
+/* ── Date-wise Drive folder backup ──
+   Drive: FormTrack_Backups/<YYYY-MM-DD>/FormTrack_<YYYY-MM-DD>.json
+   Same day → same file gets overwritten in place (no duplicate files).
+   New day → new dated folder + new file, created automatically. */
+const FT_ROOT_FOLDER = 'FormTrack_Backups';
+let _gdRootFolderId = null;
+let _gdDateFolderCache = {dateStr:null, folderId:null};
+
+async function getOrCreateFolder(name, parentId) {
+  try {
+    let query = `name = '${name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+    if (parentId) query += ` and '${parentId}' in parents`;
+    const resp = await gapi.client.drive.files.list({
+      q: query,
+      fields: 'files(id, name, createdTime)',
+      orderBy: 'createdTime',
+      spaces: 'drive'
+    });
+    const files = resp.result.files;
+    if (files && files.length > 0) return files[0].id;
+    const createResp = await gapi.client.drive.files.create({
+      resource: {
+        name: name,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: parentId ? [parentId] : undefined
+      },
+      fields: 'id'
+    });
+    return createResp.result.id;
+  } catch (err) {
+    console.error('getOrCreateFolder error:', err);
+    throw err;
+  }
+}
+
+async function getOrCreateFileInFolder(name, folderId) {
+  try {
+    const query = `name = '${name}' and trashed = false and '${folderId}' in parents`;
+    const resp = await gapi.client.drive.files.list({
+      q: query,
+      fields: 'files(id, name, createdTime)',
+      orderBy: 'createdTime',
+      spaces: 'drive'
+    });
+    const files = resp.result.files;
+    if (files && files.length > 0) return files[0].id;
+    const createResp = await gapi.client.drive.files.create({
+      resource: { name: name, mimeType: 'application/json', parents: [folderId] },
+      fields: 'id'
+    });
+    return createResp.result.id;
+  } catch (err) {
+    console.error('getOrCreateFileInFolder error:', err);
+    throw err;
+  }
+}
+
+async function _getTodayDriveFolderId() {
+  const dateStr = tod(); // YYYY-MM-DD, same helper used by the PC-folder backup
+  if (_gdDateFolderCache.dateStr === dateStr && _gdDateFolderCache.folderId) {
+    return _gdDateFolderCache.folderId;
+  }
+  if (!_gdRootFolderId) _gdRootFolderId = await getOrCreateFolder(FT_ROOT_FOLDER, null);
+  const folderId = await getOrCreateFolder(dateStr, _gdRootFolderId);
+  _gdDateFolderCache = {dateStr, folderId};
+  return folderId;
+}
+
+async function _writeDateFolderDriveBackup() {
+  if (!gdriveAccessToken) return;
+  try {
+    const dateStr = tod();
+    const folderId = await _getTodayDriveFolderId();
+    const fileId = await getOrCreateFileInFolder(`FormTrack_${dateStr}.json`, folderId);
+    const snapshot = getFullSnapshot();
+    snapshot.backupDate = dateStr;
+    await updateFileContent(fileId, snapshot);
+  } catch (e) {
+    console.warn('[GDrive] Date-folder backup failed:', e);
+  }
+}
+
 // Debounced Auto-Sync Logic — always overwrites the single live-data file
 let _gdTimer = null;
 
@@ -5206,6 +5471,8 @@ function _triggerGDriveBackup() {
     try {
       const fileId = await getLiveDataFileId();
       await updateFileContent(fileId, getFullSnapshot());
+      // Also mirror into today's dated folder (same data, same overwrite behaviour)
+      await _writeDateFolderDriveBackup();
       const now = new Date().toISOString();
       localStorage.setItem('ft7_lastbk', now);
       const lbEl = document.getElementById('last-bk-txt');
