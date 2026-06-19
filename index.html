@@ -1485,6 +1485,7 @@ function toggleDarkMode(){
   document.getElementById('dm-toggle').textContent=isDark?'🌙':'☀️';
 }
 (function(){if(localStorage.getItem('ft_dark'))document.documentElement.setAttribute('data-theme','dark');})();
+const matchMonth=(item, month, ...fields)=>{for(const f of fields){const v=item[f];if(v&&String(v).startsWith(month))return true}return false};
 const ini=n=>n.trim().split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
 const fmtD=d=>{if(!d)return'';const[y,m,dy]=d.split('-');return dy+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y;};
 const fmtDT=iso=>{const d=new Date(iso);return fmtD(d.toISOString().split('T')[0])+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
@@ -1739,8 +1740,11 @@ function renderCats(){
   document.getElementById('cat-area').innerHTML=mc.map(c=>`
     <div class="ci" id="ci-${c.id}">
       <div class="chdr"><div class="cnm">📄 ${c.name}</div><span class="ccnt" id="cnt-${c.id}"></span></div>
-      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">⬆️ <span>Tap to upload file / photo / Excel</span>
+      <div class="upbtn" onclick="document.getElementById('fu-${c.id}').click()">⬆️ <span>Upload file / photo / Excel</span>
         <input type="file" id="fu-${c.id}" multiple data-cid="${c.id}" onchange="onFile(this)">
+      </div>
+      <div class="upbtn" onclick="document.getElementById('fc-${c.id}').click()" style="margin-top:6px">📸 <span>Camera / Photo</span>
+        <input type="file" id="fc-${c.id}" accept="image/*" capture="environment" data-cid="${c.id}" onchange="onFile(this)">
       </div>
       <div class="chips" id="ch-${c.id}"></div>
     </div>`).join('');
@@ -2136,15 +2140,15 @@ function renderOv(){
   const mc=filtered.length;
   const tf=filtered.reduce((a,x)=>a+Object.values(x.categories||{}).reduce((b,c)=>b+c.files.length,0),0);
   const pLeaves=db.leaves.filter(l=>l.status==='pending').length;
-  const moMist=(db.mistakes||[]).filter(m=>(m.date||'').startsWith(selMo)).length;
-  const prevMist=(db.mistakes||[]).filter(m=>(m.date||'').startsWith(prevMo)).length;
-  const moLate=(db.lateEntries||[]).filter(l=>(l.date||'').startsWith(selMo)&&l.status==='pending').length;
-  const prevLate=(db.lateEntries||[]).filter(l=>(l.date||'').startsWith(prevMo)&&l.status==='pending').length;
-  const moOT=((db.workHours||[]).filter(h=>(h.date||'').startsWith(selMo)&&h.otHours>0).reduce((a,h)=>a+h.otHours,0)).toFixed(1);
-  const prevOT=((db.workHours||[]).filter(h=>(h.date||'').startsWith(prevMo)&&h.otHours>0).reduce((a,h)=>a+h.otHours,0)).toFixed(1);
+  const moMist=(db.mistakes||[]).filter(m=>matchMonth(m,selMo,'date','submittedAt','reportedAt')).length;
+  const prevMist=(db.mistakes||[]).filter(m=>matchMonth(m,prevMo,'date','submittedAt','reportedAt')).length;
+  const moLate=(db.lateEntries||[]).filter(l=>matchMonth(l,selMo,'date','submittedAt','entryDate')&&l.status==='pending').length;
+  const prevLate=(db.lateEntries||[]).filter(l=>matchMonth(l,prevMo,'date','submittedAt','entryDate')&&l.status==='pending').length;
+  const moOT=((db.workHours||[]).filter(h=>matchMonth(h,selMo,'date','submittedAt')&&h.otHours>0).reduce((a,h)=>a+h.otHours,0)).toFixed(1);
+  const prevOT=((db.workHours||[]).filter(h=>matchMonth(h,prevMo,'date','submittedAt')&&h.otHours>0).reduce((a,h)=>a+h.otHours,0)).toFixed(1);
   const avgRat=db.ratings&&db.ratings.length?(db.ratings.reduce((a,r)=>a+(r.stars||0),0)/db.ratings.length).toFixed(1):0;
-  const moLeavesTaken=(db.leaves||[]).filter(l=>l.status==='approved'&&(l.from||'').startsWith(selMo)).reduce((a,l)=>a+l.days,0);
-  const prevLeaves=(db.leaves||[]).filter(l=>l.status==='approved'&&(l.from||'').startsWith(prevMo)).reduce((a,l)=>a+l.days,0);
+  const moLeavesTaken=(db.leaves||[]).filter(l=>l.status==='approved'&&matchMonth(l,selMo,'from','appliedAt')).reduce((a,l)=>a+l.days,0);
+  const prevLeaves=(db.leaves||[]).filter(l=>l.status==='approved'&&matchMonth(l,prevMo,'from','appliedAt')).reduce((a,l)=>a+l.days,0);
   const prevSubs=db.submissions.filter(x=>(x.date||'').startsWith(prevMo)).length;
   function tr(cur,prev){if(prev==0)return'';const d=((cur-prev)/prev*100).toFixed(1);return d>0?`<span style="font-size:10px;color:var(--gr)">↑${d}%</span>`:d<0?`<span style="font-size:10px;color:var(--re)">↓${Math.abs(d)}%</span>`:'<span style="font-size:10px;color:var(--t3)">→0%</span>';}
   document.getElementById('a-stats').innerHTML=`
@@ -2157,6 +2161,16 @@ function renderOv(){
     <div class="sc sc-yellow"><div class="sc-ico">⭐</div><div class="sn">${avgRat||'—'}</div><div class="sl">Avg Rating</div></div>
     <div class="sc sc-green" onclick="ovDrill('leavetaken','📅 Leave Days (${moLeavesTaken})',leaveTakenDrill(selMo))" style="cursor:pointer" title="Click to view"><div class="sc-ico">📅</div><div class="sn">${moLeavesTaken}${tr(moLeavesTaken,prevLeaves)}</div><div class="sl">Leave Days ${tr(moLeavesTaken,prevLeaves)}</div></div>
   `;
+  // Show total data hint when stats are zero
+  const totalMist=db.mistakes&&db.mistakes.length||0;
+  const totalLate=db.lateEntries&&db.lateEntries.length||0;
+  const totalOT=db.workHours&&db.workHours.filter(h=>h.otHours>0).length||0;
+  const totalLeaves=db.leaves&&db.leaves.length||0;
+  const totalRatings=db.ratings&&db.ratings.length||0;
+  if(!moMist&&!moLate&&!parseFloat(moOT)&&!moLeavesTaken&&(totalMist||totalLate||totalOT||totalLeaves||totalRatings)){
+    const h=document.createElement('div');h.style.cssText='font-size:11px;color:var(--t2);padding:6px 12px;background:var(--s2);border-radius:var(--rs);margin:0';h.innerHTML='💡 Total data (all months): ⚠️ Mistakes: '+totalMist+' · ⏰ Late: '+totalLate+' · ⏱️ OT hrs: '+totalOT+' · 📅 Leaves: '+totalLeaves+' · ⭐ Ratings: '+totalRatings+' — <span style="color:var(--am)">Select different month to view</span>';
+    document.getElementById('a-stats').appendChild(h);
+  }
   // Hide drill area when month changes
   document.getElementById('ov-drill-area').style.display='none'; _drillType='';
   /* Recent Submissions panel */
@@ -2243,13 +2257,13 @@ function renderCharts(selMo){
   for(let i=5;i>=0;i--){
     const m=offsetMonth(mo,-i);
     mistMonths.push(monthLabel(m));
-    mistData.push(db.mistakes.filter(mk=>(mk.date||'').startsWith(m)).length);
+    mistData.push(db.mistakes.filter(mk=>matchMonth(mk,m,'date','submittedAt','reportedAt')).length);
   }
   const ctx3=document.getElementById('ch-mist-trend');
   if(ctx3)_charts.mist=new Chart(ctx3,{type:'line',data:{labels:mistMonths,datasets:[{label:'Mistakes',data:mistData,borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.3,pointBackgroundColor:'#EF4444',pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
 
   // 4. Bar chart — OT hours per manager (current month)
-  const moOTData=db.workHours.filter(h=>(h.date||'').startsWith(mo));
+  const moOTData=db.workHours.filter(h=>matchMonth(h,mo,'date','submittedAt'));
   const mgrOT={};
   moOTData.forEach(h=>{if(h.otHours>0){mgrOT[h.mgrName]=(mgrOT[h.mgrName]||0)+h.otHours;}});
   const otNames=Object.keys(mgrOT).slice(0,10);
@@ -3771,11 +3785,11 @@ function renderMgrDash(){
   const{score}=calcPerfScore(mid);
 
   const cmSubs=mySubs.filter(s=>(s.date||'').startsWith(selMo));
-  const cmPendingLeaves=myLeaves.filter(l=>l.status==='pending'&&(l.from||'').startsWith(selMo));
-  const cmApprovedLeaves=myLeaves.filter(l=>l.status==='approved'&&(l.from||'').startsWith(selMo)).reduce((a,l)=>a+l.days,0);
-  const cmMist=(db.mistakes||[]).filter(m=>m.mgrId===mid&&(m.date||'').startsWith(selMo));
-  const cmLate=(db.lateEntries||[]).filter(l=>l.mgrId===mid&&(l.date||'').startsWith(selMo));
-  const cmOT=((db.workHours||[]).filter(h=>h.mgrId===mid&&(h.date||'').startsWith(selMo)).reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
+  const cmPendingLeaves=myLeaves.filter(l=>l.status==='pending'&&matchMonth(l,selMo,'from','appliedAt'));
+  const cmApprovedLeaves=myLeaves.filter(l=>l.status==='approved'&&matchMonth(l,selMo,'from','appliedAt')).reduce((a,l)=>a+l.days,0);
+  const cmMist=(db.mistakes||[]).filter(m=>m.mgrId===mid&&matchMonth(m,selMo,'date','submittedAt','reportedAt'));
+  const cmLate=(db.lateEntries||[]).filter(l=>l.mgrId===mid&&matchMonth(l,selMo,'date','submittedAt','entryDate'));
+  const cmOT=((db.workHours||[]).filter(h=>h.mgrId===mid&&matchMonth(h,selMo,'date','submittedAt')).reduce((a,h)=>a+(h.otHours||0),0)).toFixed(1);
 
   // Stats cards
   document.getElementById('mgr-dash-stats').innerHTML=`
