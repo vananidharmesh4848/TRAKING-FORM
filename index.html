@@ -2518,6 +2518,43 @@ seedJemzIfMissing();
 let catFiles={}, curUser=null, editId=null, curRole=null;
 curDevice=localStorage.getItem('ft_device')||null; // already declared early as var
 
+/* ─── Safe localStorage setter ───────────────────────────────────────
+   Handles QuotaExceededError by auto-pruning oldest entries from large
+   arrays and retrying. Critical config keys are never pruned.
+─────────────────────────────────────────────────────────────────── */
+const _PRUNABLE_KEYS = ['ft6_sb','ft6_lv','ft6_mist','ft7_late','ft8_prob','ft8_rtng','ft7_hrs','ft_sug'];
+const _PRUNE_KEEP = 150; // keep most recent N records per key when pruning
+
+function _safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    if (e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014)) {
+      console.warn('[Storage] Quota exceeded writing "' + key + '" — pruning old data…');
+      _PRUNABLE_KEYS.forEach(function(pk) {
+        try {
+          const raw = localStorage.getItem(pk);
+          if (!raw) return;
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr) && arr.length > _PRUNE_KEEP) {
+            localStorage.setItem(pk, JSON.stringify(arr.slice(-_PRUNE_KEEP)));
+          }
+        } catch (pe) { /* ignore parse errors during prune */ }
+      });
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (e2) {
+        console.error('[Storage] Still over quota after pruning — "' + key + '" not saved. Data safe in memory.', e2);
+        return false;
+      }
+    }
+    console.error('[Storage] Unexpected write error for "' + key + '":', e);
+    return false;
+  }
+}
+
 function persistLocal(mgrId) {
   const now = new Date().toISOString();
   if (mgrId) {
@@ -2527,21 +2564,23 @@ function persistLocal(mgrId) {
   } else if (curRole === 'a') {
     localStorage.setItem('ft_last_write_admin', now);
   }
-  try{
-    localStorage.setItem('ft6_mg',JSON.stringify(db.managers));
-    localStorage.setItem('ft6_dp',JSON.stringify(db.departments));
-    localStorage.setItem('ft6_ct',JSON.stringify(db.categories));
-    localStorage.setItem('ft6_sb',JSON.stringify(db.submissions));
-    localStorage.setItem('ft6_lv',JSON.stringify(db.leaves));
-    localStorage.setItem('ft6_lb',JSON.stringify(db.leavebal));
-    localStorage.setItem('ft6_apw',db.adminPw);
-    if (db.mistakes) localStorage.setItem('ft6_mist',JSON.stringify(db.mistakes));
-    if (db.lateEntries) localStorage.setItem('ft7_late',JSON.stringify(db.lateEntries));
-    if (db.problems) localStorage.setItem('ft8_prob',JSON.stringify(db.problems));
-    if (db.ratings) localStorage.setItem('ft8_rtng',JSON.stringify(db.ratings));
-    if (db.workHours) localStorage.setItem('ft7_hrs',JSON.stringify(db.workHours));
-    if (db.suggestions) localStorage.setItem('ft_sug',JSON.stringify(db.suggestions));
-  }catch(e){console.warn('Storage write failed:',e);}
+  // Critical small config — write directly (never pruned)
+  try {
+    localStorage.setItem('ft6_mg', JSON.stringify(db.managers));
+    localStorage.setItem('ft6_dp', JSON.stringify(db.departments));
+    localStorage.setItem('ft6_ct', JSON.stringify(db.categories));
+    localStorage.setItem('ft6_apw', db.adminPw);
+  } catch(e) { console.error('[Storage] Failed to write critical config:', e); }
+  // Large time-series arrays — safe write with auto-prune on quota error
+  _safeSetItem('ft6_sb', JSON.stringify(db.submissions));
+  _safeSetItem('ft6_lv', JSON.stringify(db.leaves));
+  _safeSetItem('ft6_lb', JSON.stringify(db.leavebal));
+  if (db.mistakes)    _safeSetItem('ft6_mist', JSON.stringify(db.mistakes));
+  if (db.lateEntries) _safeSetItem('ft7_late', JSON.stringify(db.lateEntries));
+  if (db.problems)    _safeSetItem('ft8_prob',  JSON.stringify(db.problems));
+  if (db.ratings)     _safeSetItem('ft8_rtng',  JSON.stringify(db.ratings));
+  if (db.workHours)   _safeSetItem('ft7_hrs',   JSON.stringify(db.workHours));
+  if (db.suggestions) _safeSetItem('ft_sug',    JSON.stringify(db.suggestions));
 }
 const _origPersistFSA = persistLocal;
 
@@ -7720,11 +7759,9 @@ function applyGlobalSnapshot(snapshot) {
     localStorage.setItem('ft_log', JSON.stringify(db.activityLog));
     if (typeof cleanupOldActivityLogs === 'function') cleanupOldActivityLogs();
   }
-  if (typeof _origPersistFSA === 'function') {
-    _origPersistFSA();
-  } else if (typeof persist === 'function') {
-    persist();
-  }
+  // Note: callers (applyFullSnapshot, gdRestore, _doFsaRestore) are
+  // responsible for calling _origPersistFSA() once after all snapshots
+  // are applied. Do NOT call it here to avoid redundant writes mid-loop.
 }
 
 /* ── Single consolidated Drive file ──────────────────────────────
