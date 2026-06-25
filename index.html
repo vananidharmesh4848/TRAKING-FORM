@@ -366,7 +366,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
 /* MODAL */
 .mbg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
 @media(min-width:480px){.mbg{align-items:center;padding:1rem}}
-.mbg.open{display:flex}
+.mbg.on{display:flex}
 .mbox{background:#fff;border:1px solid var(--bd);border-radius:var(--rx) var(--rx) 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:su .25s ease;box-shadow:0 -8px 30px rgba(0,0,0,0.15)}
 @media(min-width:480px){.mbox{border-radius:var(--rx);box-shadow:0 20px 60px rgba(0,0,0,0.2)}}
 @keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -378,8 +378,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
 .bulk-bar .srch-inp:focus{border-color:var(--ac)}.bulk-bar .srch-inp::placeholder{color:var(--t3)}
 .cb-wrap{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;user-select:none}
 .cb-wrap input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
-.cb-chip{display:inline-flex;align-items:center;margin-right:6px;padding:2px;cursor:pointer}
-.cb-chip input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
+.cb-chip{display:inline-flex;align-items:center;margin-right:6px;padding:2px;cursor:pointer;position:relative}
+.cb-chip input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.cb-chip input+span{width:20px;height:20px;border:2px solid var(--bd);border-radius:4px;background:var(--s);display:inline-flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.cb-chip input:checked+span{background:var(--ac);border-color:var(--ac)}
+.cb-chip input:checked+span::after{content:'✓';color:#fff;font-size:14px;font-weight:700;line-height:1}
 .late-row,.lv-row,.mist-row,.prob-row,.sug-row,.hrs-row{position:relative}
 /* Dark mode fixes for modals */
 [data-theme=dark] .mbox{background:var(--s);border-color:var(--bd);color:var(--t)}
@@ -1504,8 +1507,8 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="fg" style="margin:0"><label>Department</label><select id="fd"><option value="">All</option></select></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderReps()">Apply</button>
-          <button class="btn bg2 bsm" onclick="clrF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderReps()">📥 Load</button>
+          <button class="btn bg2 bsm" onclick="clrF()">🔄 Clear</button>
           <button class="btn bgr bsm" onclick="dlFormRepPDF()">📄 PDF Download</button>
           <button class="btn bam bsm" onclick="dlFormRepExcel()">📊 Excel Download</button>
         </div>
@@ -1520,7 +1523,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <!-- Quick actions: pending -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Pending Approvals</div>
       <div class="bulk-bar">
-        <label class="cb-wrap"><input type="checkbox" id="selall-leave" onchange="toggleAll('leave',this.checked)"> Select All</label>
+        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-leave" onchange="toggleAll('leave',this.checked)"><span></span> Select All</label>
         <input type="text" class="srch-inp" id="srch-leave" placeholder="🔍 Search..." oninput="renderAdminLv()">
         <button class="btn bgr bxs" onclick="bulkAction('leave','approve')">✅ Bulk Approve</button>
         <button class="btn bre bxs" onclick="bulkAction('leave','reject')">❌ Bulk Reject</button>
@@ -1539,8 +1542,8 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="fg" style="margin:0"><label>To Month</label><input type="date" id="lf-to"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderLvReport()">Apply</button>
-          <button class="btn bg2 bsm" onclick="clrLvF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderLvReport()">📥 Load</button>
+          <button class="btn bg2 bsm" onclick="clrLvF()">🔄 Clear</button>
           <button class="btn bgr bsm" onclick="dlLeaveRepPDF()">📄 PDF Download</button>
           <button class="btn bam bsm" onclick="dlLeaveRepExcel()">📊 Excel Download</button>
         </div>
@@ -1732,8 +1735,8 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="mf-to"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderMistReport()">Apply</button>
-          <button class="btn bg2 bsm" onclick="clrMistF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderMistReport()">📥 Load</button>
+          <button class="btn bg2 bsm" onclick="clrMistF()">🔄 Clear</button>
           <button class="btn bgr bsm" onclick="dlMistRepPDF()">📄 PDF Download</button>
           <button class="btn bam bsm" onclick="dlMistRepExcel()">📊 Excel Download</button>
         </div>
@@ -1748,7 +1751,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       </div>
       <!-- Bulk + Search Bar -->
       <div class="bulk-bar">
-        <label class="cb-wrap"><input type="checkbox" id="selall-mistake" onchange="toggleAll('mistake',this.checked)"> Select All</label>
+        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-mistake" onchange="toggleAll('mistake',this.checked)"><span></span> Select All</label>
         <input type="text" class="srch-inp" id="srch-mistake" placeholder="🔍 Search..." oninput="renderMistReport()">
         <button class="btn bre bxs" onclick="bulkAction('mistake','delete')">🗑️ Bulk Delete</button>
       </div>
@@ -1793,8 +1796,8 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="fg" style="margin:0"><label>To</label><input type="date" id="lef-to"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderLateReport()">Apply</button>
-          <button class="btn bg2 bsm" onclick="clrLateF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderLateReport()">📥 Load</button>
+          <button class="btn bg2 bsm" onclick="clrLateF()">🔄 Clear</button>
           <button class="btn bgr bsm" onclick="dlLateRepPDF()">📄 PDF Download</button>
           <button class="btn bam bsm" onclick="dlLateRepExcel()">📊 Excel Download</button>
         </div>
@@ -1809,7 +1812,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       </div>
       <!-- Bulk + Search Bar -->
       <div class="bulk-bar">
-        <label class="cb-wrap"><input type="checkbox" id="selall-late" onchange="toggleAll('late',this.checked)"> Select All</label>
+        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-late" onchange="toggleAll('late',this.checked)"><span></span> Select All</label>
         <input type="text" class="srch-inp" id="srch-late" placeholder="🔍 Search..." oninput="renderLateReport()">
         <button class="btn bgr bxs" onclick="bulkAction('late','excuse')">✅ Bulk Excuse</button>
         <button class="btn bre bxs" onclick="bulkAction('late','unexcuse')">❌ Bulk Unexcuse</button>
@@ -1834,15 +1837,15 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="prf-to"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderProblems()">Apply</button>
-          <button class="btn bg2 bsm" onclick="clrProbF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderProblems()">📥 Load</button>
+          <button class="btn bg2 bsm" onclick="clrProbF()">🔄 Clear</button>
           <button class="btn bgr bsm" onclick="dlProbRepPDF()">📄 PDF Download</button>
           <button class="btn bam bsm" onclick="dlProbRepExcel()">📊 Excel Download</button>
         </div>
       </div>
       <!-- Bulk + Search Bar -->
       <div class="bulk-bar">
-        <label class="cb-wrap"><input type="checkbox" id="selall-problem" onchange="toggleAll('problem',this.checked)"> Select All</label>
+        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-problem" onchange="toggleAll('problem',this.checked)"><span></span> Select All</label>
         <input type="text" class="srch-inp" id="srch-problem" placeholder="🔍 Search..." oninput="renderProblems()">
         <button class="btn bgr bxs" onclick="bulkAction('problem','solve')">✅ Bulk Solve</button>
         <button class="btn bre bxs" onclick="bulkAction('problem','delete')">🗑️ Bulk Delete</button>
@@ -1865,7 +1868,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         <div class="ok" id="asug-msg-status"></div>
       </div>
       <div class="bulk-bar">
-        <label class="cb-wrap"><input type="checkbox" id="selall-suggestion" onchange="toggleAll('suggestion',this.checked)"> Select All</label>
+        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-suggestion" onchange="toggleAll('suggestion',this.checked)"><span></span> Select All</label>
         <input type="text" class="srch-inp" id="srch-suggestion" placeholder="🔍 Search..." oninput="renderAdminSug()">
         <button class="btn bre bxs" onclick="bulkAction('suggestion','delete')">🗑️ Bulk Delete</button>
       </div>
@@ -1901,8 +1904,9 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       </div>
       <!-- Date Filter + Export -->
       <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-        <div class="fg" style="margin:0"><label>From</label><input type="date" id="rf-from" onchange="renderAdminRating()"></div>
-        <div class="fg" style="margin:0"><label>To</label><input type="date" id="rf-to" onchange="renderAdminRating()"></div>
+        <div class="fg" style="margin:0"><label>From</label><input type="date" id="rf-from"></div>
+        <div class="fg" style="margin:0"><label>To</label><input type="date" id="rf-to"></div>
+        <button class="btn ba bsm" onclick="renderAdminRating()">📥 Load</button>
         <button class="btn bg2 bsm" onclick="clrRtngF()">🔄 Clear</button>
         <div style="flex:1"></div>
         <button class="btn bgr bsm" onclick="dlRtngRepPDF()">📄 PDF</button>
@@ -1987,8 +1991,8 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="hrf-to"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn ba bsm" onclick="renderHrsReport()">Apply</button>
-          <button class="btn bg2 bsm" onclick="clrHrsF()">Reset</button>
+          <button class="btn ba bsm" onclick="renderHrsReport()">📥 Load</button>
+          <button class="btn bg2 bsm" onclick="clrHrsF()">🔄 Clear</button>
           <button class="btn bgr bsm" onclick="dlHrsRepPDF()">📄 PDF Download</button>
           <button class="btn bam bsm" onclick="dlHrsRepExcel()">📊 Excel Download</button>
         </div>
@@ -2001,7 +2005,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         </table></div>
       </div>
       <div class="bulk-bar">
-        <label class="cb-wrap"><input type="checkbox" id="selall-hours" onchange="toggleAll('hours',this.checked)"> Select All</label>
+        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-hours" onchange="toggleAll('hours',this.checked)"><span></span> Select All</label>
         <input type="text" class="srch-inp" id="srch-hours" placeholder="🔍 Search..." oninput="renderHrsReport()">
         <button class="btn bre bxs" onclick="bulkAction('hours','delete')">🗑️ Bulk Delete</button>
       </div>
@@ -2426,92 +2430,23 @@ if(!db.managers){
   for(let i=1;i<=10;i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'),name:'Manager '+i,deptId:'d1',pw:'pass'+String(i).padStart(2,'0')});
 }
 
-// Seed dummy manager Jemz and entries
+// Remove all Jemz dummy data
 function seedJemzIfMissing() {
-  if (!db.managers) db.managers = [];
-  const jemzExists = db.managers.some(m => m.id === 'JEMZ');
-  if (!jemzExists) {
-    db.managers.push({ id: 'JEMZ', name: 'Jemz', deptId: 'd1', pw: 'passjemz' });
-    localStorage.setItem('ft6_mg', JSON.stringify(db.managers));
-  }
-  
-  // Submissions
-  if (!db.submissions) db.submissions = [];
-  const jemzSubExists = db.submissions.some(s => s.mgrId === 'JEMZ');
-  if (!jemzSubExists) {
-    db.submissions.unshift({
-      id: Date.now() - 10000,
-      mgrId: 'JEMZ',
-      mgrName: 'Jemz',
-      deptId: 'd1',
-      deptName: 'Production',
-      date: new Date().toISOString().slice(0, 10),
-      shift: 'day',
-      note: 'Dummy checklist submission for Jemz',
-      categories: {
-        c1: { name: 'Checklist', files: [{ name: 'form.png', type: 'image/png', data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' }] }
-      },
-      submittedAt: new Date(Date.now() - 10000).toISOString()
-    });
-    localStorage.setItem('ft6_sb', JSON.stringify(db.submissions));
-  }
-
-  // Mistakes
-  if (!db.mistakes) db.mistakes = [];
-  const jemzMistExists = db.mistakes.some(m => m.mgrId === 'JEMZ');
-  if (!jemzMistExists) {
-    db.mistakes.unshift({
-      id: Date.now() - 20000,
-      mgrId: 'JEMZ',
-      mgrName: 'Jemz',
-      deptId: 'd1',
-      deptName: 'Production',
-      date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
-      severity: 'minor',
-      category: 'Form Error',
-      description: 'Dummy mistake entry for Jemz',
-      actionTaken: 'Warned verbally',
-      addedBy: 'admin',
-      addedAt: new Date(Date.now() - 20000).toISOString(),
-      seenByMgr: false
-    });
-    localStorage.setItem('ft6_mist', JSON.stringify(db.mistakes));
-  }
-
-  // Late entries
-  if (!db.lateEntries) db.lateEntries = [];
-  const jemzLateExists = db.lateEntries.some(l => l.mgrId === 'JEMZ');
-  if (!jemzLateExists) {
-    db.lateEntries.unshift({
-      id: Date.now() - 30000,
-      mgrId: 'JEMZ',
-      mgrName: 'Jemz',
-      date: new Date(Date.now() - 86400000 * 2).toISOString().slice(0, 10),
-      shift: 'day',
-      lateMinutes: 15,
-      status: 'pending',
-      submittedAt: new Date(Date.now() - 30000).toISOString()
-    });
-    localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
-  }
-
-  // Work Hours & OT
-  if (!db.workHours) db.workHours = [];
-  const jemzOTExists = db.workHours.some(w => w.mgrId === 'JEMZ');
-  if (!jemzOTExists) {
-    db.workHours.unshift({
-      id: Date.now() - 40000,
-      mgrId: 'JEMZ',
-      mgrName: 'Jemz',
-      date: new Date().toISOString().slice(0, 10),
-      clockIn: '09:00',
-      clockOut: '19:30',
-      otHours: 1.5,
-      remarkOT: 'Dummy OT entry for Jemz',
-      submittedAt: new Date(Date.now() - 40000).toISOString()
-    });
-    localStorage.setItem('ft7_hrs', JSON.stringify(db.workHours));
-  }
+  ['ft6_mg','ft6_sb','ft6_mist','ft7_late','ft7_hrs','ft6_lv','ft8_prob','ft8_rtng','ft_sug'].forEach(k=>{
+    try{const v=JSON.parse(localStorage.getItem(k));if(v&&Array.isArray(v)){const f=v.filter(x=>x.mgrId!=='JEMZ'&&x.id!=='JEMZ');localStorage.setItem(k,JSON.stringify(f));}}catch(e){}
+  });
+  try{const lb=JSON.parse(localStorage.getItem('ft6_lb'));if(lb&&typeof lb==='object'){delete lb.JEMZ;localStorage.setItem('ft6_lb',JSON.stringify(lb));}}catch(e){}
+  if(db.managers)db.managers=db.managers.filter(m=>m.id!=='JEMZ');
+  if(db.submissions)db.submissions=db.submissions.filter(s=>s.mgrId!=='JEMZ');
+  if(db.mistakes)db.mistakes=db.mistakes.filter(m=>m.mgrId!=='JEMZ');
+  if(db.lateEntries)db.lateEntries=db.lateEntries.filter(l=>l.mgrId!=='JEMZ');
+  if(db.workHours)db.workHours=db.workHours.filter(w=>w.mgrId!=='JEMZ');
+  if(db.leaves)db.leaves=db.leaves.filter(l=>l.mgrId!=='JEMZ');
+  if(db.problems)db.problems=db.problems.filter(p=>p.mgrId!=='JEMZ');
+  if(db.ratings)db.ratings=db.ratings.filter(r=>r.mgrId!=='JEMZ');
+  if(db.suggestions)db.suggestions=db.suggestions.filter(s=>s.mgrId!=='JEMZ');
+  if(db.activityLog)db.activityLog=db.activityLog.filter(a=>a.mgrId!=='JEMZ');
+  if(db.leavebal)delete db.leavebal.JEMZ;
 }
 seedJemzIfMissing();
 
@@ -4039,8 +3974,13 @@ function renderDpTbl(){
       <td><span class="badge b-te">🏬 ${d.name}</span></td>
       <td>${db.managers.filter(m=>m.deptId===d.id).length}</td>
       <td>${db.categories.filter(c=>c.deptId===d.id).length}</td>
-      <td style="text-align:right"><button class="btn bre bxs" onclick="delDept('${d.id}')">Delete</button></td>
+      <td style="text-align:right"><button class="btn ba bxs" onclick="editDept('${d.id}')">✏️</button> <button class="btn bre bxs" onclick="delDept('${d.id}')">Delete</button></td>
     </tr>`).join('')}</tbody></table>`:'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
+}
+function editDept(id){
+  const d=db.departments.find(x=>x.id===id);if(!d)return;
+  const nn=prompt('Edit department name:',d.name);
+  if(nn&&nn.trim()&&nn.trim()!==d.name){d.name=nn.trim();persistGlobal();renderDpTbl();}
 }
 function delDept(id){
   if(db.categories.filter(c=>c.deptId===id).length||db.managers.filter(m=>m.deptId===id).length){alert('Remove managers & categories first');return;}
@@ -4057,9 +3997,14 @@ function renderCtList(){
   document.getElementById('ct-list').innerHTML=db.departments.map(d=>{
     const cats=db.categories.filter(c=>c.deptId===d.id);
     return `<div style="margin-bottom:1rem"><div style="font-size:12px;font-weight:600;color:var(--te);margin-bottom:7px">🏬 ${d.name}</div>
-    ${cats.length?`<div style="display:flex;flex-wrap:wrap">${cats.map(c=>`<div style="display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:5px 10px;margin:3px;font-size:12px">🏷️ ${c.name}<button class="btn bre bxs" style="padding:2px 7px;margin-left:3px" onclick="delCat('${c.id}')">✕</button></div>`).join('')}</div>`:'<p style="font-size:12px;color:var(--t3);padding:4px">No categories</p>'}
+    ${cats.length?`<div style="display:flex;flex-wrap:wrap">${cats.map(c=>`<div style="display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:5px 10px;margin:3px;font-size:12px">🏷️ ${c.name}<button class="btn ba bxs" style="padding:2px 7px;margin-left:3px" onclick="editCat('${c.id}')">✏️</button><button class="btn bre bxs" style="padding:2px 7px;margin-left:3px" onclick="delCat('${c.id}')">✕</button></div>`).join('')}</div>`:'<p style="font-size:12px;color:var(--t3);padding:4px">No categories</p>'}
     </div>`;
   }).join('')||'<div class="empty" style="padding:1.5rem"><p>No departments yet</p></div>';
+}
+function editCat(id){
+  const c=db.categories.find(x=>x.id===id);if(!c)return;
+  const nn=prompt('Edit category name:',c.name);
+  if(nn&&nn.trim()&&nn.trim()!==c.name){c.name=nn.trim();persistGlobal();renderCtList();}
 }
 function delCat(id){if(!confirm('Delete?'))return;db.categories=db.categories.filter(c=>c.id!==id);persistGlobal();renderCtList();}
 
@@ -4285,7 +4230,7 @@ function mistCard(m, isAdmin){
       </div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
         <span class="badge ${sv.cls}">${sv.label}</span>
-        ${isAdmin?`<button class="btn bre bxs" onclick="delMist(${m.id})">🗑️</button>`:''}
+        ${isAdmin?`<button class="btn ba bxs" onclick="editMist(${m.id})">✏️</button><button class="btn bre bxs" onclick="delMist(${m.id})">🗑️</button>`:''}
       </div>
     </div>
     <div class="mist-meta">
@@ -4302,6 +4247,16 @@ function mistCard(m, isAdmin){
       ${m.actionTaken}
     </div>`:''}
   </div></div>`;
+}
+
+function editMist(id){
+  const m=db.mistakes.find(x=>x.id===id);if(!m)return;
+  const sv=prompt('Severity (minor/major/critical):',m.severity);if(sv===null)return;
+  const ct=prompt('Category:',m.category);if(ct===null)return;
+  const ds=prompt('Description:',m.description);if(ds===null)return;
+  const ac=prompt('Action taken:',m.actionTaken||'');if(ac===null)return;
+  m.severity=sv;m.category=ct;m.description=ds;m.actionTaken=ac;
+  persistMist(m.mgrId);renderMistReport();
 }
 
 function delMist(id){
@@ -6004,7 +5959,7 @@ function popSugMgrs(){
   const curChecked=[...dpWrap.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
   dpWrap.innerHTML=db.departments.length?db.departments.map(d=>{
     const cnt=db.managers.filter(m=>m.deptId===d.id).length;
-    return `<label class="cb-wrap" style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--t)"><input type="checkbox" value="${d.id}" onchange="popSugMgrs()" ${curChecked.includes(d.id)?'checked':''}> 🏬 ${d.name} <span style="color:var(--t3);font-weight:400">(${cnt})</span></label>`;
+    return `<label class="cb-chip" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--t);margin-right:0;padding:4px 6px"><input type="checkbox" value="${d.id}" onchange="popSugMgrs()" ${curChecked.includes(d.id)?'checked':''}><span></span> 🏬 ${d.name} <span style="color:var(--t3);font-weight:400">(${cnt})</span></label>`;
   }).join(''):'<div style="font-size:12px;color:var(--t3)">No departments yet</div>';
   const selDepts=[...dpWrap.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
   const mgrs=selDepts.length?db.managers.filter(m=>selDepts.includes(m.deptId)):[];
