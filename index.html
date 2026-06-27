@@ -2510,9 +2510,11 @@ function _safeSetItem(key, value) {
 function _subsForStorage(subs) {
   return subs.map(function(s) {
     var cloned = JSON.parse(JSON.stringify(s));
-    if (cloned.categories) {
-      cloned.categories = cloned.categories.map(function(c) {
-        if (c.files) {
+    if (cloned.categories && typeof cloned.categories === 'object') {
+      var keys = Object.keys(cloned.categories);
+      for (var ki = 0; ki < keys.length; ki++) {
+        var c = cloned.categories[keys[ki]];
+        if (c && c.files && Array.isArray(c.files)) {
           c.files = c.files.map(function(f) {
             if (f.data && f.data.length > 200) {
               f.data = '_stripped_';
@@ -2520,8 +2522,7 @@ function _subsForStorage(subs) {
             return f;
           });
         }
-        return c;
-      });
+      }
     }
     return cloned;
   });
