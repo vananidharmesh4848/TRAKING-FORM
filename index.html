@@ -8,18 +8,18 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
 :root{
-  --bg:#F0F2F5;--s:#FFFFFF;--s2:#F5F7FA;--s3:#E8ECF0;
-  --bd:rgba(0,0,0,0.08);--bd2:rgba(0,0,0,0.15);
-  --t:#1A2035;--t2:#6B7280;--t3:#9CA3AF;
-  --ac:#3D5AF1;--ac2:rgba(61,90,241,0.1);--ac3:rgba(61,90,241,0.3);
-  --gr:#10B981;--gr2:rgba(16,185,129,0.1);--gr3:rgba(16,185,129,0.3);
-  --am:#F59E0B;--am2:rgba(245,158,11,0.1);--am3:rgba(245,158,11,0.3);
-  --re:#EF4444;--re2:rgba(239,68,68,0.1);--re3:rgba(239,68,68,0.3);
-  --pu:#8B5CF6;--pu2:rgba(139,92,246,0.1);
-  --te:#06B6D4;--te2:rgba(6,182,212,0.1);
-  --or:#F97316;--or2:rgba(249,115,22,0.1);
+  --bg:#F0F4FB;--s:#FFFFFF;--s2:#F2F6FF;--s3:#E6EEF8;
+  --bd:rgba(79,70,229,0.10);--bd2:rgba(79,70,229,0.18);
+  --t:#1A1F3A;--t2:#5B6A8F;--t3:#93A3C0;
+  --ac:#4F46E5;--ac2:rgba(79,70,229,0.08);--ac3:rgba(79,70,229,0.25);
+  --gr:#10B981;--gr2:rgba(16,185,129,0.08);--gr3:rgba(16,185,129,0.25);
+  --am:#F59E0B;--am2:rgba(245,158,11,0.08);--am3:rgba(245,158,11,0.25);
+  --re:#EF4444;--re2:rgba(239,68,68,0.08);--re3:rgba(239,68,68,0.25);
+  --pu:#8B5CF6;--pu2:rgba(139,92,246,0.08);
+  --te:#06B6D4;--te2:rgba(6,182,212,0.08);
+  --or:#F97316;--or2:rgba(249,115,22,0.08);
   --r:12px;--rs:8px;--rl:16px;--rx:22px;
-  --sh:0 2px 12px rgba(0,0,0,0.08);
+  --sh:0 2px 12px rgba(79,70,229,0.08);
   --sidebar-w:190px;
 }
 [data-theme=dark]{
@@ -44,7 +44,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);font-siz
 ::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px}
 
 /* ═══ LOGIN ═══ */
-.lwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+.lwrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 50%,#EC4899 100%)}
 .lbrand{text-align:center;margin-bottom:2rem}
 .lico{width:64px;height:64px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;border:2px solid rgba(255,255,255,0.3)}
 .lbrand h1{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px}
@@ -81,7 +81,7 @@ textarea{resize:vertical;min-height:56px}
 
 /* ═══ DESKTOP LAYOUT (Sidebar) ═══ */
 .admin-layout{display:flex;min-height:100vh}
-.sidebar{width:var(--sidebar-w);background:#1E2A5A;position:fixed;top:0;left:0;bottom:0;z-index:300;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#EEF1FF 0%,var(--s) 100%);border-right:1px solid var(--bd);position:fixed;top:0;left:0;bottom:0;z-index:300;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
 /* ═══ MOBILE ADMIN MODE ═══ */
 body.mobile-admin .sidebar{display:none}
 body.mobile-admin .main-area{margin-left:0}
@@ -90,29 +90,29 @@ body.mobile-admin .main-topbar{display:none}
 body.mobile-admin .main-content{padding-bottom:0}
 body.mobile-admin #pg-admin .atabs{display:none}
 .admin-mobile-topbar{display:none;position:sticky;top:0;z-index:200;
-  background:rgba(14,18,46,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:linear-gradient(135deg,#4F46E5,#7C3AED);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   padding:0 1rem;height:54px;align-items:center;justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  box-shadow:0 2px 16px rgba(0,0,0,0.35)}
+  border-bottom:1px solid var(--bd);
+  box-shadow:0 2px 16px rgba(79,70,229,0.3)}
 .admin-mobile-topbar .tlo{width:34px;height:34px;
-  background:linear-gradient(135deg,rgba(88,166,255,0.3),rgba(88,166,255,0.1));
-  border-radius:10px;border:1px solid rgba(88,166,255,0.2);
+  background:rgba(255,255,255,0.2);
+  border-radius:10px;border:1px solid rgba(255,255,255,0.15);
   display:flex;align-items:center;justify-content:center;font-size:16px}
-.admin-mobile-topbar .tnm{font-size:15px;font-weight:700;color:#fff}
+.admin-mobile-topbar .tnm{font-size:15px;font-weight:800;color:#fff}
 /* ═══ APP-STYLE MOBILE ADMIN NAV ═══ */
 .admin-bnav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(14,18,46,0.94);
+  background:rgba(255,255,255,0.94);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-top:1px solid rgba(255,255,255,0.08);
+  border-top:1px solid var(--bd);
   padding:4px 4px max(10px,env(safe-area-inset-bottom));
-  box-shadow:0 -8px 32px rgba(0,0,0,0.5)}
+  box-shadow:0 -8px 32px rgba(79,70,229,0.1)}
 body.mobile-admin .admin-bnav{display:flex}
 .anav-row{display:flex;width:100%;gap:2px}
 .anav-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
   padding:5px 2px 3px;cursor:pointer;border:none;background:none;
-  font-family:'Inter',sans-serif;color:rgba(255,255,255,0.36);
+  font-family:'Inter',sans-serif;color:var(--t3);
   transition:color .2s;position:relative;
   -webkit-tap-highlight-color:transparent}
 .anav-btn:active .anav-pip{transform:scale(0.82)}
@@ -120,15 +120,15 @@ body.mobile-admin .admin-bnav{display:flex}
   width:46px;height:34px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
   transition:all .25s cubic-bezier(.34,1.56,.64,1);background:transparent}
-.anav-btn.on{color:#fff}
-.anav-btn.on .anav-pip{background:rgba(88,166,255,0.17)}
+.anav-btn.on{color:var(--ac)}
+.anav-btn.on .anav-pip{background:var(--ac2)}
 .anav-ico{font-size:20px;line-height:1}
 .anav-lbl{font-size:9.5px;font-weight:600;letter-spacing:.01em}
 .anav-bdg{
   position:absolute;top:3px;right:calc(50% - 20px);background:#EF4444;
   color:#fff;border-radius:100px;font-size:8.5px;font-weight:800;
   padding:1px 4.5px;min-width:15px;text-align:center;
-  pointer-events:none;box-shadow:0 0 0 2px rgba(14,18,46,0.9);
+  pointer-events:none;box-shadow:0 0 0 2px var(--s);
   animation:bdg-pop .3s cubic-bezier(.34,1.56,.64,1)}
 @keyframes bdg-pop{from{transform:scale(0)}to{transform:scale(1)}}
 /* OVERLAY */
@@ -210,39 +210,39 @@ body.mobile-admin .admin-bnav{display:flex}
   transition:all .15s;-webkit-tap-highlight-color:transparent}
 .sheet-logout:active{background:rgba(248,81,73,0.2);transform:scale(0.98)}
 .sidebar::-webkit-scrollbar{width:3px}
-.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1)}
-.sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bd2)}
+.sb-brand{padding:1.2rem 1rem 1rem;border-bottom:1px solid var(--bd);flex-shrink:0}
 .sb-logo{display:flex;align-items:center;gap:9px}
-.sb-ico{width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.sb-title{font-size:14px;font-weight:700;color:#fff;line-height:1.2}
-.sb-sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:1px}
+.sb-ico{width:34px;height:34px;background:linear-gradient(135deg,var(--ac),var(--pu));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:#fff}
+.sb-title{font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--ac),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.3;letter-spacing:-.3px}
+.sb-sub{font-size:10px;color:var(--t3);margin-top:1px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .sb-nav{flex:1;padding:10px 8px}
-.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.6);font-size:12.5px;font-weight:500;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;position:relative}
-.sb-item:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9)}
-.sb-item.on{background:rgba(255,255,255,0.15);color:#fff;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--t2);font-size:12.5px;font-weight:500;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;position:relative}
+.sb-item:hover{background:var(--ac2);color:var(--ac)}
+.sb-item.on{background:var(--ac2);color:var(--ac);font-weight:700}
 .sb-item .si{font-size:16px;width:20px;text-align:center;flex-shrink:0}
 .sb-item .sl{flex:1}
 .sb-badge{background:var(--re);color:#fff;border-radius:100px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
-.sb-logout{padding:10px 8px 1.2rem;border-top:1px solid rgba(255,255,255,0.08)}
+.sb-logout{padding:10px 8px 1.2rem;border-top:1px solid var(--bd)}
 .sb-user{padding:8px 10px;margin-bottom:6px}
-.sb-user-name{font-size:12px;font-weight:600;color:#fff}
-.sb-user-role{font-size:10px;color:rgba(255,255,255,0.45);margin-top:1px}
-.sb-divider{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;font-weight:600}
+.sb-user-name{font-size:12px;font-weight:700;color:var(--t)}
+.sb-user-role{font-size:10px;color:var(--t3);margin-top:1px;font-weight:500}
+.sb-divider{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;font-weight:700}
 
 /* ═══ MAIN CONTENT AREA ═══ */
 .main-area{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
-.main-topbar{background:#fff;border-bottom:1px solid var(--bd);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.main-topbar{background:var(--s);border-bottom:1px solid var(--bd);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .tb-title{font-size:16px;font-weight:700;color:var(--t);display:flex;align-items:center;gap:8px}
 .tb-sub{font-size:12px;color:var(--t2);margin-top:1px}
 .tb-right{display:flex;align-items:center;gap:10px}
 .tb-user{display:flex;align-items:center;gap:7px;background:var(--s2);padding:5px 12px 5px 5px;border-radius:100px;cursor:pointer}
 .tb-dot{width:8px;height:8px;background:var(--gr);border-radius:50%}
-.main-content{padding:1.5rem;flex:1}
+.main-content{padding:1rem;flex:1}
 
 /* ═══ TOPBAR (Mobile mgr) ═══ */
 .topbar{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--bd);padding:0 1rem;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh)}
 .tbl-logo{display:flex;align-items:center;gap:10px}
-.tlo{width:32px;height:32px;background:linear-gradient(135deg,#3D5AF1,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.tlo{width:32px;height:32px;background:linear-gradient(135deg,var(--ac),var(--pu));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .tnm{font-size:14px;font-weight:700;color:var(--t)}.tsb{font-size:11px;color:var(--t2)}
 .wrap{max-width:760px;margin:0 auto;padding:1.25rem 1rem 4rem}
 body.pc-mgr .wrap{max-width:1100px;padding:1.5rem 2rem 3rem}
@@ -348,7 +348,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
 
 /* ═══ MGR ROW ═══ */
 .mr{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;background:#fff;border:1px solid var(--bd);border-radius:var(--r);box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--ac),#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
+.av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--ac),var(--pu));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
 
 /* ═══ TABLE ═══ */
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
@@ -377,12 +377,14 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
 .bulk-bar .srch-inp{padding:6px 10px;border:1px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);font-size:13px;flex:1;min-width:140px;outline:none}
 .bulk-bar .srch-inp:focus{border-color:var(--ac)}.bulk-bar .srch-inp::placeholder{color:var(--t3)}
 .cb-wrap{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;user-select:none}
-.cb-wrap input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
-.cb-chip{display:inline-flex;align-items:center;margin-right:6px;padding:2px;cursor:pointer;position:relative}
+.cb-wrap input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac);color-scheme:var(--cs,light)}
+.mgs:focus{border-color:var(--ac)!important;box-shadow:0 0 0 2px var(--ac3)}
+.mgs-wrap select{display:none}
+.cb-chip{display:inline-flex;align-items:center;margin-right:6px;cursor:pointer;-webkit-user-select:none;user-select:none}
 .cb-chip input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-.cb-chip input+span{width:20px;height:20px;border:2px solid var(--bd);border-radius:4px;background:var(--s);display:inline-flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.cb-chip input+span{width:20px;height:20px;border:2px solid var(--bd);border-radius:4px;background:var(--s);display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .cb-chip input:checked+span{background:var(--ac);border-color:var(--ac)}
-.cb-chip input:checked+span::after{content:'✓';color:#fff;font-size:14px;font-weight:700;line-height:1}
+.cb-chip input:checked+span::after{content:'✓';color:#fff;font-size:14px;font-weight:700;line-height:1;display:block}
 .late-row,.lv-row,.mist-row,.prob-row,.sug-row,.hrs-row{position:relative}
 /* Dark mode fixes for modals */
 [data-theme=dark] .mbox{background:var(--s);border-color:var(--bd);color:var(--t)}
@@ -1180,7 +1182,15 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         <button class="btn ba bsm" onclick="applyLv()">📨 Apply Leave</button>
         <div class="ok" id="lv-msg"></div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Leave History</div>
+      <div class="div" style="margin:1.2rem 0"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">My Leave Report</div>
+      <div class="fwrap" style="margin-bottom:10px">
+        <div class="fgrid" style="grid-template-columns:1fr 1fr">
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="mlf-from" onchange="renderMgrLv()"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="mlf-to" onchange="renderMgrLv()"></div>
+        </div>
+      </div>
+      <div id="mgr-lv-summary" style="margin-bottom:10px"></div>
       <div id="my-lv-list"></div>
     </div>
 
@@ -1231,6 +1241,14 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
     <div class="sec" id="ms-prob">
       <div class="card">
         <div class="ct">🔧 Admin ne Problem / Complaint Moklo</div>
+        <div class="fg"><label>Priority</label>
+          <select id="mgr-pr-priority">
+            <option value="Low">🟢 Low</option>
+            <option value="Medium" selected>🟡 Medium</option>
+            <option value="High">🔴 High</option>
+            <option value="Urgent">⛔ Urgent</option>
+          </select>
+        </div>
         <div class="fg"><label>Category</label>
           <select id="mgr-pr-cat">
             <option value="Work Issue">Work Issue</option>
@@ -1384,7 +1402,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         <button class="sb-item" id="sbi-rtng" onclick="aTab('rtng',this)"><span class="si">⭐</span><span class="sl">Manager Rating</span></button>
         <button class="sb-item" id="sbi-prob" onclick="aTab('prob',this)"><span class="si">🔧</span><span class="sl">Problem / Solution</span><span class="sb-badge" id="prob-badge" style="display:none">0</span></button>
         <button class="sb-item" id="sbi-sug" onclick="aTab('sug',this)"><span class="si">💡</span><span class="sl">Suggestions</span><span class="sb-badge" id="sug-badge" style="display:none">0</span></button>
-        <button class="sb-item" id="sbi-ai" onclick="toggleAIDrawer(true)" style="background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(236,72,153,0.1));border:1px dashed rgba(139,92,246,0.25);margin-top:6px;margin-bottom:6px;color:#c084fc"><span class="si">✨</span><span class="sl" style="font-weight:600">AI Suggestions</span></button>
+        <button class="sb-item" id="sbi-ai" onclick="toggleAIDrawer(true)" style="background:linear-gradient(135deg,var(--pu2),rgba(236,72,153,0.08));border:1px dashed rgba(139,92,246,0.25);margin-top:6px;margin-bottom:6px;color:var(--pu)"><span class="si">✨</span><span class="sl" style="font-weight:600">AI Suggestions</span></button>
         <div class="sb-divider" style="margin-top:8px">Manage</div>
         <button class="sb-item" id="sbi-mg" onclick="aTab('mg',this)"><span class="si">👥</span><span class="sl">Managers</span></button>
         <button class="sb-item" id="sbi-dp" onclick="aTab('dp',this)"><span class="si">🏬</span><span class="sl">Departments</span></button>
@@ -1398,7 +1416,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <div class="sb-user-name">Admin</div>
           <div class="sb-user-role">FormTrack Dashboard</div>
         </div>
-        <button class="sb-item" onclick="doLogout()" style="color:rgba(248,113,113,0.8)"><span class="si">🚪</span><span class="sl">Logout</span></button>
+        <button class="sb-item" onclick="doLogout()" style="color:var(--re)"><span class="si">🚪</span><span class="sl">Logout</span></button>
       </div>
     </nav>
     <!-- MAIN CONTENT -->
@@ -1501,11 +1519,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
     <div class="sec" id="as-rp">
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>From</label><input type="date" id="ff"></div>
-          <div class="fg" style="margin:0"><label>To</label><input type="date" id="ft"></div>
-          <div class="fg" style="margin:0"><label>Shift</label><select id="fsh"><option value="">All shifts</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
-          <div class="fg" style="margin:0"><label>Manager</label><select id="fm"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Department</label><select id="fd"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>From</label><input type="date" id="ff" onchange="renderReps()"></div>
+          <div class="fg" style="margin:0"><label>To</label><input type="date" id="ft" onchange="renderReps()"></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="fsh" onchange="renderReps()"><option value="">All shifts</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="fm" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="fm" onchange="renderReps()"><option value="">All</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Department</label><select id="fd" onchange="renderReps()"><option value="">All</option></select></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderReps()">📥 Load</button>
@@ -1521,11 +1539,12 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
     <div class="sec" id="as-lv">
       <!-- Stats -->
       <div class="sg3" id="lv-stats"></div>
+      <div class="div"></div>
       <!-- Quick actions: pending -->
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Pending Approvals</div>
       <div class="bulk-bar">
         <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-leave" onchange="toggleAll('leave',this.checked)"><span></span> Select All</label>
-        <input type="text" class="srch-inp" id="srch-leave" placeholder="🔍 Search..." oninput="renderAdminLv()">
+        <input type="text" class="srch-inp" id="srch-leave" placeholder="✍️ Type name..." oninput="renderAdminLv()">
         <button class="btn bgr bxs" onclick="bulkAction('leave','approve')">✅ Bulk Approve</button>
         <button class="btn bre bxs" onclick="bulkAction('leave','reject')">❌ Bulk Reject</button>
         <button class="btn bg2 bxs" onclick="bulkAction('leave','delete')">🗑️ Bulk Delete</button>
@@ -1536,11 +1555,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Leave Report</div>
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>Status</label><select id="lf-st"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Approved</option><option value="rejected">❌ Rejected</option></select></div>
-          <div class="fg" style="margin:0"><label>Manager</label><select id="lf-mg"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Leave Type</label><select id="lf-tp"><option value="">All types</option></select></div>
-          <div class="fg" style="margin:0"><label>From Month</label><input type="date" id="lf-from"></div>
-          <div class="fg" style="margin:0"><label>To Month</label><input type="date" id="lf-to"></div>
+          <div class="fg" style="margin:0"><label>Status</label><select id="lf-st" onchange="renderLvReport()"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Approved</option><option value="rejected">❌ Rejected</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="lf-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="lf-mg" onchange="renderLvReport()"><option value="">All</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Leave Type</label><select id="lf-tp" onchange="renderLvReport()"><option value="">All types</option></select></div>
+          <div class="fg" style="margin:0"><label>From Month</label><input type="date" id="lf-from" onchange="renderLvReport()"></div>
+          <div class="fg" style="margin:0"><label>To Month</label><input type="date" id="lf-to" onchange="renderLvReport()"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderLvReport()">📥 Load</button>
@@ -1557,26 +1576,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         </table></div>
       </div>
       <div class="ok" id="lv-admin-msg"></div>
-      <div class="div"></div>
-      <!-- Balance Summary -->
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Manager Leave Balance Summary</div>
-      <div class="card" style="padding:0;overflow:hidden">
-        <div class="lrep-wrap"><table class="lrep-tbl" id="lv-bal-tbl">
-          <thead><tr id="lv-bal-hdr"></tr></thead>
-          <tbody id="lv-bal-body"></tbody>
-        </table></div>
-      </div>
-      <!-- Admin: set balance -->
-      <div class="card" style="margin-top:1rem">
-        <div class="ct">🔧 Set Leave Balance</div>
-        <div class="g2">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="sb-mg"><option value="">Select manager</option></select></div>
-          <div class="fg" style="margin:0"><label>Leave Type</label><select id="sb-tp"><option value="">Select type</option></select></div>
-        </div>
-        <div class="fg" style="margin-top:10px"><label>New Balance (days)</label><input type="number" id="sb-val" min="0" max="365" placeholder="e.g. 12"></div>
-        <button class="btn ba bsm" onclick="setBalance()">Set Balance</button>
-        <div class="ok" id="sb-msg"></div>
-      </div>
+
     </div>
 
     <!-- MANAGERS -->
@@ -1595,7 +1595,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         <button class="btn ba bsm" style="margin-top:4px" onclick="addMgr()">+ Add Manager</button>
         <div class="ok" id="mg-msg"></div>
       </div>
-      <div class="card"><div class="ct">All Managers (<span id="mg-cnt">0</span>)</div><div id="mg-tbl"></div></div>
+      <div class="card">
+        <div class="ct">All Managers (<span id="mg-cnt">0</span>)</div>
+        <div style="margin-bottom:8px"><input type="text" id="mg-srch" placeholder="🔍 Name, ID or Dept search..." style="width:100%;font-size:13px;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" oninput="renderMgTbl()"></div>
+        <div id="mg-tbl"></div>
+      </div>
     </div>
 
     <!-- DEPTS -->
@@ -1696,7 +1700,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <div class="card">
         <div class="ct">⚠️ Navo Mistake Report Add Karo</div>
         <div class="g3r">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="mr-mg"><option value="">— Select Manager —</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="mr-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="mr-mg"><option value="">— Select Manager —</option></select></div></div>
           <div class="fg" style="margin:0"><label>Date</label><input type="date" id="mr-dt"></div>
           <div class="fg" style="margin:0"><label>Severity</label>
             <select id="mr-sv">
@@ -1729,11 +1733,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <!-- Filter -->
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="mf-mg"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Severity</label><select id="mf-sv"><option value="">All</option><option value="minor">🟡 Minor</option><option value="moderate">🟠 Moderate</option><option value="major">🔴 Major</option><option value="critical">🚨 Critical</option></select></div>
-          <div class="fg" style="margin:0"><label>Category</label><select id="mf-cat"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="mf-from"></div>
-          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="mf-to"></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="mf-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="mf-mg" onchange="renderMistReport()"><option value="">All</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Severity</label><select id="mf-sv" onchange="renderMistReport()"><option value="">All</option><option value="minor">🟡 Minor</option><option value="moderate">🟠 Moderate</option><option value="major">🔴 Major</option><option value="critical">🚨 Critical</option></select></div>
+          <div class="fg" style="margin:0"><label>Category</label><select id="mf-cat" onchange="renderMistReport()"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="mf-from" onchange="renderMistReport()"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="mf-to" onchange="renderMistReport()"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderMistReport()">📥 Load</button>
@@ -1753,7 +1757,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <!-- Bulk + Search Bar -->
       <div class="bulk-bar">
         <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-mistake" onchange="toggleAll('mistake',this.checked)"><span></span> Select All</label>
-        <input type="text" class="srch-inp" id="srch-mistake" placeholder="🔍 Search..." oninput="renderMistReport()">
+        <input type="text" class="srch-inp" id="srch-mistake" placeholder="✍️ Type name..." oninput="renderMistReport()">
         <button class="btn bre bxs" onclick="bulkAction('mistake','delete')">🗑️ Bulk Delete</button>
       </div>
       <!-- Mistake List -->
@@ -1764,37 +1768,17 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
     <!-- SETTINGS -->
     <!-- LATE ENTRY ADMIN -->
     <div class="sec" id="as-late">
-      <div class="card">
-        <div class="ct">⏰ Late Entry Add Karo (Admin)</div>
-        <div class="g3r">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="al-mg"><option value="">— Select —</option></select></div>
-          <div class="fg" style="margin:0"><label>Date</label><input type="date" id="al-date"></div>
-          <div class="fg" style="margin:0"><label>Shift</label>
-            <select id="al-shift">
-              <option value="day">☀️ Day (8am–8pm)</option>
-              <option value="night">🌙 Night (8pm–8am)</option>
-            </select>
-          </div>
-        </div>
-        <div class="g2">
-          <div class="fg" style="margin:0"><label>Late by (minutes)</label><input type="number" id="al-mins" min="1" max="480" placeholder="30"></div>
-          <div class="fg" style="margin:0"><label>Actual Arrival Time</label><input type="time" id="al-time"></div>
-        </div>
-        <div class="fg"><label>Reason</label><textarea id="al-reason" placeholder="Late aavana no reason..."></textarea></div>
-        <div class="fg"><label>Admin Remark</label><textarea id="al-remark" placeholder="Admin note..."></textarea></div>
-        <button class="btn ba bsm" onclick="adminAddLate()">⏰ Add Late Entry</button>
-        <div class="ok" id="al-msg"></div>
-      </div>
+      <!-- Stats -->
       <!-- Stats -->
       <div class="sg3" id="late-stats"></div>
       <!-- Filter -->
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="lef-mg"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Shift</label><select id="lef-sh"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
-          <div class="fg" style="margin:0"><label>Status</label><select id="lef-st"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Excused</option><option value="unexcused">❌ Unexcused</option></select></div>
-          <div class="fg" style="margin:0"><label>From</label><input type="date" id="lef-from"></div>
-          <div class="fg" style="margin:0"><label>To</label><input type="date" id="lef-to"></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="lef-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="lef-mg" onchange="renderLateReport()"><option value="">All</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="lef-sh" onchange="renderLateReport()"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>Status</label><select id="lef-st" onchange="renderLateReport()"><option value="">All</option><option value="pending">⏳ Pending</option><option value="approved">✅ Excused</option><option value="unexcused">❌ Unexcused</option></select></div>
+          <div class="fg" style="margin:0"><label>From</label><input type="date" id="lef-from" onchange="renderLateReport()"></div>
+          <div class="fg" style="margin:0"><label>To</label><input type="date" id="lef-to" onchange="renderLateReport()"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderLateReport()">📥 Load</button>
@@ -1814,7 +1798,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <!-- Bulk + Search Bar -->
       <div class="bulk-bar">
         <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-late" onchange="toggleAll('late',this.checked)"><span></span> Select All</label>
-        <input type="text" class="srch-inp" id="srch-late" placeholder="🔍 Search..." oninput="renderLateReport()">
+        <input type="text" class="srch-inp" id="srch-late" placeholder="✍️ Type name..." oninput="renderLateReport()">
         <button class="btn bgr bxs" onclick="bulkAction('late','excuse')">✅ Bulk Excuse</button>
         <button class="btn bre bxs" onclick="bulkAction('late','unexcuse')">❌ Bulk Unexcuse</button>
         <button class="btn bg2 bxs" onclick="bulkAction('late','delete')">🗑️ Bulk Delete</button>
@@ -1831,11 +1815,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <!-- Filter -->
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="prf-mg"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Category</label><select id="prf-cat"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Status</label><select id="prf-st"><option value="">All</option><option value="open">🔴 Open</option><option value="solved">✅ Solved</option></select></div>
-          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="prf-from"></div>
-          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="prf-to"></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="prf-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="prf-mg" onchange="renderProblems()"><option value="">All</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Category</label><select id="prf-cat" onchange="renderProblems()"><option value="">All</option></select></div>
+          <div class="fg" style="margin:0"><label>Status</label><select id="prf-st" onchange="renderProblems()"><option value="">All</option><option value="open">🔴 Open</option><option value="solved">✅ Solved</option></select></div>
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="prf-from" onchange="renderProblems()"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="prf-to" onchange="renderProblems()"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderProblems()">📥 Load</button>
@@ -1847,7 +1831,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <!-- Bulk + Search Bar -->
       <div class="bulk-bar">
         <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-problem" onchange="toggleAll('problem',this.checked)"><span></span> Select All</label>
-        <input type="text" class="srch-inp" id="srch-problem" placeholder="🔍 Search..." oninput="renderProblems()">
+        <input type="text" class="srch-inp" id="srch-problem" placeholder="✍️ Type name..." oninput="renderProblems()">
         <button class="btn bgr bxs" onclick="bulkAction('problem','solve')">✅ Bulk Solve</button>
         <button class="btn bre bxs" onclick="bulkAction('problem','delete')">🗑️ Bulk Delete</button>
       </div>
@@ -1870,7 +1854,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       </div>
       <div class="bulk-bar">
         <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-suggestion" onchange="toggleAll('suggestion',this.checked)"><span></span> Select All</label>
-        <input type="text" class="srch-inp" id="srch-suggestion" placeholder="🔍 Search..." oninput="renderAdminSug()">
+        <input type="text" class="srch-inp" id="srch-suggestion" placeholder="✍️ Type name..." oninput="renderAdminSug()">
         <button class="btn bre bxs" onclick="bulkAction('suggestion','delete')">🗑️ Bulk Delete</button>
       </div>
       <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">📋 Sent Suggestions</div>
@@ -1892,7 +1876,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           </div>
         </div>
         <div class="g3r">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="rt-mg" onchange="previewAutoRating()"><option value="">— Select Manager —</option></select></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="rt-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="rt-mg" onchange="previewAutoRating()"><option value="">— Select Manager —</option></select></div></div>
           <div class="fg" style="margin:0"><label>Month</label><input type="month" id="rt-month" onchange="previewAutoRating()"></div>
           <div class="fg" style="margin:0">
             <label>Auto Preview</label>
@@ -1905,9 +1889,8 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       </div>
       <!-- Date Filter + Export -->
       <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-        <div class="fg" style="margin:0"><label>From</label><input type="date" id="rf-from"></div>
-        <div class="fg" style="margin:0"><label>To</label><input type="date" id="rf-to"></div>
-        <button class="btn ba bsm" onclick="renderAdminRating()">📥 Load</button>
+        <div class="fg" style="margin:0"><label>From</label><input type="date" id="rf-from" onchange="renderAdminRating()"></div>
+        <div class="fg" style="margin:0"><label>To</label><input type="date" id="rf-to" onchange="renderAdminRating()"></div>
         <button class="btn bg2 bsm" onclick="clrRtngF()">🔄 Clear</button>
         <div style="flex:1"></div>
         <button class="btn bgr bsm" onclick="dlRtngRepPDF()">📄 PDF</button>
@@ -1969,6 +1952,7 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
         <div class="ct">💾 Storage Management</div>
         <p style="font-size:12px;color:var(--t2);margin-bottom:8px">Local storage usage (data auto-prunes when quota exceeded; file images stripped for space)</p>
         <div style="font-size:14px;font-weight:700;margin-bottom:8px" id="storage-info">—</div>
+        <div class="ok" id="stor-hint" style="margin-top:-6px;margin-bottom:8px;font-size:11px">✅ Limit removed — only used space shown</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn bam bsm" onclick="_updateStorageAlert()">🔄 Check Usage</button>
           <button class="btn bre bsm" onclick="clearStorageData()">🗑️ Clear Prunable Data</button>
@@ -1997,11 +1981,11 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
       <div class="sg" id="hrs-stats"></div>
       <div class="fwrap">
         <div class="fgrid">
-          <div class="fg" style="margin:0"><label>Manager</label><select id="hrf-mg"><option value="">All</option></select></div>
-          <div class="fg" style="margin:0"><label>Shift</label><select id="hrf-sh"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
-          <div class="fg" style="margin:0"><label>OT Filter</label><select id="hrf-ot"><option value="">All entries</option><option value="1">OT Only</option></select></div>
-          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="hrf-from"></div>
-          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="hrf-to"></div>
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="hrf-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="hrf-mg" onchange="renderHrsReport()"><option value="">All</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Shift</label><select id="hrf-sh" onchange="renderHrsReport()"><option value="">All</option><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+          <div class="fg" style="margin:0"><label>OT Filter</label><select id="hrf-ot" onchange="renderHrsReport()"><option value="">All entries</option><option value="1">OT Only</option></select></div>
+          <div class="fg" style="margin:0"><label>From Date</label><input type="date" id="hrf-from" onchange="renderHrsReport()"></div>
+          <div class="fg" style="margin:0"><label>To Date</label><input type="date" id="hrf-to" onchange="renderHrsReport()"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="btn ba bsm" onclick="renderHrsReport()">📥 Load</button>
@@ -2017,17 +2001,14 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
           <tbody id="hrs-sum-body"></tbody>
         </table></div>
       </div>
-      <div class="bulk-bar">
-        <label class="cb-chip" style="display:flex;margin-right:0"><input type="checkbox" id="selall-hours" onchange="toggleAll('hours',this.checked)"><span></span> Select All</label>
-        <input type="text" class="srch-inp" id="srch-hours" placeholder="🔍 Search..." oninput="renderHrsReport()">
-        <button class="btn bre bxs" onclick="bulkAction('hours','delete')">🗑️ Bulk Delete</button>
-      </div>
-      <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 10px">All Hours Entries</div>
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="overflow-x:auto"><table class="tbl" id="hrs-list-tbl">
-          <thead><tr><th></th><th>Manager</th><th>ID</th><th>Dept</th><th>Date</th><th>Shift</th><th style="text-align:center">Regular Hrs</th><th style="text-align:center">OT Hrs</th><th style="text-align:center">Total Hrs</th><th>OT Remark</th><th>Note</th><th>Submitted At</th></tr></thead>
-          <tbody id="hrs-list"></tbody>
-        </table></div>
+      <div class="card">
+        <div class="ct">⏱️ Hours — Manager View</div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Manager</label><div class="mgs-wrap" style="display:flex;gap:4px"><input type="text" class="mgs" data-for="ah-mg" placeholder="✍️ Type name..." style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:var(--s);color:var(--t);outline:none" onfocus="srchMgCombobox(this)" oninput="srchMgCombobox(this)"><select id="ah-mg"><option value="">— Select —</option></select></div></div>
+          <div class="fg" style="margin:0"><label>Month</label><input type="month" id="ah-month" onchange="renderHrsMgrView()"></div>
+        </div>
+        <button class="btn ba bsm" onclick="renderHrsMgrView()">📥 Load</button>
+        <div id="hrs-mgr-view" style="margin-top:12px"></div>
       </div>
     </div>
 
@@ -2290,6 +2271,46 @@ body.pc-mgr #pg-mgr .topbar{padding:0 2rem}
     </div>
   </div>
 </div>
+
+<!-- SOLVE PROBLEM MODAL -->
+<div class="mbg" id="hrs-edit-modal" style="z-index:9999">
+  <div class="mbox" style="max-width:480px">
+    <div class="mhnd"></div>
+    <div class="mtit">✏️ Edit Hours Entry</div>
+    <div class="g2">
+      <div class="fg" style="margin:0"><label>Date</label><input type="date" id="hre-date"></div>
+      <div class="fg" style="margin:0"><label>Shift</label><select id="hre-shift"><option value="day">☀️ Day</option><option value="night">🌙 Night</option></select></div>
+    </div>
+    <div class="g2">
+      <div class="fg" style="margin:0"><label>Regular Hours</label><input type="number" id="hre-reg" min="0" max="24" step="0.5"></div>
+      <div class="fg" style="margin:0"><label>OT Hours</label><input type="number" id="hre-ot" min="0" max="24" step="0.5"></div>
+    </div>
+    <div class="fg"><label>OT Remark</label><input type="text" id="hre-ot-remark"></div>
+    <div class="fg"><label>Note</label><textarea id="hre-note" rows="2" style="resize:vertical;min-height:50px"></textarea></div>
+    <div class="err" id="hre-err"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn bg2 bsm" onclick="closeHrsEdit()">Cancel</button>
+      <button class="btn ba bsm" onclick="saveHrsEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbg" id="solve-modal" style="z-index:9999">
+  <div class="mbox" style="max-width:460px">
+    <div class="mhnd"></div>
+    <div class="mtit">✅ Problem Solve Karo — Solution Lakho</div>
+    <div id="solve-prob-info" style="font-size:12px;color:var(--t2);margin-bottom:12px;padding:10px;background:var(--s2);border-radius:var(--rs)"></div>
+    <div class="fg"><label>Solution / Reply <span style="color:var(--re)">*</span></label>
+      <textarea id="solve-solution-text" rows="5" placeholder="Admin solution (problem kaise solve thayu / reply)..." style="resize:vertical;min-height:80px"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn bg2 bsm" onclick="closeSolveModal()">Cancel</button>
+      <button class="btn bgr bsm" id="solve-confirm-btn" onclick="confirmSolve()">✅ Submit Solution</button>
+    </div>
+    <div class="err" id="solve-err"></div>
+  </div>
+</div>
+
 <script>
 // Early global declaration to prevent TDZ error when selDevice() is called via onclick
 var curDevice = localStorage.getItem('ft_device') || null;
@@ -2433,14 +2454,30 @@ let db={
 };
 function ls(k){return localStorage.getItem(k);}
 
-if(!db.departments) db.departments=[{id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'}];
+if(!db.departments) db.departments=[
+  {id:'d1',name:'Production'},{id:'d2',name:'Quality'},{id:'d3',name:'Safety'},
+  {id:'d4',name:'Warehouse'},{id:'d5',name:'Maintenance'},{id:'d6',name:'Admin'}
+];
 if(!db.categories)  db.categories=[
   {id:'c1',name:'Checklist',deptId:'d1'},{id:'c2',name:'Cross Tally',deptId:'d1'},{id:'c3',name:'Production Report',deptId:'d1'},
-  {id:'c4',name:'Quality Check',deptId:'d2'},{id:'c5',name:'Whitemarking',deptId:'d2'},{id:'c6',name:'Safety Report',deptId:'d3'}
+  {id:'c4',name:'Quality Check',deptId:'d2'},{id:'c5',name:'Whitemarking',deptId:'d2'},
+  {id:'c6',name:'Safety Report',deptId:'d3'},{id:'c7',name:'Incident Log',deptId:'d3'},
+  {id:'c8',name:'Inventory',deptId:'d4'},{id:'c9',name:'Dispatch',deptId:'d4'},
+  {id:'c10',name:'Equipment Log',deptId:'d5'},{id:'c11',name:'Repair Request',deptId:'d5'},
+  {id:'c12',name:'Attendance',deptId:'d6'},{id:'c13',name:'Expense Report',deptId:'d6'}
 ];
 if(!db.managers){
-  db.managers=[];
-  for(let i=1;i<=10;i++) db.managers.push({id:'MGR-'+String(i).padStart(2,'0'),name:'Manager '+i,deptId:'d1',pw:'pass'+String(i).padStart(2,'0')});
+  db.managers = [
+    {id:'MGR-01',name:'Rajesh Patel',deptId:'d1',pw:'pass01'},{id:'MGR-02',name:'Amit Shah',deptId:'d1',pw:'pass02'},
+    {id:'MGR-03',name:'Suresh Kumar',deptId:'d1',pw:'pass03'},{id:'MGR-04',name:'Deepak Joshi',deptId:'d1',pw:'pass04'},
+    {id:'MGR-05',name:'Vikram Singh',deptId:'d2',pw:'pass05'},{id:'MGR-06',name:'Priya Mehta',deptId:'d2',pw:'pass06'},
+    {id:'MGR-07',name:'Rahul Desai',deptId:'d3',pw:'pass07'},{id:'MGR-08',name:'Anita Sharma',deptId:'d3',pw:'pass08'},
+    {id:'MGR-09',name:'Manoj Tiwari',deptId:'d4',pw:'pass09'},{id:'MGR-10',name:'Kavita Rao',deptId:'d4',pw:'pass10'},
+    {id:'MGR-11',name:'Sunil Verma',deptId:'d5',pw:'pass11'},{id:'MGR-12',name:'Neha Gupta',deptId:'d5',pw:'pass12'},
+    {id:'MGR-13',name:'Arun Yadav',deptId:'d6',pw:'pass13'},{id:'MGR-14',name:'Pooja Nair',deptId:'d6',pw:'pass14'},
+    {id:'MGR-15',name:'Hitesh Chauhan',deptId:'d1',pw:'pass15'},{id:'MGR-16',name:'Meena Iyer',deptId:'d2',pw:'pass16'},
+    {id:'MGR-17',name:'Prakash Das',deptId:'d3',pw:'pass17'},{id:'MGR-18',name:'Rekha Jain',deptId:'d4',pw:'pass18'}
+  ];
 }
 
 // Remove all Jemz dummy data
@@ -2461,7 +2498,220 @@ function seedJemzIfMissing() {
   if(db.activityLog)db.activityLog=db.activityLog.filter(a=>a.mgrId!=='JEMZ');
   if(db.leavebal)delete db.leavebal.JEMZ;
 }
-seedJemzIfMissing();
+
+/* ─── Seed rich 4-month demo data if ALL collections empty ─── */
+function seedRichDemoData() {
+  if (db.submissions.length || db.mistakes.length || db.lateEntries.length || db.problems.length || db.leaves.length || db.suggestions.length || db.workHours.length) return;
+  if (!db.managers || db.managers.length < 3) return;
+  var mgrs = db.managers, depts = db.departments, cats = db.categories || [];
+  var now = new Date();
+  function daysAgo(n){var d=new Date(now);d.setDate(d.getDate()-n);return d.toISOString().slice(0,10);}
+  function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+  function pick(n,arr){var s=new Set();while(s.size<n&&s.size<arr.length)s.add(rand(arr));return [...s];}
+  function rng(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+  // ===== PROBLEMS (25 across 4 months) =====
+  var probData = [
+    ['Machine frequently stops during production. Need urgent maintenance.','Work Issue','Urgent','Maintenance team replaced faulty belt. Machine now running smoothly.'],
+    ['Lack of raw materials for tomorrow shift. Production will stop.','Work Issue','High','Procurement expedited delivery. Materials arrived within 4 hours.'],
+    ['Team member not following safety protocols. Risk of accident.','Behavior Issue','High','Counseling session held. Employee reverted to safety training.'],
+    ['Shift handover process unclear. Information missing between shifts.','Process Issue','Medium','New handover checklist created and circulated to all managers.'],
+    ['Instructions from management are contradictory. Confusion among team.','Communication Issue','High','Management aligned on messaging. Weekly briefing initiated.'],
+    ['Product defects increasing on night shift. Quality check failing.','Quality Issue','Urgent','QC team identified calibration error. Machine recalibrated.'],
+    ['Air conditioning broken in production area. Temperature unbearable.','Work Issue','Medium','HVAC team repaired AC unit. Temperature normalized.'],
+    ['Canteen food quality has declined. Workers complaining.','Other','Low','Caterer changed. New menu implemented based on feedback.'],
+    ['Leave application process too slow. Approvals taking 3+ days.','Process Issue','Medium','Auto-approval for 1-day leaves implemented.'],
+    ['Urgent messages not reaching night shift supervisors on time.','Communication Issue','High','WhatsApp group created for all supervisors.'],
+    ['Lighting in warehouse is poor. Safety hazard for workers.','Work Issue','Medium','All warehouse lights replaced with LED. Additional fixtures installed.'],
+    ['Arguments between day and night shift teams over equipment usage.','Behavior Issue','Low','Mediation meeting conducted. Equipment usage schedule created.'],
+    ['Calibration reports not being filled correctly by operators.','Quality Issue','Medium','Training session held. New digital calibration log implemented.'],
+    ['Not enough PPE available for new joinees. Safety compliance at risk.','Work Issue','High','PPE stock ordered. Emergency supply issued from reserve.'],
+    ['Parking space insufficient for shift workers. Vehicles parked outside.','Other','Low','Additional parking area marked. Shuttle service arranged.'],
+    ['Fire alarm system not tested this month. Compliance issue.','Work Issue','High','Fire alarm tested immediately. Monthly schedule updated.'],
+    ['Raw material wastage increasing. Need process review.','Process Issue','Medium','Process audit conducted. New handling guidelines issued.'],
+    ['New operator training not completed. Mistakes increasing.','Behavior Issue','Medium','Training schedule expedited. All new operators certified.'],
+    ['Inventory count mismatch found in stores.','Work Issue','High','Physical inventory conducted. System updated with correct counts.'],
+    ['Drinking water dispenser broken on floor 2.','Other','Low','Water dispenser replaced. Monthly maintenance contract signed.'],
+    ['Safety shower not working in chemical area.','Work Issue','Urgent','Safety shower repaired immediately. All safety equipment inspected.'],
+    ['Overtime calculation errors in payroll.','Process Issue','High','Payroll system corrected. All pending OT recalculated and paid.'],
+    ['Noise level in packaging area exceeds limits.','Quality Issue','Medium','Noise dampening panels installed. Hearing protection provided.'],
+    ['Hygiene in washroom areas is poor. Workers complaining.','Other','Medium','Cleaning schedule increased to 3x per shift. Sanitizers installed.'],
+    ['Delivery vehicles blocking fire exit route.','Work Issue','Urgent','No-parking zone marked. Security instructed to enforce.'],
+  ];
+  probData.forEach(function(arr, i){
+    var mgr = rand(mgrs), days = rng(1, 120);
+    var added = new Date(now); added.setDate(added.getDate() - days);
+    var solved = i < 18;
+    db.problems.push({
+      id: Date.now()+i, mgrId: mgr.id, mgrName: mgr.name,
+      deptId: mgr.deptId, deptName: (depts.find(function(d){return d.id===mgr.deptId})||{}).name||'—',
+      date: daysAgo(days), category: arr[1], description: arr[0],
+      priority: arr[2], solution: solved ? arr[3] : '',
+      status: solved ? 'solved' : 'open',
+      addedAt: added.toISOString(), addedBy: 'manager',
+      seenByAdmin: solved, seenByMgr: true,
+      resolvedBy: solved ? 'admin' : null,
+      resolvedByName: solved ? 'Admin' : null,
+      solvedAt: solved ? new Date(added.getTime()+86400000*rng(1,5)).toISOString() : null
+    });
+  });
+
+  // ===== MISTAKES (20 across 4 months) =====
+  var mistList = [
+    'Wrong product label applied on batch #4532',
+    'Incorrect quantity entered in production log',
+    'Safety harness not worn during height work',
+    'Machine shutdown not reported in handover',
+    'Defective units passed through quality check',
+    'Temperature log not recorded for 3 hours',
+    'Wrong chemical mixture used in cleaning',
+    'Shift report not submitted on time',
+    'Tools not returned to store after shift end',
+    'Entry gate left unlocked during night shift',
+    'Fire extinguisher expiry not checked',
+    'Work area not cleaned before shift handover',
+    'Forklift left with keys in ignition overnight',
+    'Emergency exit blocked with pallets',
+    'Waste segregation not done properly',
+    'Production target missed without prior notice',
+    'Safety goggles not worn in grinding area',
+    'Electrical panel left open after maintenance',
+    'First aid kit not replenished after use',
+    'Log sheet entries found incomplete for 2 days'
+  ];
+  mistList.forEach(function(desc, i){
+    var mgr = rand(mgrs), days = rng(1, 110);
+    var d = new Date(now); d.setDate(d.getDate() - days);
+    db.mistakes.push({
+      id: Date.now()+i, mgrId: mgr.id, mgrName: mgr.name,
+      deptId: mgr.deptId, deptName: (depts.find(function(d){return d.id===mgr.deptId})||{}).name||'—',
+      date: daysAgo(days), description: desc,
+      reportedAt: d.toISOString(), status: i < 14 ? 'resolved' : 'pending'
+    });
+  });
+
+  // ===== LATE ENTRIES (15 across 4 months) =====
+  var lateReasons = ['Traffic jam','Bus late','Medical appointment','Vehicle breakdown','Family emergency','Heavy rain','Overslept','Road construction','Flat tyre','Train delay'];
+  for(var i=0;i<15;i++){
+    var mgr = rand(mgrs), days = rng(1, 100);
+    var st = i < 6 ? 'approved' : (i < 11 ? 'pending' : 'unexcused');
+    db.lateEntries.push({
+      id: Date.now()+i, mgrId: mgr.id, mgrName: mgr.name,
+      deptId: mgr.deptId, deptName: (depts.find(function(d){return d.id===mgr.deptId})||{}).name||'—',
+      date: daysAgo(days),
+      time: String(8+rng(0,2)).padStart(2,'0')+':'+String(rng(0,5)*10).padStart(2,'0'),
+      reason: i%3===0 ? '' : rand(lateReasons),
+      status: st, remark: st==='approved'?'Excused by admin':''
+    });
+  }
+
+  // ===== SUGGESTIONS (30 entries across 4 months) =====
+  var sugList = [
+    'Improve ventilation in packaging area for better air quality.',
+    'Install additional hand sanitizer stations across all floors.',
+    'Start 5S implementation in storage area this quarter.',
+    'Conduct monthly safety drills for all shift workers.',
+    'Upgrade old computers in supervisor office for faster reporting.',
+    'Provide drinking water dispensers on production floor.',
+    'Implement digital attendance system to replace manual register.',
+    'Organize team building activity once per month.',
+    'Install CCTV cameras in parking area for security.',
+    'Provide better lighting in staircase area.',
+    'Arrange transport facility for night shift workers.',
+    'Start skill development program for operators.',
+    'Repair potholes in factory approach road.',
+    'Provide noise cancellation earplugs for high-noise areas.',
+    'Install vending machine for snacks and beverages.'
+  ];
+  sugList.forEach(function(txt, i){
+    var targetMgrs = pick(2+rng(0,3), mgrs);
+    targetMgrs.forEach(function(mgr, j){
+      var days = rng(1, 110);
+      var d = new Date(now); d.setDate(d.getDate() - days);
+      var accepted = i < 8;
+      db.suggestions.push({
+        id: Date.now()+i*100+j, mgrId: mgr.id, mgrName: mgr.name,
+        deptId: mgr.deptId, deptName: (depts.find(function(d){return d.id===mgr.deptId})||{}).name||'—',
+        suggestion: txt, status: accepted ? 'accepted' : 'pending',
+        responseNote: accepted ? 'Thank you for the suggestion.' : '',
+        createdAt: d.toISOString(), respondedAt: accepted ? new Date(d.getTime()+86400000).toISOString() : '',
+        seenByMgr: accepted
+      });
+    });
+  });
+
+  // ===== LEAVES (20 across 4 months) =====
+  var lvTypes = ['Sick','Personal','Vacation','Emergency'];
+  for(var i=0;i<20;i++){
+    var mgr = rand(mgrs), daysCnt = rng(1,3);
+    var daysA = rng(1, 115);
+    var from = new Date(now); from.setDate(from.getDate() - daysA);
+    var to = new Date(from); to.setDate(to.getDate() + daysCnt - 1);
+    var st = i < 10 ? 'approved' : (i < 16 ? 'pending' : 'rejected');
+    db.leaves.push({
+      id: Date.now()+i, mgrId: mgr.id, mgrName: mgr.name,
+      deptId: mgr.deptId, deptName: (depts.find(function(d){return d.id===mgr.deptId})||{}).name||'—',
+      type: rand(lvTypes),
+      fromDate: from.toISOString().slice(0,10),
+      toDate: to.toISOString().slice(0,10),
+      days: daysCnt,
+      reason: ['Personal work','Medical checkup','Family function','Not well','Emergency at home','Travel'][rng(0,5)],
+      status: st,
+      appliedAt: new Date(from.getTime()-86400000*rng(1,5)).toISOString()
+    });
+  }
+  if(!db.leavebal) db.leavebal = {};
+  mgrs.forEach(function(m){
+    if(!db.leavebal[m.id]) db.leavebal[m.id] = {Sick:8,Personal:4,Vacation:10,Emergency:3};
+  });
+
+  // ===== SUBMISSIONS (40 across 4 months) =====
+  for(var i=0;i<40;i++){
+    var mgr = rand(mgrs), cat = rand(cats), days = rng(1, 110);
+    var d = new Date(now); d.setDate(d.getDate() - days);
+    db.submissions.push({
+      id: Date.now()+i, mgrId: mgr.id, mgrName: mgr.name,
+      deptId: mgr.deptId, deptName: (depts.find(function(d){return d.id===mgr.deptId})||{}).name||'—',
+      date: d.toISOString().slice(0,10), submittedAt: d.toISOString(),
+      catId: cat.id, catName: cat.name,
+      shift: rng(0,1) ? 'day' : 'night',
+      data: {remark:'All tasks completed for the shift.'},
+      categories: {}
+    });
+  }
+
+  // ===== WORK HOURS (30 across 4 months) =====
+  for(var i=0;i<30;i++){
+    var mgr = rand(mgrs), days = rng(1, 110);
+    var d = new Date(now); d.setDate(d.getDate() - days);
+    var reg = 8+rng(0,1), ot = rng(0,1) ? rng(1,3) : 0;
+    db.workHours.push({
+      id: Date.now()+i, mgrId: mgr.id, mgrName: mgr.name,
+      deptId: mgr.deptId, date: d.toISOString().slice(0,10),
+      regHours: reg, otHours: ot, totalHours: reg+ot,
+      shift: rng(0,1)?'day':'night', notes: '',
+      submittedAt: d.toISOString()
+    });
+  }
+
+  console.log('[Seed] 4-month demo data populated.');
+  setTimeout(function(){
+    try { persist(); } catch(e) { console.warn('[Seed] persist error (will retry):',e); }
+    /* Save directly to localStorage as fallback */
+    try {
+      if(db.problems)    localStorage.setItem('ft8_prob',  JSON.stringify(db.problems));
+      if(db.mistakes)    localStorage.setItem('ft6_mist', JSON.stringify(db.mistakes));
+      if(db.lateEntries) localStorage.setItem('ft7_late', JSON.stringify(db.lateEntries));
+      if(db.suggestions) localStorage.setItem('ft_sug',   JSON.stringify(db.suggestions));
+      if(db.leaves)      localStorage.setItem('ft6_lv',   JSON.stringify(db.leaves));
+      if(db.leavebal)    localStorage.setItem('ft6_lb',   JSON.stringify(db.leavebal));
+      if(db.submissions) localStorage.setItem('ft6_sb',   JSON.stringify(_subsForStorage ? _subsForStorage(db.submissions) : db.submissions));
+      if(db.workHours)   localStorage.setItem('ft7_hrs',  JSON.stringify(db.workHours));
+      console.log('[Seed] Direct localStorage save complete.');
+    } catch(e2) { console.warn('[Seed] Direct save error:', e2); }
+  }, 200);
+}
+seedRichDemoData();
 
 let catFiles={}, curUser=null, editId=null, curRole=null;
 curDevice=localStorage.getItem('ft_device')||null; // already declared early as var
@@ -2540,17 +2790,15 @@ function _updateStorageAlert() {
       var v = localStorage.getItem(localStorage.key(i));
       if (v) estimate += v.length * 2; // UTF-16 → bytes
     }
-    var limit = 5 * 1024 * 1024;
-    var pct = (estimate / limit * 100).toFixed(1);
     var usedMB = (estimate / (1024 * 1024)).toFixed(1);
-    if (pct > 80) {
+    if (estimate > 4.5 * 1024 * 1024) {
       el.style.display = 'flex';
-      el.innerHTML = '⚠️ <b>Storage nearly full!</b> ' + usedMB + 'MB / 5MB (' + pct + '%). <button class="btn bxs bam" onclick="clearStorageData()" style="margin-left:8px">Clear All Local Data</button> <button class="btn bxs bg2" onclick="this.parentElement.style.display=\'none\'" style="margin-left:4px">Dismiss</button>';
+      el.innerHTML = '⚠️ <b>Storage nearly full!</b> ' + usedMB + 'MB used. <button class="btn bxs bam" onclick="clearStorageData()" style="margin-left:8px">Clear All Local Data</button> <button class="btn bxs bg2" onclick="this.parentElement.style.display=\'none\'" style="margin-left:4px">Dismiss</button>';
     } else {
       el.style.display = 'none';
     }
     var infoEl = document.getElementById('storage-info');
-    if (infoEl) infoEl.textContent = usedMB + ' MB / 5 MB (' + pct + '%)';
+    if (infoEl) infoEl.textContent = usedMB + ' MB';
   } catch(e) { el.style.display = 'none'; }
 }
 
@@ -2566,7 +2814,7 @@ function clearStorageData() {
   renderReps();
   if (typeof renderAdminLv === 'function') renderAdminLv();
   var infoEl = document.getElementById('storage-info');
-  if (infoEl) infoEl.textContent = '0 MB / 5 MB (0%)';
+  if (infoEl) infoEl.textContent = '0 MB';
 }
 
 function toggleStorageCheck(enable) {
@@ -3009,8 +3257,35 @@ function renderMgrLv(){
       <div class="bal-n" style="color:${(bal[t]??DEF_BAL[t])>0?'var(--gr)':'var(--re)'}">${bal[t]??DEF_BAL[t]}</div>
       <div class="bal-l">${t}</div>
     </div>`).join('');
-  const myLv=db.leaves.filter(l=>l.mgrId===curUser.id).sort((a,b)=>b.appliedAt-a.appliedAt);
-  document.getElementById('my-lv-list').innerHTML=myLv.length?myLv.map(l=>lvRow(l,false)).join(''):'<div class="empty"><div class="ee">🏖️</div><p>No leave applications yet</p></div>';
+  /* Filtered leave report */
+  var from=document.getElementById('mlf-from')?.value, to=document.getElementById('mlf-to')?.value;
+  var myLv=db.leaves.filter(function(l){return l.mgrId===curUser.id;});
+  if(from) myLv=myLv.filter(function(l){return l.from>=from||l.to>=from;});
+  if(to) myLv=myLv.filter(function(l){return l.from<=to||l.to<=to;});
+  myLv.sort(function(a,b){return b.appliedAt-a.appliedAt;});
+  var totalDays=0, byType={}, byStatus={pending:0,approved:0,rejected:0};
+  myLv.forEach(function(l){
+    totalDays+=l.days;
+    byType[l.type]=(byType[l.type]||0)+l.days;
+    if(byStatus[l.status]!==undefined) byStatus[l.status]+=l.days;
+  });
+  var lbl='';
+  if(from&&to) lbl=fmtD(from)+' — '+fmtD(to);
+  else if(from) lbl='From '+fmtD(from);
+  else if(to) lbl='Till '+fmtD(to);
+  else lbl='All time';
+  var sumHtml='<div class="card" style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">'+
+    '<span style="font-size:11px;color:var(--t3)">📅 '+lbl+'</span>'+
+    '<span style="font-weight:600;color:var(--ac)">Total: '+totalDays+' days</span>'+
+    '<span style="color:var(--gr);font-size:12px">✅ Approved: '+byStatus.approved+'</span>'+
+    '<span style="color:var(--am);font-size:12px">⏳ Pending: '+byStatus.pending+'</span>'+
+    '<span style="color:var(--re);font-size:12px">❌ Rejected: '+byStatus.rejected+'</span>';
+  Object.keys(byType).forEach(function(t){
+    sumHtml+='<span class="badge b-te" style="font-size:10px">'+t+': '+byType[t]+'</span>';
+  });
+  sumHtml+='</div>';
+  document.getElementById('mgr-lv-summary').innerHTML=sumHtml;
+  document.getElementById('my-lv-list').innerHTML=myLv.length?myLv.map(function(l){return lvRow(l,false);}).join(''):'<div class="empty"><div class="ee">🏖️</div><p>No leave applications yet</p></div>';
 }
 function applyLv(){
   const type=document.getElementById('lv-type').value;
@@ -3538,8 +3813,15 @@ function renderOv(){
   const mc=filtered.length;
   const tf=filtered.reduce((a,x)=>a+Object.values(x.categories||{}).reduce((b,c)=>b+c.files.length,0),0);
   
-  // Pending leaves are kept unfiltered by date to sync with the sidebar badge & Leave tab
+  // Pending counts (all time — admin actions needed)
   const pLeaves=db.leaves.filter(l=>l.status==='pending').length;
+  const pLate=db.lateEntries.filter(l=>l.status==='pending').length;
+  const pMist=db.mistakes.filter(m=>m.status==='pending').length;
+  const pProb=db.problems.filter(p=>p.status==='open').length;
+  const pSug=db.suggestions.filter(s=>s.status==='pending').length;
+  const totalPending = pLeaves + pLate + pMist + pProb;
+  
+  // Monthly filtered data
   const moMist=(db.mistakes||[]).filter(m=>matchPeriodCustom(m,curPeriod,'date','submittedAt','reportedAt')).length;
   const prevMist=(db.mistakes||[]).filter(m=>matchPeriodCustom(m,prevPeriod,'date','submittedAt','reportedAt')).length;
   const moLate=(db.lateEntries||[]).filter(l=>matchPeriodCustom(l,curPeriod,'date','submittedAt','entryDate')&&l.status==='pending').length;
@@ -3564,7 +3846,19 @@ function renderOv(){
   const avgOT = (parseFloat(moOT) / mgrCount).toFixed(1);
   const avgLeavesTaken = (moLeavesTaken / mgrCount).toFixed(1);
   
-  document.getElementById('a-stats').innerHTML=`
+  // Pending actions alert bar
+  var pendingAlertHtml = '';
+  if (totalPending > 0) {
+    var items = [];
+    if (pLeaves) items.push('🏖️ Leaves: ' + pLeaves);
+    if (pLate) items.push('⏰ Late: ' + pLate);
+    if (pMist) items.push('⚠️ Mistakes: ' + pMist);
+    if (pProb) items.push('🔧 Problems: ' + pProb);
+    if (pSug) items.push('💡 Suggestions: ' + pSug);
+    pendingAlertHtml = '<div class="sync-alert warning" style="margin-bottom:12px;cursor:pointer" onclick="aTab(\'lv\',document.getElementById(\'sbi-lv\'))">🔔 <b>' + totalPending + ' pending action' + (totalPending!==1?'s':'') + ' — </b>' + items.join(' &nbsp;|&nbsp; ') + ' <span style="font-size:10px;opacity:0.6">(Click to view)</span></div>';
+  }
+  
+  document.getElementById('a-stats').innerHTML= pendingAlertHtml + `
     <div class="sc sc-blue">
       <div class="sc-ico">👤</div>
       <div>
@@ -3585,7 +3879,7 @@ function renderOv(){
     <div class="sc sc-orange" onclick="ovDrill('leaves','🏖️ Pending Leaves (${pLeaves})',leavesDrill())" style="cursor:pointer" title="Click to view">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="sc-ico">🏖️</div>
-        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">Avg: ${avgPending}/Mgr</span>
+        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">${pLeaves} pending</span>
       </div>
       <div>
         <div class="sn">${pLeaves}</div>
@@ -3595,21 +3889,31 @@ function renderOv(){
     <div class="sc sc-red" onclick="ovDrill('mistakes','⚠️ Mistakes (${moMist})',mistDrill(getCurrentPeriod()))" style="cursor:pointer" title="Click to view">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="sc-ico">⚠️</div>
-        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">Avg: ${avgMist}/Mgr</span>
+        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">${pMist} pending</span>
       </div>
       <div>
-        <div class="sn">${moMist}${tr(-(moMist-prevMist),prevMist)}</div>
-        <div class="sl">Mistakes ${tr(moMist,prevMist)}</div>
+        <div class="sn">${moMist}<span style="font-size:9px;margin-left:4px">${tr(-(moMist-prevMist),prevMist)}</span></div>
+        <div class="sl">Mistakes</div>
       </div>
     </div>
     <div class="sc sc-amber" onclick="ovDrill('late','⏰ Late Entries (${moLate})',lateDrill(getCurrentPeriod()))" style="cursor:pointer" title="Click to view">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="sc-ico">⏰</div>
-        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">Avg: ${avgLate}/Mgr</span>
+        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">${pLate} pending</span>
       </div>
       <div>
         <div class="sn">${moLate}${tr(-(moLate-prevLate),prevLate)}</div>
-        <div class="sl">Late Entries ${tr(moLate,prevLate)}</div>
+        <div class="sl">Late Entries</div>
+      </div>
+    </div>
+    <div class="sc sc-indigo" onclick="aTab('prob',document.getElementById('sbi-prob'))" style="cursor:pointer" title="Click to view problems">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="sc-ico">🔧</div>
+        <span style="font-size:10px;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:4px;font-weight:600">${pProb} open</span>
+      </div>
+      <div>
+        <div class="sn">${pProb}</div>
+        <div class="sl">Open Problems</div>
       </div>
     </div>
     <div class="sc sc-teal" onclick="ovDrill('ot','⏱️ OT Hours (${moOT}h)',otDrill(getCurrentPeriod()))" style="cursor:pointer" title="Click to view">
@@ -3619,7 +3923,7 @@ function renderOv(){
       </div>
       <div>
         <div class="sn">${moOT}h${tr(parseFloat(moOT),parseFloat(prevOT))}</div>
-        <div class="sl">OT Hours ${tr(parseFloat(moOT),parseFloat(prevOT))}</div>
+        <div class="sl">OT Hours</div>
       </div>
     </div>
     <div class="sc sc-yellow">
@@ -3636,7 +3940,7 @@ function renderOv(){
       </div>
       <div>
         <div class="sn">${moLeavesTaken}${tr(moLeavesTaken,prevLeaves)}</div>
-        <div class="sl">Leave Days ${tr(moLeavesTaken,prevLeaves)}</div>
+        <div class="sl">Leave Days</div>
       </div>
     </div>
   `;
@@ -3673,18 +3977,33 @@ function renderOv(){
       </div>
     </div>`).join(''):'<div class="panel-empty">કોઈ submission નથી</div>';}
     
-  // Pending leaves are kept unfiltered and sorted by applied/from date descending
-  const pend=db.leaves.filter(l=>l.status==='pending').sort((a,b)=>new Date(b.appliedAt || b.from || 0) - new Date(a.appliedAt || a.from || 0)).slice(0,5);
+  // Show pending items that need admin attention (all time)
+  var pendItems = [];
+  var pendLeaves = db.leaves.filter(l=>l.status==='pending').sort((a,b)=>new Date(b.appliedAt||b.from||0)-new Date(a.appliedAt||a.from||0)).slice(0,3);
+  pendLeaves.forEach(function(l){ pendItems.push({icon:'🏖️',name:l.mgrName,detail:l.type+' · '+l.days+' day(s)',badge:'⏳ Leave',cls:'b-am',tab:'lv'}); });
+  var pendLate = db.lateEntries.filter(l=>l.status==='pending').sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).slice(0,2);
+  pendLate.forEach(function(l){ pendItems.push({icon:'⏰',name:l.mgrName,detail:l.date+' · '+(l.reason||'No reason'),badge:'⏳ Late',cls:'b-am',tab:'late'}); });
+  var pendProb = db.problems.filter(p=>p.status==='open').sort((a,b)=>new Date(b.addedAt||0)-new Date(a.addedAt||0)).slice(0,2);
+  pendProb.forEach(function(p){ pendItems.push({icon:'🔧',name:p.mgrName,detail:(p.description||'').slice(0,50),badge:'Open',cls:'b-re',tab:'prob'}); });
+  pendItems = pendItems.slice(0,5);
   const pendEl=document.getElementById('a-sum-pending');
-  if(pendEl){pendEl.innerHTML=pend.length?pend.map(l=>`
-    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd)">
-      <div class="av" style="width:30px;height:30px;font-size:10px;flex-shrink:0;background:linear-gradient(135deg,#F97316,#FB923C)">${ini(l.mgrName||'?')}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:600;color:var(--t)">${l.mgrName}</div>
-        <div style="font-size:11px;color:var(--t2)">${l.type} · ${l.days} day(s)</div>
-      </div>
-      <span class="badge b-am" style="font-size:10px">⏳ Pending</span>
-    </div>`).join(''):'<div class="panel-empty">કોઈ pending leave નથી</div>';}
+  if(pendEl){
+    if(pendItems.length){
+      pendEl.innerHTML = pendItems.map(function(item){
+        var tab = item.tab || 'lv';
+        return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer" onclick="aTab(\''+tab+'\',document.getElementById(\'sbi-'+tab+'\'))">' +
+          '<div class="av" style="width:30px;height:30px;font-size:10px;flex-shrink:0;background:linear-gradient(135deg,#F97316,#FB923C)">' + item.icon + '</div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:12px;font-weight:600;color:var(--t)">' + item.name + '</div>' +
+            '<div style="font-size:11px;color:var(--t2)">' + item.detail + '</div>' +
+          '</div>' +
+          '<span class="badge ' + item.cls + '" style="font-size:10px">' + item.badge + '</span>' +
+        '</div>';
+      }).join('');
+    } else {
+      pendEl.innerHTML = '<div class="panel-empty">✅ Koi pending nathi — saru che!</div>';
+    }
+  }
     
   const sumEl=document.getElementById('a-sum');
   const cntEl=document.getElementById('a-sum-cnt');
@@ -3800,94 +4119,91 @@ function popF(){
   const ft=document.getElementById('ft');if(!ft.value)ft.value=today;
 }
 function renderReps(){
-  let data=[...db.submissions];
-  const from=document.getElementById('ff').value,to=document.getElementById('ft').value;
-  const sh=document.getElementById('fsh').value,mg=document.getElementById('fm').value,dp=document.getElementById('fd').value;
-  if(from)data=data.filter(s=>s.date>=from);if(to)data=data.filter(s=>s.date<=to);
-  if(sh)data=data.filter(s=>s.shift===sh);if(mg)data=data.filter(s=>s.mgrId===mg);if(dp)data=data.filter(s=>s.deptId===dp);
-  if(!data.length){document.getElementById('all-reps').innerHTML='<div class="empty"><div class="ee">🔍</div><p>No results</p></div>';return;}
+  var now=new Date(), todayStr=now.toISOString().slice(0,10);
+  var cmYY=now.getFullYear(), cmMM=String(now.getMonth()+1).padStart(2,'0');
+  var cmStart=cmYY+'-'+cmMM+'-01', cmEnd=cmYY+'-'+cmMM+'-'+new Date(cmYY,now.getMonth()+1,0).getDate().toString().padStart(2,'0');
+  var moName=now.toLocaleString('default',{month:'long'});
 
-  // ── 1. Daily Summary Table ──
-  const todayStr = new Date().toISOString().slice(0,10);
-  const dayMap = {};
-  data.forEach(s => {
-    const key = s.date + '|' + (s.mgrId||'?') + '|' + (s.shift||'');
-    if (!dayMap[key]) {
-      const cats = Object.values(s.categories||{});
-      const files = cats.reduce((a,c)=>a+c.files.length,0);
-      const mgr = db.managers.find(m => m.id === s.mgrId);
-      const deptId = mgr ? mgr.deptId : '';
-      const allCats = db.categories.filter(c => c.deptId === deptId);
-      dayMap[key] = {
-        date: s.date, mgrName: s.mgrName||s.mgrId||'—', dept: s.deptName||'—',
-        shift: s.shift, filledCatCount: cats.length, assignedCatCount: allCats.length,
-        filledNames: cats.map(c=>c.name).join(', '), files, note: s.note||'',
-        mgrId: s.mgrId, deptId
-      };
+  /* ── Helper: manager-wise summary table ── */
+  function mgrTable(subset, title){
+    var mmap={};
+    db.managers.forEach(function(m){
+      var ac=db.categories.filter(function(c){return c.deptId===m.deptId;});
+      mmap[m.id]={id:m.id,name:m.name,dept:dn(m.deptId)||'—',subs:0,files:0,fset:new Set(),ac:ac.length};
+    });
+    subset.forEach(function(s){
+      var mid=s.mgrId;
+      if(!mid||!mmap[mid]) return;
+      mmap[mid].subs++;
+      mmap[mid].files+=Object.values(s.categories||{}).reduce(function(a,c){return a+c.files.length;},0);
+      Object.keys(s.categories||{}).forEach(function(c){mmap[mid].fset.add(c);});
+    });
+    var e=Object.values(mmap); if(!e.length) return '';
+    var h='<div class="card" style="padding:0;overflow:hidden;margin-bottom:1rem"><div style="overflow-x:auto"><table class="tbl" style="font-size:12px"><thead><tr>'+
+      '<th>#</th><th>Manager</th><th>Dept</th><th style="text-align:center">Assigned</th><th style="text-align:center">Filled</th><th style="text-align:center">%</th><th style="text-align:center">Subs</th><th style="text-align:center">Files</th><th>Shift</th></tr></thead><tbody>';
+    e.sort(function(a,b){return b.subs-a.subs;}).forEach(function(m,i){
+      var pct=m.ac?Math.round(m.fset.size/m.ac*100):0;
+      var shifts=subset.filter(function(s){return s.mgrId===m.id;}).map(function(s){return s.shift==='day'?'☀️':'🌙';}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(' ');
+      h+='<tr>'+
+        '<td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'+
+        '<td style="font-weight:600">'+m.name+'</td>'+
+        '<td style="color:var(--t2)">'+m.dept+'</td>'+
+        '<td style="text-align:center;font-weight:600;color:var(--ac)">'+m.ac+'</td>'+
+        '<td style="text-align:center;font-weight:600;color:'+(m.fset.size===m.ac?'var(--gr)':'var(--am)')+'">'+m.fset.size+'</td>'+
+        '<td style="text-align:center;font-weight:600;color:'+(pct>=100?'var(--gr)':pct>=50?'var(--am)':'var(--re)')+'">'+pct+'%</td>'+
+        '<td style="text-align:center;color:var(--ac);font-weight:600">'+m.subs+'</td>'+
+        '<td style="text-align:center;font-weight:600;color:var(--gr)">'+m.files+'</td>'+
+        '<td>'+shifts+'</td>'+
+      '</tr>';
+    });
+    h+='</tbody></table></div></div>';
+    return '<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'+title+'</div>'+h;
+  }
+
+  var hs=[], todaySubs=db.submissions.filter(function(s){return s.date===todayStr;}), monthSubs=db.submissions.filter(function(s){return s.date>=cmStart&&s.date<=cmEnd;});
+
+  /* ── 1. Today — Manager Summary Table (always shows all managers, 0 if not filled) ── */
+  hs.push(mgrTable(todaySubs,'📋 Today — Manager Wise ('+fmtD(todayStr)+')'));
+  /* ── 2. Today — Detailed Submissions (only if data exists) ── */
+  if(todaySubs.length){
+    hs.push('<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:12px">📋 Today — Submissions</div>');
+    hs.push(todaySubs.map(function(s){return repCard(s,true);}).join(''));
+  }
+
+  /* ── 3. Current Month — Manager Summary Table (always shows all managers) ── */
+  hs.push('<div class="div" style="margin:1.5rem 0"></div>');
+  hs.push(mgrTable(monthSubs,'📊 '+moName+' '+cmYY+' — Manager Wise ('+monthSubs.length+' entries)'));
+
+  /* ── 4. Filtered data (according to date range / shift / manager / dept) ── */
+  var from=document.getElementById('ff').value, to=document.getElementById('ft').value;
+  var sh=document.getElementById('fsh').value, mg=document.getElementById('fm').value, dp=document.getElementById('fd').value;
+  if(from||to||sh||mg||dp){
+    var fd=[...db.submissions];
+    if(from) fd=fd.filter(function(s){return s.date>=from;});
+    if(to) fd=fd.filter(function(s){return s.date<=to;});
+    if(sh) fd=fd.filter(function(s){return s.shift===sh;});
+    if(mg) fd=fd.filter(function(s){return s.mgrId===mg;});
+    if(dp) fd=fd.filter(function(s){return s.deptId===dp;});
+    var fl='';
+    if(from&&to) fl=fmtD(from)+' — '+fmtD(to);
+    else if(from) fl='From '+fmtD(from);
+    else if(to) fl='Till '+fmtD(to);
+    else fl='All';
+    if(sh) fl+=' · '+(sh==='day'?'☀️ Day':'🌙 Night');
+    if(mg){var fmgr=db.managers.find(function(m){return m.id===mg;}); if(fmgr) fl+=' · '+fmgr.name;}
+    if(dp){var fdept=db.departments.find(function(d){return d.id===dp;}); if(fdept) fl+=' · '+fdept.name;}
+    hs.push('<div class="div" style="margin:1.5rem 0"></div>');
+    if(fd.length){
+      hs.push('<div style="font-size:11px;font-weight:600;color:var(--ac);margin-bottom:8px">🔍 Filtered — '+fl+' ('+fd.length+' entries)</div>');
+      hs.push(mgrTable(fd,'📋 Manager Wise — '+fl));
+      hs.push('<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:1rem">📋 Submissions — '+fl+'</div>');
+      hs.push(fd.map(function(s){return repCard(s,true);}).join(''));
+    } else {
+      hs.push('<div class="empty"><div class="ee">🔍</div><p>No results for '+fl+'</p></div>');
     }
-  });
-  const dayEntries = Object.values(dayMap).sort((a,b) => b.date.localeCompare(a.date) || a.mgrName.localeCompare(b.mgrName));
-  let html = '<div class="card" style="padding:0;overflow:hidden;margin-bottom:1rem"><div style="overflow-x:auto"><table class="tbl" style="font-size:12px;min-width:700px"><thead><tr>'+
-    '<th>Date</th><th>Manager</th><th>Dept</th><th>Shift</th><th style="text-align:center">Assigned</th><th style="text-align:center">Filled</th><th style="text-align:center">%</th><th style="text-align:center">Files</th><th>Note</th></tr></thead><tbody>';
-  dayEntries.forEach(e => {
-    const pct = e.assignedCatCount ? Math.round(e.filledCatCount/e.assignedCatCount*100) : 0;
-    const isToday = e.date === todayStr;
-    html += `<tr${isToday?' style="background:var(--bg3);font-weight:600"':''}>
-      <td style="white-space:nowrap;font-weight:500">${fmtD(e.date)}${isToday?' <span style="font-size:10px;color:var(--ac)">Today</span>':''}</td>
-      <td style="font-weight:600">${e.mgrName}</td>
-      <td style="color:var(--t2)">${e.dept}</td>
-      <td>${e.shift==='day'?'☀️ Day':'🌙 Night'}</td>
-      <td style="text-align:center;font-weight:600;color:var(--ac)">${e.assignedCatCount}</td>
-      <td style="text-align:center;font-weight:600;color:${e.filledCatCount===e.assignedCatCount?'var(--gr)':'var(--am)'}">${e.filledCatCount}</td>
-      <td style="text-align:center;font-weight:600;color:${pct>=100?'var(--gr)':pct>=50?'var(--am)':'var(--re)'}">${pct}%</td>
-      <td style="text-align:center;font-weight:600;color:var(--gr)">${e.files}</td>
-      <td style="font-size:11px;color:var(--t3);max-width:120px;overflow:hidden;text-overflow:ellipsis">${e.note||'—'}</td>
-    </tr>`;
-  });
-  html += '</tbody></table></div></div>';
+  }
 
-  // ── 2. Per-Manager Summary Table (current month only) ──
-  const now=new Date(),cmYY=now.getFullYear(),cmMM=String(now.getMonth()+1).padStart(2,'0');
-  const cmStart=cmYY+'-'+cmMM+'-01',cmEnd=cmYY+'-'+cmMM+'-'+new Date(cmYY,now.getMonth()+1,0).getDate().toString().padStart(2,'0');
-  const cmData=db.submissions.filter(s=>s.date>=cmStart&&s.date<=cmEnd);
-  const mgrMap = {};
-  cmData.forEach(s => {
-    const mId = s.mgrId || '?';
-    if (!mgrMap[mId]) {
-      const mgr = db.managers.find(m => m.id === mId);
-      const deptId = mgr ? mgr.deptId : '';
-      const allCats = db.categories.filter(c => c.deptId === deptId);
-      mgrMap[mId] = { id: mId, name: s.mgrName || mId, dept: s.deptName || dn(deptId) || '—', subs: 0, files: 0, filledSet: new Set(), allCatCount: allCats.length };
-    }
-    mgrMap[mId].subs++;
-    mgrMap[mId].files += Object.values(s.categories||{}).reduce((a,c)=>a+c.files.length,0);
-    Object.keys(s.categories||{}).forEach(c => mgrMap[mId].filledSet.add(c));
-  });
-  const entries = Object.values(mgrMap);
-  const moName=new Date(cmYY,now.getMonth()).toLocaleString('default',{month:'long'});
-  html += '<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📊 Manager-wise Summary — '+moName+' '+cmYY+'</div>';
-  html += '<div class="card" style="padding:0;overflow:hidden;margin-bottom:1rem"><div style="overflow-x:auto"><table class="tbl" style="font-size:12px"><thead><tr>'+
-    '<th>#</th><th>Manager</th><th>Dept</th><th style="text-align:center">Assigned Categories</th><th style="text-align:center">Filled</th><th style="text-align:center">%</th><th style="text-align:center">Submissions</th><th style="text-align:center">Files</th></tr></thead><tbody>';
-  entries.sort((a,b)=>b.subs-a.subs).forEach((m,i) => {
-    const pct = m.allCatCount ? Math.round(m.filledSet.size / m.allCatCount * 100) : 0;
-    html += `<tr>
-      <td style="color:var(--t3);font-size:11px">${i+1}</td>
-      <td style="font-weight:600">${m.name}</td>
-      <td style="color:var(--t2)">${m.dept}</td>
-      <td style="text-align:center">${m.allCatCount}</td>
-      <td style="text-align:center;font-weight:600;color:${m.filledSet.size===m.allCatCount?'var(--gr)':'var(--am)'}">${m.filledSet.size}</td>
-      <td style="text-align:center;font-weight:600;color:${pct>=100?'var(--gr)':pct>=50?'var(--am)':'var(--re)'}">${pct}%</td>
-      <td style="text-align:center;color:var(--ac);font-weight:600">${m.subs}</td>
-      <td style="text-align:center;font-weight:600;color:var(--gr)">${m.files}</td>
-    </tr>`;
-  });
-  html += '</tbody></table></div></div>';
-
-  // ── 3. Detailed Report Cards ──
-  html += '<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 Detailed Submissions</div>';
-  html += data.map(s=>repCard(s,true)).join('');
-
-  document.getElementById('all-reps').innerHTML = html;
+  document.getElementById('all-reps').innerHTML = hs.join('');
 }
 function clrF(){const t=new Date().toISOString().slice(0,10);document.getElementById('ff').value=t;document.getElementById('ft').value=t;['fsh','fm','fd'].forEach(id=>document.getElementById(id).value='');renderReps();}
 
@@ -3901,12 +4217,6 @@ function renderAdminLv(){
   if(lmg.options.length<=1){db.managers.forEach(m=>lmg.add(new Option(m.name,m.id)));}
   const ltp=document.getElementById('lf-tp');
   if(ltp.options.length<=1){LEAVE_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;ltp.appendChild(o);});}
-  // populate balance set dropdowns
-  const sbmg=document.getElementById('sb-mg');
-  if(sbmg.options.length<=1){db.managers.forEach(m=>sbmg.add(new Option(m.name,m.id)));}
-  const sbtp=document.getElementById('sb-tp');
-  if(sbtp.options.length<=1){LEAVE_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sbtp.appendChild(o);});}
-
   // STATS
   const pend=db.leaves.filter(l=>l.status==='pending').length;
   const appr=db.leaves.filter(l=>l.status==='approved').length;
@@ -3929,20 +4239,6 @@ function renderAdminLv(){
 
   // LEAVE REPORT TABLE (filtered)
   renderLvReport();
-
-  // BALANCE TABLE
-  const hdr=document.getElementById('lv-bal-hdr');
-  hdr.innerHTML='<th>Manager</th><th>Dept</th>'+LEAVE_TYPES.map(t=>`<th>${t}</th>`).join('')+'<th>Total Used</th>';
-  document.getElementById('lv-bal-body').innerHTML=db.managers.map(m=>{
-    const bal=getLvBal(m.id);
-    const used=db.leaves.filter(l=>l.mgrId===m.id&&l.status==='approved').reduce((a,l)=>a+l.days,0);
-    return `<tr>
-      <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
-      <td><span class="badge b-te" style="font-size:10px">${dn(m.deptId)}</span></td>
-      ${LEAVE_TYPES.map(t=>`<td style="text-align:center"><span style="font-weight:600;color:${(bal[t]??DEF_BAL[t])>0?'var(--gr)':'var(--re)'}">${bal[t]??DEF_BAL[t]}</span></td>`).join('')}
-      <td style="text-align:center;font-weight:600;color:var(--am)">${used}</td>
-    </tr>`;
-  }).join('');
 }
 
 function renderLvReport(){
@@ -3980,16 +4276,6 @@ function renderLvReport(){
 }
 function clrLvF(){['lf-st','lf-mg','lf-tp','lf-from','lf-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderLvReport();}
 
-function setBalance(){
-  const mid=document.getElementById('sb-mg').value;
-  const tp=document.getElementById('sb-tp').value;
-  const val=parseInt(document.getElementById('sb-val').value);
-  if(!mid||!tp){sm('sb-msg','Manager ane type select karo',true);return;}
-  if(isNaN(val)||val<0){sm('sb-msg','Valid number nakho',true);return;}
-  const bal=getLvBal(mid);bal[tp]=val;db.leavebal[mid]=bal;persist(mid);
-  sm('sb-msg','✅ Balance set: '+val+' days for '+tp);renderAdminLv();
-}
-
 /* ============================================================
    MANAGERS
 ============================================================ */
@@ -4011,10 +4297,13 @@ function addMgr(){
   sm('mg-msg','✅ '+nm+' added!');renderMgTbl();
 }
 function renderMgTbl(){
-  document.getElementById('mg-cnt').textContent=db.managers.length;
-  document.getElementById('mg-tbl').innerHTML=db.managers.length?`<table class="tbl">
+  var q=(document.getElementById('mg-srch')?.value||'').toLowerCase().trim();
+  var list=db.managers;
+  if(q) list=list.filter(function(m){return m.id.toLowerCase().includes(q)||m.name.toLowerCase().includes(q)||dn(m.deptId).toLowerCase().includes(q);});
+  document.getElementById('mg-cnt').textContent=list.length+' / '+db.managers.length;
+  document.getElementById('mg-tbl').innerHTML=list.length?`<table class="tbl">
     <thead><tr><th>ID</th><th>Password</th><th>Name</th><th>Dept</th><th>Subs</th><th></th></tr></thead>
-    <tbody>${db.managers.map(m=>`<tr>
+    <tbody>${list.map(m=>`<tr>
       <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${m.id}</td>
       <td style="font-family:'DM Mono';font-size:11px;white-space:nowrap"><span class="badge b-am" id="mgpw-${m.id}" style="letter-spacing:1px">••••••</span> <button class="btn bg2 bxs" style="padding:2px 7px" onclick="tglMgPw('${m.id}')">👁</button></td>
       <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:26px;height:26px;font-size:10px">${ini(m.name)}</div>${m.name}</div></td>
@@ -4455,34 +4744,7 @@ function renderMgrLate(){
 }
 
 // ── Admin: add late entry ──
-function adminAddLate(){
-  const mgrId  = document.getElementById('al-mg').value;
-  const date   = document.getElementById('al-date').value;
-  const shift  = document.getElementById('al-shift').value;
-  const mins   = parseInt(document.getElementById('al-mins').value);
-  const time   = document.getElementById('al-time').value;
-  const reason = document.getElementById('al-reason').value.trim();
-  const remark = document.getElementById('al-remark').value.trim();
-  if(!mgrId){sm('al-msg','Manager select karo',true);return;}
-  if(!date){sm('al-msg','Date nakho',true);return;}
-  if(!mins||mins<1){sm('al-msg','Late minutes nakho',true);return;}
-  if(!reason){sm('al-msg','Reason lakhao',true);return;}
-  const mgr = db.managers.find(m=>m.id===mgrId);
-  db.lateEntries.unshift({
-    id:Date.now(), mgrId, mgrName:mgr.name,
-    deptId:mgr.deptId, deptName:dn(mgr.deptId),
-    date, shift, lateMinutes:mins, arrivalTime:time, reason,
-    status:'pending', remark, addedBy:'admin',
-    submittedAt:new Date().toISOString()
-  });
-  persistLate(mgrId);
-  sm('al-msg','✅ Late entry add thayi — '+mgr.name);
-  ['al-mg','al-date','al-mins','al-time','al-reason','al-remark'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value='';
-  });
-  renderLateReport();
-  updateLateBadges();
-}
+
 
 // ── Admin: approve/reject/delete ──
 function excuseLate(id){
@@ -4552,8 +4814,6 @@ function lateCard(l, isAdmin){
 function renderLateReport(){
   updateLateBadges();
   // populate manager dropdowns
-  const almg=document.getElementById('al-mg');
-  if(almg&&almg.options.length<=1) db.managers.forEach(m=>almg.add(new Option(m.name+' ('+m.id+')',m.id)));
   const lefmg=document.getElementById('lef-mg');
   if(lefmg&&lefmg.options.length<=1) db.managers.forEach(m=>lefmg.add(new Option(m.name,m.id)));
 
@@ -4641,7 +4901,7 @@ function bulkAction(section,action){
   }else if(section==='mistake'){
     if(action==='delete')showCfm(ids.length+' mistake entry delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.mistakes.findIndex(x=>x.id==+id);if(i>-1)db.mistakes.splice(i,1);});persist();renderMistReport();});
   }else if(section==='problem'){
-    if(action==='solve')showCfm(ids.length+' problem solve mark karva?','✅ Bulk Solve').then(ok=>{if(!ok)return;ids.forEach(id=>{const p=db.problems.find(x=>x.id==+id);if(p){p.status='solved';p.adminSolved=true;p.solvedAt=new Date().toISOString();if(!p.adminSolution)p.adminSolution='Bulk solved by admin';}});persist();renderProblems();});
+    if(action==='solve')showCfm(ids.length+' problem solve mark karva?','✅ Bulk Solve').then(ok=>{if(!ok)return;ids.forEach(id=>{const p=db.problems.find(x=>x.id==+id);if(p){p.status='solved';p.solvedAt=new Date().toISOString();p.resolvedBy=curUser.id;p.resolvedByName=curUser.name;if(!p.solution)p.solution='Bulk solved by admin';p.seenByMgr=false;}});persist();renderProblems();});
     else if(action==='delete')showCfm(ids.length+' problem delete karva?','🗑️ Bulk Delete').then(ok=>{if(!ok)return;ids.forEach(id=>{const i=db.problems.findIndex(x=>x.id==+id);if(i>-1)db.problems.splice(i,1);});persist();renderProblems();});
   }else if(section==='leave'){
     if(action==='approve')showCfm(ids.length+' leave approve karva?','✅ Bulk Approve').then(ok=>{if(!ok)return;ids.forEach(id=>{const l=db.leaves.find(x=>x.id==+id);if(l&&l.status==='pending'){l.status='approved';if(!l.remark)l.remark='Bulk approved by admin';}});persist();renderAdminLv();});
@@ -4860,6 +5120,7 @@ const PROB_CATS=['Work Issue','Behavior Issue','Process Issue','Communication Is
 /* ── Manager submits a problem ── */
 function mgrSubmitProblem(){
   if(!curUser)return;
+  const priority=document.getElementById('mgr-pr-priority').value;
   const cat=document.getElementById('mgr-pr-cat').value;
   const desc=document.getElementById('mgr-pr-desc').value.trim();
   if(!desc){sm('mgr-pr-msg','Problem lakhao',true);return;}
@@ -4867,9 +5128,11 @@ function mgrSubmitProblem(){
     id:Date.now(), mgrId:curUser.id, mgrName:curUser.name,
     deptId:curUser.deptId, deptName:dn(curUser.deptId),
     date:tod(), category:cat, description:desc,
+    priority:priority,
     solution:'', status:'open',
     addedAt:new Date().toISOString(), addedBy:'manager',
-    seenByAdmin:false, seenByMgr:true
+    seenByAdmin:false, seenByMgr:true,
+    resolvedBy:null, resolvedByName:null, resolvedAt:null
   });
   persistProb(curUser.id);
   sm('mgr-pr-msg','✅ Problem submit thayi! Admin solution aapshhe.');
@@ -4878,14 +5141,44 @@ function mgrSubmitProblem(){
 }
 
 /* ── Admin: reply/solve a problem ── */
+var _solvingProbId = null;
+
 function solveProblem(id){
   const p=db.problems.find(x=>x.id===id);if(!p)return;
-  const sol=prompt('Admin Solution / Reply lakhao:');if(sol===null)return;
-  p.solution=sol||'Resolved by admin';
-  p.status='solved';
-  p.solvedAt=new Date().toISOString();
-  p.seenByMgr=false; // manager ne notification
-  persistProb(p.mgrId); renderProblems(); updateProbBadge();
+  _solvingProbId = id;
+  document.getElementById('solve-prob-info').innerHTML =
+    '<strong>Manager:</strong> ' + p.mgrName + ' (' + p.mgrId + ')<br>' +
+    '<strong>Category:</strong> ' + p.category + ' · <strong>Priority:</strong> ' + p.priority +
+    '<br><strong>Problem:</strong> ' + p.description.slice(0, 200);
+  document.getElementById('solve-solution-text').value = '';
+  document.getElementById('solve-err').textContent = '';
+  document.getElementById('solve-modal').classList.add('on');
+  setTimeout(()=>document.getElementById('solve-solution-text').focus(), 150);
+}
+
+function closeSolveModal(){
+  document.getElementById('solve-modal').classList.remove('on');
+  _solvingProbId = null;
+}
+
+function confirmSolve(){
+  const id = _solvingProbId;
+  if(!id) return;
+  const p = db.problems.find(x=>x.id===id);
+  if(!p) return;
+  const sol = document.getElementById('solve-solution-text').value.trim();
+  if(!sol) { document.getElementById('solve-err').textContent = 'Krupaya solution lakho!'; return; }
+  p.solution = sol;
+  p.status = 'solved';
+  p.solvedAt = new Date().toISOString();
+  p.resolvedBy = curUser.id;
+  p.resolvedByName = curUser.name;
+  p.seenByMgr = false;
+  addLog('solve-problem', p.mgrId, p.mgrName, 'Problem solved: ' + (p.description||'').slice(0, 60));
+  persistProb(p.mgrId);
+  closeSolveModal();
+  renderProblems();
+  updateProbBadge();
 }
 
 /* ── Admin: delete ── */
@@ -4932,6 +5225,10 @@ function renderProblems(){
 /* ── Problem card — used by both admin and manager ── */
 function probCard(p,isAdmin){
   const timeAgo=p.addedAt?fmtDT(p.addedAt):'—';
+  const solvedAt=p.solvedAt?fmtDT(p.solvedAt):'';
+  const priorityColors={Low:'b-te',Medium:'b-am',High:'b-re',Urgent:'#fff;background:#7C2D12'};
+  const priorityClass=priorityColors[p.priority]||'b-te';
+  const priorityLabel=p.priority||'Medium';
   return `<div class="prob-row ${p.status==='open'?'prob-open':'prob-solved'}">
     ${isAdmin?`<label class="cb-chip"><input type="checkbox" class="cb-problem" value="${p.id}" onchange="bulkUpdateBtn('problem')"><span></span></label>`:''}
     <div style="flex:1">
@@ -4942,6 +5239,7 @@ function probCard(p,isAdmin){
       </div>
       <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
         <span class="badge ${p.status==='open'?'b-re':'b-gr'}">${p.status==='open'?'🔴 Open':'✅ Solved'}</span>
+        <span class="badge ${priorityClass}" style="font-size:10px">${priorityLabel}</span>
         <span class="badge b-te" style="font-size:10px">${p.category}</span>
         ${isAdmin&&p.status==='open'?`<button class="btn bgr bxs" onclick="solveProblem(${p.id})">✅ Reply</button>`:''}
         ${isAdmin?`<button class="btn bre bxs" onclick="delProb(${p.id})">🗑️</button>`:''}
@@ -4955,6 +5253,7 @@ function probCard(p,isAdmin){
       ?`<div style="font-size:13px;padding:8px 10px;background:var(--gr2);border-radius:var(--rs);border-left:2px solid var(--gr)">
           <div style="font-size:10px;font-weight:600;color:var(--gr);margin-bottom:3px">✅ ADMIN SOLUTION / REPLY</div>
           ${p.solution}
+          ${solvedAt?`<div style="font-size:10px;color:var(--t3);margin-top:5px;border-top:1px solid var(--bd);padding-top:4px">🕐 ${solvedAt} ${p.resolvedByName?'· by '+p.resolvedByName:''}</div>`:''}
         </div>`
       :'<div style="font-size:11px;color:var(--t3);font-style:italic;padding:4px 0">⏳ Admin solution pending...</div>'
     }
@@ -5484,7 +5783,7 @@ function generateAISuggestions() {
       }
 
       if (db.problems && db.problems.length > 0) {
-        const openProbs = db.problems.filter(p => !p.solved);
+        const openProbs = db.problems.filter(p => p.status === 'open');
         if (openProbs.length > 0) {
           const oldestProb = openProbs.sort((a,b) => new Date(a.date || a.submittedAt || 0) - new Date(b.date || b.submittedAt || 0))[0];
           const openDays = oldestProb.date ? Math.floor((now - new Date(oldestProb.date).getTime())/86400000) : 0;
@@ -5492,7 +5791,7 @@ function generateAISuggestions() {
             insights.push({
               priority: 'warning',
               title: '🔧 Unresolved Operational Issues',
-              desc: `There are unresolved problem reports pending for over 3 days (e.g. <em>"${oldestProb.title}"</em> by ${getMgrName(oldestProb.mgrId)}). Review and close these issues.`,
+              desc: `There are unresolved problem reports pending for over 3 days (e.g. <em>"${(oldestProb.description||'').slice(0,60)}"</em> by ${getMgrName(oldestProb.mgrId)}). Review and close these issues.`,
               score: 50
             });
           }
@@ -5686,7 +5985,7 @@ function runOnScreenAnalysis() {
           }
         }
       } else if (secId === 'as-prob') {
-        const openProbs = db.problems.filter(p => !p.solved).length;
+        const openProbs = db.problems.filter(p => p.status === 'open').length;
         insights.push({
           priority: 'info',
           title: '💻 Screen: Problem reports',
@@ -6606,7 +6905,11 @@ function delHrs(id){
 
 /* ── Admin: Render Hours Report ── */
 function renderHrsReport(){
-  /* populate manager filter */
+  /* populate manager dropdowns */
+  var ahMG=document.getElementById('ah-mg');
+  if(ahMG&&ahMG.options.length<=1) db.managers.forEach(function(m){ahMG.add(new Option(m.name,m.id));});
+  var ahMonth=document.getElementById('ah-month');
+  if(ahMonth&&!ahMonth.value) ahMonth.value=new Date().toISOString().slice(0,7);
   const hfmg = document.getElementById('hrf-mg');
   if(hfmg && hfmg.options.length<=1){
     db.managers.forEach(m=>hfmg.add(new Option(m.name, m.id)));
@@ -6657,32 +6960,6 @@ function renderHrsReport(){
       <td style="text-align:center;color:var(--t2)">${(tH/Math.max(days,1)).toFixed(1)}</td>
     </tr>`;
   }).join('');
-
-  /* full list — table rows */
-  const listEl = document.getElementById('hrs-list');
-  if(!listEl) return;
-  listEl.innerHTML = data.length
-    ? data.map(h=>{
-        const reg = h.regularHours ?? Math.max(0, h.workedHours-(h.otHours||0));
-        const ot  = h.otHours||0;
-        return `<tr>
-          <td><input type="checkbox" class="cb-hours" value="${h.id}" onchange="bulkUpdateBtn('hours')" style="width:16px;height:16px;cursor:pointer;accent-color:var(--ac)"></td>
-          <td><div style="display:flex;align-items:center;gap:7px"><div class="av" style="width:24px;height:24px;font-size:10px">${ini(h.mgrName)}</div>${h.mgrName}</div></td>
-          <td style="font-family:'DM Mono';font-size:11px;color:var(--t2)">${h.mgrId}</td>
-          <td><span class="badge b-te" style="font-size:10px">${h.deptName||'—'}</span></td>
-          <td style="white-space:nowrap">${fmtD(h.date)}</td>
-          <td>${h.shift==='day'?'☀️ Day':'🌙 Night'}</td>
-          <td style="text-align:center;font-weight:600;color:var(--gr)">${reg.toFixed(1)}h</td>
-          <td style="text-align:center;font-weight:600;color:${ot>0?'var(--am)':'var(--t3)'}">${ot.toFixed(1)}h</td>
-          <td style="text-align:center;font-weight:700;color:var(--ac)">${h.workedHours}h</td>
-          <td style="font-size:11px;color:var(--t2);max-width:120px">${h.remarkOT||'—'}</td>
-          <td style="font-size:11px;color:var(--t2);max-width:120px">${h.note||'—'}</td>
-          <td style="font-size:11px;color:var(--t3);white-space:nowrap">${fmtDT(h.submittedAt)}</td>
-        </tr>`;
-      }).join('')
-    : '<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--t3)">⏱️ No hours entries found</td></tr>';
-  const sa=document.getElementById('selall-hours');
-  if(sa)sa.checked=false;
 }
 
 function clrHrsF(){
@@ -6694,7 +6971,156 @@ function clrHrsF(){
 
 // Work Hours patch unified in script block 1
 
-/* ── expJSON is fully defined above (includes workHours) — no override needed here ── */
+/* ── Hours Edit Modal ── */
+var _hrsEditId=null;
+function openHrsEdit(id){
+  var h=db.workHours.find(function(x){return x.id===id;});
+  if(!h) return;
+  _hrsEditId=id;
+  document.getElementById('hre-date').value=h.date||'';
+  document.getElementById('hre-shift').value=h.shift||'day';
+  document.getElementById('hre-reg').value=h.regularHours??Math.max(0,h.workedHours-(h.otHours||0));
+  document.getElementById('hre-ot').value=h.otHours||0;
+  document.getElementById('hre-ot-remark').value=h.remarkOT||'';
+  document.getElementById('hre-note').value=h.note||'';
+  document.getElementById('hre-err').textContent='';
+  document.getElementById('hrs-edit-modal').classList.add('on');
+}
+function closeHrsEdit(){
+  document.getElementById('hrs-edit-modal').classList.remove('on');
+  _hrsEditId=null;
+}
+function saveHrsEdit(){
+  var h=db.workHours.find(function(x){return x.id===_hrsEditId;});
+  if(!h) return;
+  var date=document.getElementById('hre-date').value;
+  var shift=document.getElementById('hre-shift').value;
+  var reg=parseFloat(document.getElementById('hre-reg').value);
+  var ot=parseFloat(document.getElementById('hre-ot').value);
+  var otRemark=document.getElementById('hre-ot-remark').value.trim();
+  var note=document.getElementById('hre-note').value.trim();
+  if(!date){document.getElementById('hre-err').textContent='Date select karo';return;}
+  if(isNaN(reg)||reg<0){document.getElementById('hre-err').textContent='Valid regular hours nakho';return;}
+  if(isNaN(ot)||ot<0){document.getElementById('hre-err').textContent='Valid OT hours nakho';return;}
+  h.date=date;
+  h.shift=shift;
+  h.regularHours=reg;
+  h.otHours=ot;
+  h.workedHours=reg+ot;
+  h.remarkOT=otRemark;
+  h.note=note;
+  persist(h.mgrId);
+  if(typeof addLog==='function') addLog('edit-hours','admin','Admin','Edited hours entry for '+h.mgrName+' ('+h.date+')',_hrsEditId);
+  closeHrsEdit();
+  renderHrsReport();
+}
+
+/* ── Admin: Manager + Month specific hours view ── */
+function renderHrsMgrView(){
+  var mgrId=document.getElementById('ah-mg')?.value;
+  var month=document.getElementById('ah-month')?.value;
+  var el=document.getElementById('hrs-mgr-view');
+  if(!mgrId||!month){el.innerHTML='<div class="empty" style="padding:1rem"><div class="ee">👆</div><p>Manager ane month select karo</p></div>';return;}
+  var data=db.workHours.filter(function(h){return h.mgrId===mgrId&&h.date&&h.date.startsWith(month);});
+  var mgr=db.managers.find(function(m){return m.id===mgrId;});
+  if(!mgr){el.innerHTML='';return;}
+  var tH=data.reduce(function(a,h){return a+h.workedHours;},0);
+  var tOT=data.reduce(function(a,h){return a+(h.otHours||0);},0);
+  var tReg=tH-tOT;
+  var html='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px">'+
+    '<span style="font-weight:600;font-size:13px">'+mgr.name+' — '+month+' ('+data.length+' entries)</span>'+
+    '<span class="badge b-gr">Total: '+tH.toFixed(1)+'h</span>'+
+    '<span class="badge b-am">Regular: '+tReg.toFixed(1)+'h</span>'+
+    '<span class="badge b-re" style="background:var(--or2);color:var(--or)">OT: '+tOT.toFixed(1)+'h</span>'+
+  '</div>';
+  if(!data.length){html+='<div class="empty" style="padding:1rem"><div class="ee">⏱️</div><p>Koi hours entry nathi aa mahina ma</p></div>';el.innerHTML=html;return;}
+  html+='<div class="card" style="padding:0;overflow:hidden"><div style="overflow-x:auto"><table class="tbl" style="font-size:12px"><thead><tr>'+
+    '<th>Date</th><th>Shift</th><th style="text-align:center">Regular</th><th style="text-align:center">OT</th><th style="text-align:center">Total</th><th>OT Remark</th><th>Note</th><th></th></tr></thead><tbody>';
+  data.sort(function(a,b){return b.date.localeCompare(a.date);}).forEach(function(h){
+    var reg=h.regularHours??Math.max(0,h.workedHours-(h.otHours||0));
+    var ot=h.otHours||0;
+    html+='<tr>'+
+      '<td style="white-space:nowrap;font-weight:500">'+fmtD(h.date)+'</td>'+
+      '<td>'+(h.shift==='day'?'☀️ Day':'🌙 Night')+'</td>'+
+      '<td style="text-align:center;font-weight:600;color:var(--gr)">'+reg.toFixed(1)+'h</td>'+
+      '<td style="text-align:center;font-weight:600;color:var(--am)">'+ot.toFixed(1)+'h</td>'+
+      '<td style="text-align:center;font-weight:700;color:var(--ac)">'+h.workedHours+'h</td>'+
+      '<td style="font-size:11px;color:var(--t2);max-width:120px">'+(h.remarkOT||'—')+'</td>'+
+      '<td style="font-size:11px;color:var(--t2);max-width:120px">'+(h.note||'—')+'</td>'+
+      '<td><button class="btn bg2 bxs" onclick="openHrsEdit('+h.id+')" title="Edit">✏️</button></td>'+
+    '</tr>';
+  });
+  html+='</tbody></table></div></div>';
+  el.innerHTML=html;
+}
+
+/* ── Manual Backup: Export JSON ── */
+function expJSON(){
+  var data = {
+    exportedAt: new Date().toISOString(),
+    version: '1.2',
+    managers: db.managers,
+    departments: db.departments,
+    categories: db.categories,
+    adminPw: db.adminPw,
+    submissions: db.submissions,
+    leaves: db.leaves,
+    leavebal: db.leavebal,
+    mistakes: db.mistakes,
+    lateEntries: db.lateEntries,
+    problems: db.problems,
+    suggestions: db.suggestions,
+    ratings: db.ratings,
+    workHours: db.workHours
+  };
+  var json = JSON.stringify(data, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'FormTrack_Backup_' + tod() + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  var el = document.getElementById('mn-msg');
+  if(el){ el.textContent = '✅ File download thayi gayu!'; el.style.color = 'var(--gr)'; }
+}
+
+/* ── Manual Backup: Import JSON ── */
+function impJSON(input){
+  if(!input || !input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var data = JSON.parse(e.target.result);
+      if(!data || typeof data !== 'object') { alert('Invalid backup file!'); return; }
+      // Apply data to db
+      if(data.managers)     db.managers = data.managers;
+      if(data.departments)  db.departments = data.departments;
+      if(data.categories)   db.categories = data.categories;
+      if(data.adminPw)      db.adminPw = data.adminPw;
+      if(data.submissions)  db.submissions = data.submissions;
+      if(data.leaves)       db.leaves = data.leaves;
+      if(data.leavebal)     db.leavebal = data.leavebal;
+      if(data.mistakes)     db.mistakes = data.mistakes;
+      if(data.lateEntries)  db.lateEntries = data.lateEntries;
+      if(data.problems)     db.problems = data.problems;
+      if(data.suggestions)  db.suggestions = data.suggestions;
+      if(data.ratings)      db.ratings = data.ratings;
+      if(data.workHours)    db.workHours = data.workHours;
+      persist();
+      var el = document.getElementById('mn-msg');
+      if(el){ el.textContent = '✅ Backup file import thayi gayo! Page refresh karo.'; el.style.color = 'var(--gr)'; }
+      alert('✅ Backup import successful! Refresh karo.');
+    } catch(err) {
+      alert('❌ Error reading file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
 
 /* ── Hours: get filtered data (reuse from renderHrsReport filters) ── */
 function getHrsRepData(){
@@ -6756,13 +7182,15 @@ function getProbRepData(){
 function dlProbRepPDF(){
   const data=getProbRepData();
   if(!data.length){alert('Koi data nathi!');return;}
-  const headers=['Manager','Dept','Category','Status','Problem','Admin Solution','Date'];
+  const headers=['Manager','Dept','Category','Priority','Status','Problem','Admin Solution','Date','Solved By','Solved At'];
   const rows=data.map(p=>[
-    p.mgrName||'—',p.deptName||'—',p.category||'—',
+    p.mgrName||'—',p.deptName||'—',p.category||'—',p.priority||'Medium',
     p.status==='solved'?'Solved':'Open',
     (p.description||'').substring(0,80),
     (p.solution||'').substring(0,80),
-    dlFmtD(p.submittedAt?.slice(0,10)||p.date||'')
+    dlFmtD(p.submittedAt?.slice(0,10)||p.date||''),
+    p.resolvedByName||'—',
+    p.solvedAt?new Date(p.solvedAt).toLocaleDateString('en-IN'):'—'
   ]);
   makePDF('Problem/Solution Report',headers,rows,'FormTrack_ProblemReport_'+tod()+'.pdf');
 }
@@ -6770,12 +7198,14 @@ function dlProbRepPDF(){
 function dlProbRepExcel(){
   const data=getProbRepData();
   if(!data.length){alert('Koi data nathi!');return;}
-  const headers=['Manager','ID','Dept','Category','Status','Problem Description','Admin Solution','Submitted At'];
+  const headers=['Manager','ID','Dept','Category','Priority','Status','Problem Description','Admin Solution','Submitted At','Solved By','Solved At'];
   const rows=data.map(p=>[
-    p.mgrName||'—',p.mgrId||'—',p.deptName||'—',p.category||'—',
+    p.mgrName||'—',p.mgrId||'—',p.deptName||'—',p.category||'—',p.priority||'Medium',
     p.status==='solved'?'Solved':'Open',
     p.description||'',p.solution||'',
-    p.submittedAt?new Date(p.submittedAt).toLocaleString('en-IN'):''
+    p.submittedAt?new Date(p.submittedAt).toLocaleString('en-IN'):'',
+    p.resolvedByName||'—',
+    p.solvedAt?new Date(p.solvedAt).toLocaleString('en-IN'):''
   ]);
   makeExcel('Problem/Solution Report',headers,rows,'FormTrack_ProblemReport_'+tod()+'.xlsx');
 }
@@ -8336,6 +8766,112 @@ function initFirebaseListeners() {
     console.error("[Firebase] Listener setup failed:", e);
   }
 }
+/* ── Searchable manager select (combobox) ── */
+function srchMgCombobox(inp,dd){
+  if(!dd) dd=inp.parentNode.querySelector('.mg-dd');
+  if(!dd){
+    dd=document.createElement('div');
+    dd.className='mg-dd';
+    dd.style.cssText='position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--s);border:1.5px solid var(--bd);border-radius:var(--rs);box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:99999;display:none';
+    inp.parentNode.style.position='relative';
+    inp.parentNode.appendChild(dd);
+    inp.autocomplete='off';
+  }
+  var sel=document.getElementById(inp.dataset.for);
+  if(!sel) return;
+  if(!sel._origOpts){
+    sel._origOpts=[];for(var i=0;i<sel.options.length;i++) sel._origOpts.push(sel.options[i]);
+  }
+  var q=inp.value.toLowerCase().trim();
+  dd.innerHTML='';
+  var selOpts=sel._origOpts||[];
+  if(!q){
+    // show all options when input is empty
+    selOpts.forEach(function(o){
+      if(!o.value) return;
+      var item=document.createElement('div');
+      item.textContent=o.text;
+      item.style.cssText='padding:8px 10px;cursor:pointer;font-size:13px;color:var(--t);border-bottom:1px solid var(--bd)';
+      item.addEventListener('mouseenter',function(){this.style.background='var(--s2)';});
+      item.addEventListener('mouseleave',function(){this.style.background='';});
+      item.addEventListener('click',function(){
+        inp.value=o.text;
+        sel.value=o.value;
+        dd.style.display='none';
+        sel.dispatchEvent(new Event('change',{bubbles:true}));
+      });
+      dd.appendChild(item);
+    });
+    if(dd.children.length){dd.style.display='block';dd.children[0].style.background='var(--ac2)';}
+    else dd.style.display='none';
+    return;
+  }
+  sel._origOpts.forEach(function(o){
+    if(o.value&&o.text.toLowerCase().includes(q)){
+      var item=document.createElement('div');
+      item.textContent=o.text;
+      item.style.cssText='padding:8px 10px;cursor:pointer;font-size:13px;color:var(--t);border-bottom:1px solid var(--bd)';
+      item.addEventListener('mouseenter',function(){this.style.background='var(--s2)';});
+      item.addEventListener('mouseleave',function(){this.style.background='';});
+      item.addEventListener('click',function(){
+        inp.value=o.text;
+        sel.value=o.value;
+        dd.style.display='none';
+        sel.dispatchEvent(new Event('change',{bubbles:true}));
+      });
+      dd.appendChild(item);
+    }
+  });
+  if(dd.children.length){
+    dd.style.display='block';
+    dd.children[0].style.background='var(--ac2)';
+  } else {
+    var no=document.createElement('div');
+    no.textContent='— No match —';
+    no.style.cssText='padding:8px 10px;font-size:12px;color:var(--t3)';
+    dd.appendChild(no);
+    dd.style.display='block';
+  }
+}
+/* Close all combobox dropdowns on outside click */
+document.addEventListener('click',function(e){
+  var t=e.target;
+  document.querySelectorAll('.mg-dd').forEach(function(dd){
+    if(!dd.parentNode.contains(t)) dd.style.display='none';
+  });
+},true);
+/* Sync search input when select changed directly */
+document.addEventListener('change',function(e){
+  var sel=e.target;
+  if(sel&&sel.id&&sel.id.match(/-mg$|^fm$|^rt-mg$/)&&sel._origOpts){
+    var inp=document.querySelector('.mgs[data-for="'+sel.id+'"]');
+    if(inp){
+      var txt=sel.options[sel.selectedIndex]?.text||'';
+      inp.value=txt&&sel.value?txt:'';
+    }
+  }
+},true);
+/* ── Ensure all filter onchange fires reliably on all browsers ── */
+(function(){
+  document.addEventListener('change',function(e){
+    var el=e.target;
+    if(el&&el.hasAttribute('onchange')){
+      var fn=el.getAttribute('onchange');
+      if(fn&&typeof window[fn.split('(')[0]]==='function'){
+        try{new Function(fn)();}catch(ex){/*silent*/}
+      }
+    }
+  },true);
+  document.addEventListener('input',function(e){
+    var el=e.target;
+    if(el&&(el.type==='date'||el.type==='month')&&el.hasAttribute('onchange')){
+      var fn=el.getAttribute('onchange');
+      if(fn&&typeof window[fn.split('(')[0]]==='function'){
+        try{new Function(fn)();}catch(ex){/*silent*/}
+      }
+    }
+  },true);
+})();
 </script>
 </body>
 </html>
